@@ -11,13 +11,17 @@ For our use case, the conversion is about 4x faster with go, cutting
 time from about 10min to about 2min.
 
 
-Build - you'll [need a Go installation](http://golang.org/doc/install):
+Build
+-----
+
+You'll [need a Go installation](http://golang.org/doc/install):
 
     $ git clone git@github.com:miku/lok2tsv.git
     $ cd lok2tsv
     $ make
 
-Usage:
+Usage
+-----
 
     $ ./lok2tsv /tmp/data-lok.mrc
     ...
@@ -29,7 +33,10 @@ Usage:
     ...
 
 
-Benchmarks on a single 1.3G file with 5457095 records:
+Benchmarks
+----------
+
+On a single 1.3G file with 5457095 records:
 
     $ wc -c < test.mrc
     1384415730
@@ -50,7 +57,11 @@ Benchmarks on a single 1.3G file with 5457095 records:
 So about 37896 records/s.
 
 
-P.S. A hacky way to get a similar output would be:
+
+P.S.
+----
+
+A hacky way to get a similar output would be:
 
     $ time yaz-marcdump test.mrc | egrep "(^001 |^004 |^005 |^852.*DE-*)" | \
         sed -e 's/852    $a //' | \
