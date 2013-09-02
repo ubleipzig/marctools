@@ -6,6 +6,11 @@ import "io"
 import "os"
 
 func main() {
+    if len(os.Args) != 2 {
+        fmt.Printf("Usage: lok2tsv MARCFILE\n")
+        os.Exit(1)
+    }
+
     fi, err := os.Open(os.Args[1])
     if err != nil { panic(err) }
     defer func() {
@@ -26,21 +31,21 @@ func main() {
         if len(fields) == 1 {
             epn = fields[0].(*marc21.ControlField).Data
         } else {
-            panic("No 001 found.")
+            panic("No 001 found. Are you sure this is local data?")
         }
 
         fields = record.GetFields("004")
         if len(fields) == 1 {
             ppn = fields[0].(*marc21.ControlField).Data
         } else {
-            panic("No 004 found.")   
+            panic("No 004 found. Are you sure this is local data?")
         }
 
         fields = record.GetFields("005")
         if len(fields) == 1 {
             date = fields[0].(*marc21.ControlField).Data
         } else {
-            panic("No 005 found.")
+            panic("No 005 found. Are you sure this is local data?")
         }
 
         var subfields = record.GetSubFields("852", 'a')
