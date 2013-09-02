@@ -1,11 +1,23 @@
 package main
 
-import "./marc21" // https://gitorious.org/marc21-go/marc21
+// https://gitorious.org/marc21-go/marc21
+import "./marc21"
+import "flag"
 import "fmt"
 import "io"
 import "os"
 
+const AppVersion = "1.0.0"
+
 func main() {
+
+    version := flag.Bool("v", false, "prints current roxy version")
+    flag.Parse()
+    if *version {
+        fmt.Println(AppVersion)
+        os.Exit(0)
+    }
+
     if len(os.Args) != 2 {
         fmt.Printf("Usage: lok2tsv MARCFILE\n")
         os.Exit(1)
