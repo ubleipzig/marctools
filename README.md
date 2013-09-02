@@ -7,6 +7,9 @@ Convert MARC21 [*lok* data](https://wiki.bsz-bw.de/doku.php?id=v-team:daten:date
 So why not try Go? It should be faster than python and [easier](https://gitorious.org/marc21-go/marc21) to implement then [C](http://www.indexdata.com/yaz/doc/marc.html).
 Note: There are yet other ways, like splitting the large MARC file into pieces and then apply the XSL transformation.
 
+For our use case, the conversion is about 4x faster with go, cutting
+time from about 10min to about 2min.
+
 
 Build - you'll [need a Go installation](http://golang.org/doc/install):
 
