@@ -2,10 +2,10 @@ lok2tsv
 =======
 
 Convert MARC21 [*lok* data](https://wiki.bsz-bw.de/doku.php?id=v-team:daten:datendienste:marc21) into a tabular format, using *001*, *004*,
-*005*, *852.a* fields. Why? In a use case, we had a large MARC which we wanted to convert to a tabular form. Using `yaz-marcdump` and `grep` and
-`awk` would work, too, but it's dependent on the printed output of `yaz-marcdump`. Using an XSLT stylesheet on turbomarc gets `xsltproc` killed.
-So why not try Go? It should be faster than python and easier to implement then C++. Note: There are yet other ways, like splitting
-the large MARC file into pieces and then apply the XSL transformation.
+*005*, *852.a* fields. Why? In a use case, we had a large MARC file which we wanted to convert to a tabular form. Using `yaz-marcdump` and `grep` or
+`awk` would work, too, but it's a bit dependent on the printed output of `yaz-marcdump`. Using an XSLT stylesheet on turbomarc gets `xsltproc` killed (out of memory).
+So why not try Go? It should be faster than python and easier to implement then [C](http://www.indexdata.com/yaz/doc/marc.html).
+Note: There are yet other ways, like splitting the large MARC file into pieces and then apply the XSL transformation.
 
 
 Build - you'll [need a Go installation](http://golang.org/doc/install):
@@ -18,11 +18,11 @@ Usage:
 
     $ ./lok2tsv /tmp/data-lok.mrc
     ...
-    014929481   481126031   20040219000000  DE-15-292
-    014929481   531827348   20090924120312  DE-15
-    014929481   481126880   19971112000000  DE-Ch1
-    014929481   481126996   20061219132653  DE-105
-    014929481   481127062   19980210000000  DE-Zwi2
+    014929481   481126031   DE-15-292   20040219000000  
+    014929481   531827348   DE-15       20090924120312  
+    014929481   481126880   DE-Ch1      19971112000000  
+    014929481   481126996   DE-105      20061219132653  
+    014929481   481127062   DE-Zwi2     19980210000000  
     ...
 
 
