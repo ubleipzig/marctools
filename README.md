@@ -4,7 +4,7 @@ lok2tsv
 Convert MARC21 [*lok* data](https://wiki.bsz-bw.de/doku.php?id=v-team:daten:datendienste:marc21) into a tabular format, using *001*, *004*,
 *005*, *852.a* fields. Why? In a use case, we had a large MARC file which we wanted to convert to a tabular form. Using `yaz-marcdump` and `grep` or
 `awk` would work, too, but it's a bit dependent on the printed output of `yaz-marcdump`. Using an XSLT stylesheet on turbomarc gets `xsltproc` killed (out of memory).
-So why not try Go? It should be faster than python and easier to implement then [C](http://www.indexdata.com/yaz/doc/marc.html).
+So why not try Go? It should be faster than python and [easier](https://gitorious.org/marc21-go/marc21) to implement then [C](http://www.indexdata.com/yaz/doc/marc.html).
 Note: There are yet other ways, like splitting the large MARC file into pieces and then apply the XSL transformation.
 
 
