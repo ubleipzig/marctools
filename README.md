@@ -4,7 +4,7 @@ lok2tsv
 Convert MARC21 *lok* (local) data into a tabular format, using *001*, *004*, 
 *005*, *852.a* fields.
 
-Build ([Go needs to be installed](http://golang.org/doc/install)):
+Build - you'll [need a Go installation](http://golang.org/doc/install):
 
     $ git clone git@github.com:miku/lok2tsv.git
     $ cd lok2tsv
