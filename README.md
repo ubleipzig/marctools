@@ -1,4 +1,16 @@
 lok2tsv
 =======
 
-Convert MARC21 "lok" data into a tabular format.
+Convert MARC21 *lok* (local) data into a tabular format, using *001*, *004*, 
+*005*, *852.a* fields.
+
+Usage:
+
+    $ lok2tsv /tmp/data-lok.mrc
+    ...
+    014929481   481126031   20040219000000  DE-15-292
+    014929481   531827348   20090924120312  DE-15
+    014929481   481126880   19971112000000  DE-Ch1
+    014929481   481126996   20061219132653  DE-105
+    014929481   481127062   19980210000000  DE-Zwi2
+    ...
