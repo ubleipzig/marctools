@@ -12,7 +12,7 @@ Build - you'll [need a Go installation](http://golang.org/doc/install):
 
 Usage:
 
-    $ lok2tsv /tmp/data-lok.mrc
+    $ ./lok2tsv /tmp/data-lok.mrc
     ...
     014929481   481126031   20040219000000  DE-15-292
     014929481   531827348   20090924120312  DE-15
