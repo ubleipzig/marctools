@@ -1,8 +1,12 @@
 lok2tsv
 =======
 
-Convert MARC21 *lok* (local) data into a tabular format, using *001*, *004*, 
-*005*, *852.a* fields.
+Convert MARC21 [*lok* data](https://wiki.bsz-bw.de/doku.php?id=v-team:daten:datendienste:marc21) into a tabular format, using *001*, *004*,
+*005*, *852.a* fields. Why? In a use case, we had a large MARC which we wanted to convert to a tabular form. Using `yaz-marcdump` and `grep` and
+`awk` would work, too, but it's dependent on the printed output of `yaz-marcdump`. Using an XSLT stylesheet on turbomarc gets `xsltproc` killed.
+So why not try Go? It should be faster than python and easier to implement then C++. Note: There are yet other ways, like splitting
+the large MARC file into pieces and then apply the XSL transformation.
+
 
 Build - you'll [need a Go installation](http://golang.org/doc/install):
 
