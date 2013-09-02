@@ -14,3 +14,24 @@ Usage:
     014929481   481126996   20061219132653  DE-105
     014929481   481127062   19980210000000  DE-Zwi2
     ...
+
+
+Benchmarks on a single 1.3G file with 5457095 records:
+
+    $ wc -c < test.mrc
+    1384415730
+
+    $ time yaz-marcdump -np test.mrc | tail -1
+    <!-- Record 5457095 offset 1384415509 (0x52848115) -->
+
+    real    0m12.723s
+    user    0m12.512s
+    sys     0m0.552s
+
+    $ time ./lok2tsv test.mrc > test.tsv
+
+    real    2m24.412s
+    user    1m31.512s
+    sys     0m48.984s
+
+So about 37896 records/s.
