@@ -63,7 +63,7 @@ func main() {
             continue
         }
 
-        fmt.Printf("%s\t%s\t%s\t%s\n", ppn, epn, date, sigel)
+        fmt.Printf("%s\t%s\t%s\t%s\n", ppn, epn, sigel, date)
 
     }
     return
