@@ -45,3 +45,16 @@ Benchmarks on a single 1.3G file with 5457095 records:
     sys     0m48.984s
 
 So about 37896 records/s.
+
+
+P.S. A hacky way to get a similar output would be:
+
+    $ time yaz-marcdump test.mrc | egrep "(^001 |^004 |^005 |^852.*DE-*)" | \
+        sed -e 's/852    $a //' | \
+        sed -e 's/^001 //' | \
+        sed -e 's/^004 //' | \
+        sed -e 's/^005 //' | \
+        paste - - - -
+
+But that would not handle missing (or multiple values). On the upside, this
+takes just 27s (about 202114 records/s).
