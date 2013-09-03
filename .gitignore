@@ -24,5 +24,5 @@ _testmain.go
 lok2tsv
 marc2tsv
 marcdump
-test.mrc
-test.tsv
+test-*.mrc
+test-*.tsv
