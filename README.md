@@ -1,5 +1,73 @@
+gomarckit
+=========
+
+Included: `marcdump`, `marc2tsv`, `lok2tsv`
+
+Build
+-----
+
+You'll [need a Go installation](http://golang.org/doc/install):
+
+    $ git clone git@github.com:miku/gomarckit.git
+    $ cd gomarckit
+    $ make
+
+
+marcdump
+--------
+
+Just like `yaz-marcdump`. The Go version takes about 4-5x longer than the C one.
+
+
+
+marc2tsv
+--------
+
+Convert MARC21 to tsv.
+
+Examples:
+
+    $ ./marc2tsv test.mrc 001
+    ...
+    111859182
+    111862493
+    111874173
+    111879078
+    ...
+
+Empty tag values get a default fill value `<NULL>`:
+
+    $ ./marc2tsv test.mrc 001 004 005 852.a
+    ...
+    121187764   01635253X   20040324000000  DE-105
+    38541028X   087701561   20010420000000  DE-540
+    385410298   087701561   20120910090128  <NULL>
+    385411057   087701723   20120910090145  DE-540
+    ...
+
+Use a custom `fillna` tag:
+
+    $ ./marc2tsv test.mrc -f UNDEF 001 004 005 852.a
+    ...
+    385410271   087701553   20101125121554  DE-15
+    38541028X   087701561   20010420000000  DE-540
+    385410298   087701561   20120910090128  UNDEF
+    385411057   087701723   20120910090145  DE-540
+    ...
+
+Or skip non-complete row entirely:
+
+    $ ./marc2tsv test.mrc -k 001 004 005 852.a
+    ...
+    121187764   01635253X   20040324000000  DE-105
+    121187772   01635253X   20040324000000  DE-105
+    38541028X   087701561   20010420000000  DE-540
+    385411057   087701723   20120910090145  DE-540
+    ...
+
+
 lok2tsv
-=======
+-------
 
 Convert MARC21 [*lok* data](https://wiki.bsz-bw.de/doku.php?id=v-team:daten:datendienste:marc21) into a tabular format, using *001*, *004*,
 *005*, *852.a* fields. Why? In a use case, we had a large MARC file which we wanted to convert to a tabular form. Using `yaz-marcdump` and `grep` or
@@ -10,18 +78,6 @@ Note: There are yet other ways, like splitting the large MARC file into pieces a
 For our use case, the conversion is about 4x faster with go, cutting
 time from about 10min to about 2min.
 
-
-Build
------
-
-You'll [need a Go installation](http://golang.org/doc/install):
-
-    $ git clone git@github.com:miku/lok2tsv.git
-    $ cd lok2tsv
-    $ make
-
-Usage
------
 
     $ ./lok2tsv /tmp/data-lok.mrc
     ...
@@ -34,7 +90,7 @@ Usage
 
 
 Benchmarks
-----------
+..........
 
 On a single 1.3G file with 5457095 records:
 
@@ -58,10 +114,7 @@ So about 37896 records/s.
 
 
 
-P.S.
-----
-
-A hacky way to get a similar output would be:
+**P.S.** A hacky way to get a similar output would be:
 
     $ time yaz-marcdump test.mrc | egrep "(^001 |^004 |^005 |^852.*DE-*)" | \
         sed -e 's/852    $a //' | \
