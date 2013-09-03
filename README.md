@@ -37,7 +37,9 @@ Just like `yaz-marcdump`. The Go version takes about 4-5x longer than the C one.
 marc2tsv
 --------
 
-Convert MARC21 to tsv.
+Convert MARC21 to tsv. If a given tag or subfield has multiple values, just
+the first one is considered. Only useful for control fields or non-repeatable fields
+with a single subfield.
 
 Examples:
 
