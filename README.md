@@ -16,7 +16,7 @@ You'll [need a Go installation](http://golang.org/doc/install):
 marcdump
 --------
 
-Just like `yaz-marcdump`. The Go version takes about 4-5x longer than the C one.
+Just like `yaz-marcdump`. The Go version is about 4-5x slower than the [C version](http://git.indexdata.com/?p=yaz.git;a=blob;f=util/marcdump.c;h=f92204e386431f044f06dddd8baa1c9db08d69c9;hb=HEAD).
 
 
     $ ./marcdump test.mrc
