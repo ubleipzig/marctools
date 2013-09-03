@@ -22,5 +22,7 @@ _testmain.go
 *.exe
 
 lok2tsv
+marc2tsv
+marcdump
 test.mrc
 test.tsv
