@@ -19,6 +19,20 @@ marcdump
 Just like `yaz-marcdump`. The Go version takes about 4-5x longer than the C one.
 
 
+    $ ./marcdump test.mrc
+    ...
+    001 003915646
+    003 DE-576
+    004 000577812
+    005 19951013000000
+    008 940607||||||||||||||||ger|||||||
+    689 [  ] [(A) g], [(0) 235869880], [(a) Französisch], [(x) 00]
+    689 [  ] [(A) s], [(0) 235840734], [(a) Syntax], [(x) 01]
+    852 [  ] [(a) DE-Ch1]
+    852 [ 1] [(c) ID 5150 boe], [(9) 00]
+    936 [ln] [(0) 221790136], [(a) ID 5150]
+    ...
+
 
 marc2tsv
 --------
