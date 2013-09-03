@@ -1,7 +1,7 @@
 gomarckit
 =========
 
-Included: `marcdump`, `marc2tsv`, `lok2tsv`. Based on [marc21](https://gitorious.org/marc21-go/marc21).
+Included: `marcdump`, `marc2tsv`, `lok2tsv`. Based on [marc21](https://gitorious.org/marc21-go/marc21) by [Dan Scott](https://gitorious.org/~dbs).
 
 Build
 -----
@@ -140,3 +140,8 @@ So about 37896 records/s.
 
 But that would not handle missing (or multiple values). On the upside, this
 takes just 27s (about 202114 records/s).
+
+License
+-------
+
+GPLv3.
