@@ -14,9 +14,10 @@ const version = "1.0.0"
 
 func main() {
 
-    version := flag.Bool("v", false, "prints current program version")
     fillna := flag.String("f", "<NULL>", "fill missing values with this")
+    ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
     skip := flag.Bool("k", false, "skip lines with missing values")
+    version := flag.Bool("v", false, "prints current program version")
 
     var PrintUsage = func() {
         fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE TAG [TAG, ...]\n", os.Args[0])
@@ -63,14 +64,19 @@ func main() {
             break
         }
         if err != nil {
-            panic(err)
+            if *ignore {
+                fmt.Fprintf(os.Stderr, "Skipping, since -i was set. Error: %s\n", err)
+                continue
+            } else {
+                panic(err)
+            }
         }
 
         var line []string
         skipline := false
 
         for _, tag := range tags {
-            if recf.MatchString(tag) == true {
+            if recf.MatchString(tag) {
                 fields := record.GetFields(tag)
                 if len(fields) > 0 {
                     line = append(line, fields[0].(*marc21.ControlField).Data)
@@ -83,7 +89,7 @@ func main() {
                 }
             }
 
-            if resf.MatchString(tag) == true {
+            if resf.MatchString(tag) {
                 parts := strings.Split(tag, ".")
                 subfields := record.GetSubFields(parts[0], []byte(parts[1])[0])
                 if len(subfields) > 0 {
