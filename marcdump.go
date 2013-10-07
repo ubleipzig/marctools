@@ -7,7 +7,7 @@ import "fmt"
 import "io"
 import "os"
 
-const version = "1.0.0"
+const app_version = "1.0.0"
 
 func main() {
 
@@ -21,7 +21,7 @@ func main() {
     flag.Parse()
 
     if *version {
-        fmt.Println(version)
+        fmt.Println(app_version)
         os.Exit(0)
     }
 
