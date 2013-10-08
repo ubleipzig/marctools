@@ -81,6 +81,32 @@ Or skip non-complete row entirely:
     385411057   087701723   20120910090145  DE-540
     ...
 
+Access leader with special tags:
+
+    $ ./marc2tsv test.mrc -k 001 @Status
+    9780415681889   c
+    9780415839792   n
+    9780415773874   c
+
+    $ ./marc2tsv test.mrc 001 @Length @Status 300.a
+    9781420069235   5000    c   712 p. :
+    9780415458931   6769    c   424 p. :
+    9781841846804   3983    c   444 p. :
+
+
+Available special tags to access the leader:
+
+* @Length
+* @Status
+* @Type
+* @ImplementationDefined
+* @CharacterEncoding
+* @BaseAddress
+* @IndicatorCount
+* @SubfieldCodeLength
+* @LengthOfLength
+* @LengthOfStartPos
+
 
 lok2tsv
 -------

@@ -47,10 +47,13 @@ func main() {
         }
     }()
 
+    // regex subfield
     resf, err := regexp.Compile(`^([\d]{3})\.([a-z0-9])$`)
     if err != nil {
         panic("invalid regex")
     }
+
+    // regex controlfield
     recf, err := regexp.Compile(`^[\d]{3}$`)
     if err != nil {
         panic("invalid regex")
@@ -102,7 +105,35 @@ func main() {
                     line = append(line, *fillna) // or any fill value  
                 }
             }
+
+            if strings.HasPrefix(tag, "@") {
+                leader := record.Leader
+                switch tag {
+                case "@Length":
+                    line = append(line, fmt.Sprintf("%d", leader.Length))
+                case "@Status":
+                    line = append(line, string(leader.Status))
+                case "@Type":
+                    line = append(line, string(leader.Type))
+                case "@ImplementationDefined":
+                    line = append(line, string(leader.ImplementationDefined[:5]))
+                case "@CharacterEncoding":
+                    line = append(line, string(leader.CharacterEncoding))
+                case "@BaseAddress":
+                    line = append(line, fmt.Sprintf("%d", leader.BaseAddress))
+                case "@IndicatorCount":
+                    line = append(line, fmt.Sprintf("%d", leader.IndicatorCount))
+                case "@SubfieldCodeLength":
+                    line = append(line, fmt.Sprintf("%d", leader.SubfieldCodeLength))
+                case "@LengthOfLength":
+                    line = append(line, fmt.Sprintf("%d", leader.LengthOfLength))
+                case "@LengthOfStartPos":
+                    line = append(line, fmt.Sprintf("%d", leader.LengthOfStartPos))
+                default:
+                    panic(fmt.Sprintf("tag not recognized: %s (see: https://github.com/miku/gomarckit)", tag))
+            }
         }
+
         if skipline {
             continue
         } else {
