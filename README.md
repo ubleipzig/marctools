@@ -37,6 +37,14 @@ Just like `yaz-marcdump`. The Go version is about 4-5x slower than the [C versio
 marc2tsv
 --------
 
+    $ marc2tsv -h
+    Usage of ./marc2tsv:
+      -f="<NULL>": fill missing values with this
+      -i=false: ignore marc errors (not recommended)
+      -k=false: skip lines with missing values
+      -v=false: prints current program version
+
+
 Convert MARC21 to tsv. If a given tag or subfield has multiple values, just
 the first one is considered. Only useful for control fields or non-repeatable fields
 with a single subfield.
@@ -92,6 +100,7 @@ Access leader with special tags:
     9781420069235   5000    c   712 p. :
     9780415458931   6769    c   424 p. :
     9781841846804   3983    c   444 p. :
+    ...
 
 
 Available special tags to access the leader:
@@ -106,6 +115,17 @@ Available special tags to access the leader:
 * @SubfieldCodeLength
 * @LengthOfLength
 * @LengthOfStartPos
+
+
+Literals can be passed along (as long as they do not look like tags):
+
+
+    $ ./marc2tsv test.mrc 001 @Status Hello "x y z"
+    9781420086454   n   Hello   x y z
+    9781420086478   n   Hello   x y z
+    9781420094237   c   Hello   x y z
+    9780849397776   c   Hello   x y z
+    ...
 
 
 lok2tsv
