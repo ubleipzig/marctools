@@ -79,6 +79,7 @@ func main() {
         skipline := false
 
         for _, tag := range tags {
+
             if recf.MatchString(tag) {
                 fields := record.GetFields(tag)
                 if len(fields) > 0 {
@@ -90,9 +91,7 @@ func main() {
                     }
                     line = append(line, *fillna) // or any fill value
                 }
-            }
-
-            if resf.MatchString(tag) {
+            } else if resf.MatchString(tag) {
                 parts := strings.Split(tag, ".")
                 subfields := record.GetSubFields(parts[0], []byte(parts[1])[0])
                 if len(subfields) > 0 {
@@ -104,9 +103,7 @@ func main() {
                     }
                     line = append(line, *fillna) // or any fill value  
                 }
-            }
-
-            if strings.HasPrefix(tag, "@") {
+            } else if strings.HasPrefix(tag, "@") {
                 leader := record.Leader
                 switch tag {
                 case "@Length":
@@ -131,6 +128,9 @@ func main() {
                     line = append(line, fmt.Sprintf("%d", leader.LengthOfStartPos))
                 default:
                     panic(fmt.Sprintf("tag not recognized: %s (see: https://github.com/miku/gomarckit)", tag))
+                }
+            } else {
+                line = append(line, strings.TrimSpace(tag))
             }
         }
 
@@ -140,6 +140,7 @@ func main() {
             fmt.Printf("%s\n", strings.Join(line, "\t"))
             line = line[:0]
         }
+
     }
     return
 }
