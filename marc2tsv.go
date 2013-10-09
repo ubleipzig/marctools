@@ -129,7 +129,7 @@ func main() {
                 default:
                     panic(fmt.Sprintf("tag not recognized: %s (see: https://github.com/miku/gomarckit)", tag))
                 }
-            } else {
+            } else if !strings.HasPrefix(tag, "-") {
                 line = append(line, strings.TrimSpace(tag))
             }
         }
