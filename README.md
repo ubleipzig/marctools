@@ -1,7 +1,9 @@
 gomarckit
 =========
 
-Included: `marcdump`, `marc2tsv`, `lok2tsv`. Based on [marc21](https://gitorious.org/marc21-go/marc21) by [Dan Scott](https://gitorious.org/~dbs).
+Included: [`marcdump`](https://github.com/miku/gomarckit#marcdump), 
+[`marc2tsv`](https://github.com/miku/gomarckit#marc2tsv), 
+[`lok2tsv`](https://github.com/miku/gomarckit#lok2tsv). Based on [marc21](https://gitorious.org/marc21-go/marc21) by [Dan Scott](https://gitorious.org/~dbs).
 
 Build
 -----
