@@ -24,5 +24,6 @@ _testmain.go
 loktotsv
 marctotsv
 marcdump
+marctojson
 test-*.mrc
 test-*.tsv
