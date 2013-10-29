@@ -2,8 +2,8 @@ gomarckit
 =========
 
 Included: [`marcdump`](https://github.com/miku/gomarckit#marcdump), 
-[`marc2tsv`](https://github.com/miku/gomarckit#marc2tsv), 
-[`lok2tsv`](https://github.com/miku/gomarckit#lok2tsv). Based on [marc21](https://gitorious.org/marc21-go/marc21) by [Dan Scott](https://gitorious.org/~dbs).
+[`marctotsv`](https://github.com/miku/gomarckit#marctotsv), 
+[`loktotsv`](https://github.com/miku/gomarckit#loktotsv). Based on [marc21](https://gitorious.org/marc21-go/marc21) by [Dan Scott](https://gitorious.org/~dbs).
 
 Build
 -----
@@ -36,11 +36,11 @@ Just like `yaz-marcdump`. The Go version is about 4-5x slower than the [C versio
     ...
 
 
-marc2tsv
+marctotsv
 --------
 
-    $ marc2tsv -h
-    Usage of ./marc2tsv:
+    $ marctotsv -h
+    Usage of ./marctotsv:
       -f="<NULL>": fill missing values with this
       -i=false: ignore marc errors (not recommended)
       -k=false: skip lines with missing values
@@ -53,7 +53,7 @@ with a single subfield.
 
 Examples:
 
-    $ ./marc2tsv test.mrc 001
+    $ ./marctotsv test.mrc 001
     ...
     111859182
     111862493
@@ -63,7 +63,7 @@ Examples:
 
 Empty tag values get a default fill value `<NULL>`:
 
-    $ ./marc2tsv test.mrc 001 004 005 852.a
+    $ ./marctotsv test.mrc 001 004 005 852.a
     ...
     121187764   01635253X   20040324000000  DE-105
     38541028X   087701561   20010420000000  DE-540
@@ -73,7 +73,7 @@ Empty tag values get a default fill value `<NULL>`:
 
 Use a custom `fillna` tag:
 
-    $ ./marc2tsv test.mrc -f UNDEF 001 004 005 852.a
+    $ ./marctotsv test.mrc -f UNDEF 001 004 005 852.a
     ...
     385410271   087701553   20101125121554  DE-15
     38541028X   087701561   20010420000000  DE-540
@@ -83,7 +83,7 @@ Use a custom `fillna` tag:
 
 Or skip non-complete row entirely:
 
-    $ ./marc2tsv test.mrc -k 001 004 005 852.a
+    $ ./marctotsv test.mrc -k 001 004 005 852.a
     ...
     121187764   01635253X   20040324000000  DE-105
     121187772   01635253X   20040324000000  DE-105
@@ -93,12 +93,12 @@ Or skip non-complete row entirely:
 
 Access leader with special tags:
 
-    $ ./marc2tsv test.mrc -k 001 @Status
+    $ ./marctotsv test.mrc -k 001 @Status
     9780415681889   c
     9780415839792   n
     9780415773874   c
 
-    $ ./marc2tsv test.mrc 001 @Length @Status 300.a
+    $ ./marctotsv test.mrc 001 @Length @Status 300.a
     9781420069235   5000    c   712 p. :
     9780415458931   6769    c   424 p. :
     9781841846804   3983    c   444 p. :
@@ -122,7 +122,7 @@ Available special tags to access the leader:
 Literals can be passed along (as long as they do not look like tags):
 
 
-    $ ./marc2tsv test.mrc 001 @Status Hello "x y z"
+    $ ./marctotsv test.mrc 001 @Status Hello "x y z"
     9781420086454   n   Hello   x y z
     9781420086478   n   Hello   x y z
     9781420094237   c   Hello   x y z
@@ -130,7 +130,7 @@ Literals can be passed along (as long as they do not look like tags):
     ...
 
 
-lok2tsv
+loktotsv
 -------
 
 Convert MARC21 [*lok* data](https://wiki.bsz-bw.de/doku.php?id=v-team:daten:datendienste:marc21) into a tabular format, using *001*, *004*,
@@ -142,7 +142,7 @@ Note: There are yet other ways, like splitting the large MARC file into pieces a
 For our use case, the conversion with Go is about 4x faster than our current pure Python version.
 
 
-    $ ./lok2tsv /tmp/data-lok.mrc
+    $ ./loktotsv /tmp/data-lok.mrc
     ...
     014929481   481126031   DE-15-292   20040219000000
     014929481   531827348   DE-15       20090924120312
@@ -167,7 +167,7 @@ On a single 1.3G file with 5457095 records:
     user    0m12.512s
     sys     0m0.552s
 
-    $ time ./lok2tsv test.mrc > test.tsv
+    $ time ./loktotsv test.mrc > test.tsv
 
     real    2m24.412s
     user    1m31.512s
