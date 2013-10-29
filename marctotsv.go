@@ -101,7 +101,7 @@ func main() {
                         skipline = true
                         break
                     }
-                    line = append(line, *fillna) // or any fill value  
+                    line = append(line, *fillna) // or any fill value
                 }
             } else if strings.HasPrefix(tag, "@") {
                 leader := record.Leader

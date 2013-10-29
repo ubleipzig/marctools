@@ -21,8 +21,8 @@ _testmain.go
 
 *.exe
 
-lok2tsv
-marc2tsv
+loktotsv
+marctotsv
 marcdump
 test-*.mrc
 test-*.tsv
