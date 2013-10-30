@@ -14,8 +14,10 @@ const app_version = "1.0.0"
 
 func stringToMap(s string) map[string]string {
     result := make(map[string]string)
+    if len(s) == 0 {
+        return result
+    }
     for _, pair := range strings.Split(s, ",") {
-        fmt.Println(pair)
         kv := strings.Split(pair, "=")
         if len(kv) != 2 {
             panic(fmt.Sprintf("Could not parse key-value parameter: %s", s))
@@ -31,7 +33,8 @@ func main() {
     ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
     version := flag.Bool("v", false, "prints current program version")
 
-    var meta *string = flag.String("m", "", "a key=value pair to pass to meta")
+    metaVar := flag.String("m", "", "a key=value pair to pass to meta")
+    filterVar := flag.String("r", "", "only dump the given tags (comma separated list)")
 
     var PrintUsage = func() {
         fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -61,7 +64,14 @@ func main() {
         }
     }()
 
-    metamap := stringToMap(*meta)
+    metamap := stringToMap(*metaVar)
+    filterMap := make(map[string]bool)
+    if len(*filterVar) > 0 {
+        tags := strings.Split(*filterVar, ",")
+        for _, value := range tags {
+            filterMap[value] = true
+        }
+    }
 
     for {
         record, err := marc21.ReadRecord(fi)
@@ -77,50 +87,56 @@ func main() {
             }
         }
 
-        mainmap := make(map[string]interface{})
+        mainMap := make(map[string]interface{})
 
-        marcmap := make(map[string]interface{})
-        leadermap := make(map[string]string)
+        marcMap := make(map[string]interface{})
+        leaderMap := make(map[string]string)
 
         leader := record.Leader
-        leadermap["status"] = string(leader.Status)
-        leadermap["cs"] = string(leader.CharacterEncoding)
-        leadermap["length"] = fmt.Sprintf("%d", leader.Length)
-        leadermap["type"] = string(leader.Type)
-        leadermap["impldef"] = string(leader.ImplementationDefined[:5])
-        leadermap["ic"] = fmt.Sprintf("%d", leader.IndicatorCount)
-        leadermap["lol"] = fmt.Sprintf("%d", leader.LengthOfLength)
-        leadermap["losp"] = fmt.Sprintf("%d", leader.LengthOfStartPos)
-        leadermap["sfcl"] = fmt.Sprintf("%d", leader.SubfieldCodeLength)
-        leadermap["ba"] = fmt.Sprintf("%d", leader.BaseAddress)
-        leadermap["raw"] = string(leader.Bytes())
+        leaderMap["status"] = string(leader.Status)
+        leaderMap["cs"] = string(leader.CharacterEncoding)
+        leaderMap["length"] = fmt.Sprintf("%d", leader.Length)
+        leaderMap["type"] = string(leader.Type)
+        leaderMap["impldef"] = string(leader.ImplementationDefined[:5])
+        leaderMap["ic"] = fmt.Sprintf("%d", leader.IndicatorCount)
+        leaderMap["lol"] = fmt.Sprintf("%d", leader.LengthOfLength)
+        leaderMap["losp"] = fmt.Sprintf("%d", leader.LengthOfStartPos)
+        leaderMap["sfcl"] = fmt.Sprintf("%d", leader.SubfieldCodeLength)
+        leaderMap["ba"] = fmt.Sprintf("%d", leader.BaseAddress)
+        leaderMap["raw"] = string(leader.Bytes())
 
-        marcmap["leader"] = leadermap
+        marcMap["leader"] = leaderMap
 
         for _, field := range record.Fields {
             tag := field.GetTag()
+            if len(filterMap) > 0 {
+                _, present := filterMap[tag]
+                if !present {
+                    continue
+                }
+            }
             if strings.HasPrefix(tag, "00") {
-                marcmap[tag] = field.(*marc21.ControlField).Data
+                marcMap[tag] = field.(*marc21.ControlField).Data
             } else {
                 datafield := field.(*marc21.DataField)
-                subfieldmap := make(map[string]string)
+                subfieldMap := make(map[string]string)
                 for _, subfield := range datafield.SubFields {
-                    subfieldmap[fmt.Sprintf("%c", subfield.Code)] = subfield.Value
+                    subfieldMap[fmt.Sprintf("%c", subfield.Code)] = subfield.Value
                 }
-                _, present := marcmap[tag]
+                _, present := marcMap[tag]
                 if !present {
                     subfields := make([]interface{}, 0)
-                    marcmap[tag] = subfields
+                    marcMap[tag] = subfields
                 }
-                marcmap[tag] = append(marcmap[tag].([]interface{}), subfieldmap)
+                marcMap[tag] = append(marcMap[tag].([]interface{}), subfieldMap)
             }
         }
 
-        mainmap["content"] = marcmap
-        mainmap["meta"] = metamap
-        mainmap["content_type"] = "application/marc"
+        mainMap["content"] = marcMap
+        mainMap["meta"] = metamap
+        mainMap["content_type"] = "application/marc"
 
-        b, err := json.Marshal(mainmap)
+        b, err := json.Marshal(mainMap)
         if err != nil {
             fmt.Println("error:", err)
         }
