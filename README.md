@@ -147,7 +147,8 @@ Performance data points:
   in Go, which amounts to about 17425 records per seconds.
 
 * A simple `yaz-marcdump -np` seems to iterate over the same 4007756 records
-  in about 30 seconds (133591 records per second).
+  in about 30 seconds (133591 records per second) and a `dev/nulled`
+  iteration about 65 seconds. So C is still three three times faster.
 
 Example usage:
 
