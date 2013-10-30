@@ -137,11 +137,17 @@ marctojson
 Similar output to [marctojson](https://github.com/miku/marctojson) (Java version).
 The Go version is a bit more lightweight and faster.
 
-Performance data point:
+Performance data points:
 
-* extracting 5 fields from 4007756 records from a 4.3G file takes about
+* Extracting 5 fields from 4007756 records from a 4.3G file takes about
   8 minutes, so about 8349 records per second. That's about four times
   faster than the Java version.
+
+* As comparison, the baseline iteration, which only creates the MARC data structures takes about 4 minutes
+  in Go, which amounts to about 17425 records per seconds.
+
+* A simple `yaz-marcdump -np` seems to iterate over the same 4007756 records
+  in about 30 seconds (133591 records per second).
 
 Example usage:
 
