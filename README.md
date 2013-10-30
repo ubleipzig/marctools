@@ -2,7 +2,8 @@ gomarckit
 =========
 
 Included: [`marcdump`](https://github.com/miku/gomarckit#marcdump), 
-[`marctotsv`](https://github.com/miku/gomarckit#marctotsv), 
+[`marctotsv`](https://github.com/miku/gomarckit#marctotsv),
+[`marctojson`](https://github.com/miku/gomarckit#marctojson),
 [`loktotsv`](https://github.com/miku/gomarckit#loktotsv). Based on [marc21](https://gitorious.org/marc21-go/marc21) by [Dan Scott](https://gitorious.org/~dbs).
 
 Build
@@ -128,6 +129,90 @@ Literals can be passed along (as long as they do not look like tags):
     9781420094237   c   Hello   x y z
     9780849397776   c   Hello   x y z
     ...
+
+
+marctojson
+----------
+
+Similar output to [marctojson](https://github.com/miku/marctojson) (Java version).
+The Go version is a bit more lightweight and faster.
+
+Performance data point:
+
+* extracting 5 fields from 4007756 records from a 4.3G file takes about
+  8 minutes, so about 8349 records per second. That's about four times
+  faster than the Java version.
+
+    $ ./marctojson -h
+    Usage of ./marctojson:
+      -i=false: ignore marc errors (not recommended)
+      -m="": a key=value pair to pass to meta
+      -r="": only dump the given tags (comma separated list)
+      -v=false: prints current program version
+
+Examples:
+
+    $ ./marctojson -r 001,260 test-tit.mrc|head -1|json_pp
+    {
+       "content_type" : "application/marc",
+       "content" : {
+          "leader" : {
+             "sfcl" : "2",
+             "ba" : "265",
+             "status" : "c",
+             "lol" : "4",
+             "impldef" : "m   a",
+             "length" : "1078",
+             "cs" : "a",
+             "type" : "a",
+             "losp" : "5",
+             "ic" : "2",
+             "raw" : "01078cam a2200265  a4500"
+          },
+          "260" : [
+             {
+                "c" : "18XX",
+                "a" : "Karlsruhe :",
+                "b" : "Groos,"
+             }
+          ],
+          "001" : "00002144X"
+       },
+       "meta" : {}
+    }
+
+
+    $ ./marctojson -r 001,005,260 -m date=`date +"%Y-%-m-%d"` test-tit.mrc|head -1|json_pp
+    {
+       "content_type" : "application/marc",
+       "content" : {
+          "leader" : {
+             "sfcl" : "2",
+             "ba" : "265",
+             "status" : "c",
+             "lol" : "4",
+             "impldef" : "m   a",
+             "length" : "1078",
+             "cs" : "a",
+             "type" : "a",
+             "losp" : "5",
+             "ic" : "2",
+             "raw" : "01078cam a2200265  a4500"
+          },
+          "260" : [
+             {
+                "c" : "18XX",
+                "a" : "Karlsruhe :",
+                "b" : "Groos,"
+             }
+          ],
+          "005" : "20120312115715.0",
+          "001" : "00002144X"
+       },
+       "meta" : {
+          "date" : "2013-10-30"
+       }
+    }
 
 
 loktotsv
