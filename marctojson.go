@@ -72,6 +72,7 @@ func main() {
             filterMap[value] = true
         }
     }
+    hasFilter := len(filterMap) > 0
 
     for {
         record, err := marc21.ReadRecord(fi)
@@ -109,7 +110,7 @@ func main() {
 
         for _, field := range record.Fields {
             tag := field.GetTag()
-            if len(filterMap) > 0 {
+            if hasFilter {
                 _, present := filterMap[tag]
                 if !present {
                     continue
