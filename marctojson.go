@@ -139,7 +139,7 @@ func main() {
 
         b, err := json.Marshal(mainMap)
         if err != nil {
-            fmt.Println("error:", err)
+            panic(fmt.Sprintf("error: %s", err))
         }
         os.Stdout.Write(b)
         fmt.Println()
