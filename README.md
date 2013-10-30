@@ -148,7 +148,7 @@ Performance data points:
 
 * A simple `yaz-marcdump -np` seems to iterate over the same 4007756 records
   in about 30 seconds (133591 records per second) and a `dev/nulled`
-  iteration about 65 seconds. So C is still three three times faster.
+  iteration about 65 seconds (61657 records per second). So C is still three three to four times faster.
 
 The upside of the Go version is, that it is quite short, it is about 126 LOC (+ 826 for entiry library),
 the Java version has around 600 (with a bit more functionality, but + 11061 for the library)
