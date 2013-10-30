@@ -150,6 +150,12 @@ Performance data points:
   in about 30 seconds (133591 records per second) and a `dev/nulled`
   iteration about 65 seconds. So C is still three three times faster.
 
+The upside of the Go version is, that it is quite short, it is about 126 LOC (+ 826 for entiry library),
+the Java version has around 600 (with a bit more functionality, but + 11061 for the library)
+and the [C version](https://github.com/nla/yaz/blob/dd8b34fa4d19c1bac5e2a8d4e3446c09f0a8cf69/src/marc_read_line.c)
+contains about 260 LOC (+ 41938 for the yaz source). (Note: I know this is a skewed
+comparison, it's only here for framing).
+
 Example usage:
 
     $ ./marctojson -h
