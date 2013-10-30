@@ -38,7 +38,7 @@ Just like `yaz-marcdump`. The Go version is about 4-5x slower than the [C versio
 
 
 marctotsv
---------
+---------
 
     $ marctotsv -h
     Usage of ./marctotsv:
@@ -143,14 +143,14 @@ Performance data point:
   8 minutes, so about 8349 records per second. That's about four times
   faster than the Java version.
 
-    $ ./marctojson -h
-    Usage of ./marctojson:
-      -i=false: ignore marc errors (not recommended)
-      -m="": a key=value pair to pass to meta
-      -r="": only dump the given tags (comma separated list)
-      -v=false: prints current program version
+Example usage:
 
-Examples:
+    $ ./marctojson -h
+        Usage of ./marctojson:
+          -i=false: ignore marc errors (not recommended)
+          -m="": a key=value pair to pass to meta
+          -r="": only dump the given tags (comma separated list)
+          -v=false: prints current program version
 
     $ ./marctojson -r 001,260 test-tit.mrc|head -1|json_pp
     {
@@ -216,7 +216,7 @@ Examples:
 
 
 loktotsv
--------
+--------
 
 Convert MARC21 [*lok* data](https://wiki.bsz-bw.de/doku.php?id=v-team:daten:datendienste:marc21) into a tabular format, using *001*, *004*,
 *005*, *852.a* fields. Why? In a use case, we had a large MARC file which we wanted to convert to a tabular form. Using `yaz-marcdump` and `grep` or
