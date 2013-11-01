@@ -111,7 +111,7 @@ class SplitMarc(luigi.Task):
     """
 
     filename = luigi.Parameter(default='test-tit.mrc')
-    prefix = luigi.Parameter(default="chunk")
+    prefix = luigi.Parameter(default="SplitMarc")
     size = luigi.IntParameter(default=1000000)
 
     @timed
