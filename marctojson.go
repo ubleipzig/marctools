@@ -2,12 +2,12 @@ package main
 
 import (
     "./marc21" // https://gitorious.org/marc21-go/marc21
+    "encoding/json"
     "flag"
     "fmt"
     "io"
     "os"
     "strings"
-    "encoding/json"
 )
 
 const app_version = "1.0.0"
