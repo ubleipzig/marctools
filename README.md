@@ -4,6 +4,9 @@ gomarckit
 Included: [`marcdump`](https://github.com/miku/gomarckit#marcdump), 
 [`marctotsv`](https://github.com/miku/gomarckit#marctotsv),
 [`marctojson`](https://github.com/miku/gomarckit#marctojson),
+[`marcsplit`](https://github.com/miku/gomarckit#marcsplit),
+[`marccount`](https://github.com/miku/gomarckit#marccount),
+[`marciter`](https://github.com/miku/gomarckit#marciter),
 [`loktotsv`](https://github.com/miku/gomarckit#loktotsv). Based on [marc21](https://gitorious.org/marc21-go/marc21) by [Dan Scott](https://gitorious.org/~dbs).
 
 Build
@@ -226,6 +229,25 @@ Example usage:
           "date" : "2013-10-30"
        }
     }
+
+
+marcsplit
+---------
+
+Just like `yaz-marcdump -s [PREFIX] -C [CHUNKSIZE] FILE`, but a bit faster.
+
+
+
+marccount
+---------
+
+Count the number of records in a file (fast).
+
+
+marciter
+--------
+
+For development and benchmarks only.
 
 
 loktotsv
