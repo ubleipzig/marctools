@@ -1,6 +1,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+"""
+$ time python marctojson.py MarcToJSONMerged --workers 4 --filename test-tit.mrc
+
+...
+
+real     7m44.436s
+user    11m31.780s
+sys      2m13.412s
+
+"""
+
 from __future__ import print_function
 import fnmatch
 import hashlib
@@ -10,6 +21,7 @@ import random
 import string
 import subprocess
 import tempfile
+import sys
 
 from timeit import default_timer
 from colorama import Fore, Back, Style
@@ -99,23 +111,26 @@ class SplitMarc(luigi.Task):
     """
 
     filename = luigi.Parameter(default='test-tit.mrc')
-    prefix = luigi.Parameter(default="test-tit-chunk.")
+    prefix = luigi.Parameter(default="chunk")
+    size = luigi.IntParameter(default=1000000)
 
     @timed
     def run(self):
+        digest = hashlib.sha1(self.filename).hexdigest()
+        realprefix = '%s-%s-%s' % (self.prefix, self.size, digest)
         cursor, i, offset, size, fileno = 0, 0, 0, 0, 0
+
         with open(self.filename) as handle:
             while True:
-                if i % 1000000 == 0:
+                if i % self.size == 0:
                     if i > 0:
-                        outfile = os.path.join(HOME, '%s%08d' % (self.prefix, fileno))
+                        outfile = os.path.join(HOME, '%s-%08d' % (realprefix, fileno))
                         with open(outfile, 'w') as output:
                             handle.seek(offset)
                             output.write(handle.read(size))
                             fileno += 1
                             offset += size
                             size = 0
-                            print('wrote %s' % outfile)
 
                 try:
                     first5 = handle.read(5)
@@ -131,44 +146,21 @@ class SplitMarc(luigi.Task):
                 except StopIteration:
                     break
 
-            outfile = os.path.join(HOME, '%s%08d' % (self.prefix, fileno))
+            outfile = os.path.join(HOME, '%s-%08d' % (realprefix, fileno))
+
             with open(outfile, 'w') as output:
                 handle.seek(offset)
                 output.write(handle.read(size))
-                print('wrote %s' % outfile)
 
         with self.output().open('w') as output:
             for fn in os.listdir('.'):
-                if fnmatch.fnmatch(fn, '%s*' % self.prefix):
+                if fnmatch.fnmatch(fn, '%s*' % (realprefix)):
                     output.write('%s\n' % fn)
 
 
     def output(self):
         digest = hashlib.sha1(self.filename).hexdigest()
-        return luigi.LocalTarget(os.path.join(HOME, 'splitfiles-%s' % digest))
-
-
-# class Split(luigi.Task):
-
-#     filename = luigi.Parameter(default='test-tit.mrc')
-
-#     @timed
-#     def run(self):
-#         prefix = "test-tit-chunk."
-#         chunksize = 1000000
-#         command = """ yaz-marcdump -s %s -C %s %s > /dev/null """ % (
-#             prefix, chunksize, self.filename)
-#         print(command)
-#         code = subprocess.call([command], shell=True)
-#         if code == 0:
-#             with self.output().open('w') as output:
-#                 for filename in os.listdir('.'):
-#                     if fnmatch.fnmatch(filename, '%s*' % prefix):
-#                         output.write('%s\n' % filename)
-
-#     def output(self):
-#         digest = hashlib.sha1(self.filename).hexdigest()
-#         return luigi.LocalTarget(os.path.join(HOME, 'splitfiles-%s' % digest))
+        return luigi.LocalTarget(os.path.join(HOME, 'SplitMarc-%s-%s' % (self.size, digest)))
 
 
 class MarcToJSON(luigi.Task):
@@ -181,7 +173,6 @@ class MarcToJSON(luigi.Task):
     def run(self):
         stopover = random_tmp_path()
         command = "./marctojson %s > %s" % (self.filename, stopover)
-        print(command)
         code = subprocess.call([command], shell=True)
         if code == 0:
             luigi.File(stopover).move(self.output().fn)
@@ -197,14 +188,15 @@ class MarcToJSONParallel(luigi.WrapperTask):
     those in parallel.
     """
     filename = luigi.Parameter()
+    size = luigi.IntParameter(default=1000000)
 
     def requires(self):
-        task = SplitMarc(filename=self.filename)
+        task = SplitMarc(filename=self.filename, size=self.size)
         luigi.build([task], local_scheduler=True)
         with task.output().open() as handle:
             for line in handle:
                 filename = line.strip()
-                yield MarcToJSON(filename)
+                yield MarcToJSON(filename=filename)
 
     def output(self):
         return self.input()
@@ -215,20 +207,25 @@ class MarcToJSONMerged(luigi.Task):
     Merge a number of JSON files into one.
     """
     filename = luigi.Parameter()
+    size = luigi.IntParameter(default=1000000)
 
     def requires(self):
-        return MarcToJSONParallel(filename=self.filename)
+        return MarcToJSONParallel(filename=self.filename, size=self.size)
 
     @timed
     def run(self):
         stopover = random_tmp_path()
         for target in self.input():
             command = """ cat %s >> %s """ % (target.fn, stopover)
-            print(command)
             code = subprocess.call([command], shell=True)
             if not code == 0:
                 raise RuntimeError('Could not concatenate files.')
         luigi.File(stopover).move(self.output().fn)
+        for target in self.input():
+            try:
+                os.remove(target.fn)
+            except OSError as err:
+                print(err, file=sys.stderr)
 
     def output(self):
         base, _ = os.path.splitext(self.filename)
