@@ -87,5 +87,5 @@ func main() {
         }
         counter += 1
     }
-    fmt.Printf("Looped over %d records.\n", i)
+    fmt.Printf("Looped over %d records.\n", counter)
 }
