@@ -25,5 +25,6 @@ loktotsv
 marcdump
 marciter
 marctojson
+marcsplit
 marctotsv
 test-*
