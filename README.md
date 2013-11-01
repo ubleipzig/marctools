@@ -7,7 +7,7 @@ Included: [`marcdump`](https://github.com/miku/gomarckit#marcdump),
 [`marcsplit`](https://github.com/miku/gomarckit#marcsplit),
 [`marccount`](https://github.com/miku/gomarckit#marccount),
 [`marciter`](https://github.com/miku/gomarckit#marciter),
-[`loktotsv`](https://github.com/miku/gomarckit#loktotsv). Based on [marc21](https://gitorious.org/marc21-go/marc21) by [Dan Scott](https://gitorious.org/~dbs).
+[`loktotsv`](https://github.com/miku/gomarckit#loktotsv). Based on [marc21](https://gitorious.org/marc21-go/marc21) by [Dan Scott](https://gitorious.org/~dbs) and William Waites.
 
 Build
 -----
