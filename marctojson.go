@@ -44,7 +44,7 @@ import (
     "strings"
 )
 
-const app_version = "1.0.1"
+const app_version = "1.1.0"
 
 // Turn a list of key=value,key=value strings into a map.
 func stringToMap(s string) map[string]string {
@@ -173,7 +173,7 @@ func main() {
                             values = append(values, subfield.Value)
                             subfieldMap[code] = values
                         case []string:
-                            subfieldMap[code] = append(subfieldMap[code].([]interface{}), subfield.Value)
+                            subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
                         }
                     } else {
                         subfieldMap[code] = subfield.Value

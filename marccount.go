@@ -11,7 +11,6 @@ import (
     "fmt"
     "io"
     "os"
-    "path/filepath"
     "strconv"
 )
 
@@ -39,9 +38,6 @@ func record_length(reader io.Reader) (length int64, err error) {
 
 func main() {
 
-    directory := flag.String("d", ".", "directory to write to")
-    prefix := flag.String("s", "split", "split file prefix")
-    size := flag.Int64("C", 1, "number of records per file")
     version := flag.Bool("v", false, "prints current program version")
 
     var PrintUsage = func() {
@@ -61,16 +57,6 @@ func main() {
         os.Exit(1)
     }
 
-    fi, err := os.Stat(*directory)
-    if os.IsNotExist(err) {
-        fmt.Printf("no such file or directory: %s\n", *directory)
-        os.Exit(1)
-    }
-    if !fi.IsDir() {
-        fmt.Printf("arg to -d must be directory: %s\n", *directory)
-        os.Exit(1)
-    }
-
     handle, err := os.Open(flag.Args()[0])
     if err != nil {
         fmt.Printf("%s\n", err)
@@ -83,10 +69,10 @@ func main() {
         }
     }()
 
-    var i, length, cumulative, offset, batch, fileno int64
+    var i, cumulative int64
 
     for {
-        length, err = record_length(handle)
+        length, err := record_length(handle)
         i += 1
         if err == io.EOF {
             break
@@ -94,48 +80,8 @@ func main() {
         if err != nil {
             panic(err)
         }
-        if i%*size == 0 {
-            if i > 0 {
-
-                filename := filepath.Join(*directory, fmt.Sprintf("%s-%08d", *prefix, fileno))
-                output, err := os.Create(filename)
-                if err != nil {
-                    panic(err)
-                }
-
-                buffer := make([]byte, batch)
-
-                handle.Seek(offset, 0)
-                handle.Read(buffer)
-                output.Write(buffer)
-                err = output.Close()
-                if err != nil {
-                    panic(err)
-                }
-
-                batch = 0
-                fileno += 1
-                offset = cumulative
-            }
-        }
         cumulative += length
-        batch += length
         handle.Seek(int64(cumulative), 0)
     }
-
-    filename := fmt.Sprintf("%s-%08d", prefix, fileno)
-    output, err := os.Create(filename)
-    if err != nil {
-        panic(err)
-    }
-
-    buffer := make([]byte, batch)
-
-    handle.Seek(offset, 0)
-    handle.Read(buffer)
-    output.Write(buffer)
-    err = output.Close()
-    if err != nil {
-        panic(err)
-    }
+    fmt.Println(i)
 }

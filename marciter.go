@@ -18,27 +18,9 @@ import (
     "fmt"
     "io"
     "os"
-    "strings"
 )
 
-const app_version = "1.0.0"
-
-// Convert a string of key=value pairs into a map, or panic.
-func stringToMap(s string) map[string]string {
-    result := make(map[string]string)
-    if len(s) == 0 {
-        return result
-    }
-    for _, pair := range strings.Split(s, ",") {
-        kv := strings.Split(pair, "=")
-        if len(kv) != 2 {
-            panic(fmt.Sprintf("Could not parse key-value parameter: %s", s))
-        } else {
-            result[kv[0]] = kv[1]
-        }
-    }
-    return result
-}
+const app_version = "1.1.0"
 
 func main() {
 
