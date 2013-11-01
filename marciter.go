@@ -1,6 +1,8 @@
 // Simple tool to test baseline iteration speed of marc records in Go.
 // Using [marc21](https://gitorious.org/marc21-go/marc21).
 //
+// Test file: 4007756 records, 4.3G
+//
 // A baseline iteration, which only creates the MARC data structures takes about
 // 4 minutes in Go, which amounts to about 17425 records per seconds.
 //
