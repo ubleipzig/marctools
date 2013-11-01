@@ -27,4 +27,5 @@ marciter
 marctojson
 marcsplit
 marctotsv
+marccount
 test-*
