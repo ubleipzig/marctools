@@ -11,11 +11,12 @@
 // user    24m13.468s
 // sys      0m17.348s
 //
-// $ time ./marctojson test-tit.mrc > test-tit.json.1
 //
-// real    12m32.742s
-// user     9m52.720s
-// sys      1m47.288s
+// $ time ./marctojson test-tit.mrc > test-tit.json.2
+// real    14m44.299s
+// user    11m24.328s
+// sys      1m49.128s
+//
 //
 // $ time ./marctojson.py MarcToJSONMerged --filename test-tit.mrc --workers 4
 // DEBUG: [SplitMarc.run] 51.48869
