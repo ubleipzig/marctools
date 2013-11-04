@@ -17,23 +17,24 @@ import (
 const app_version = "1.1.0"
 
 func record_length(reader io.Reader) (length int64, err error) {
+    var l int
     data := make([]byte, 24)
     n, err := reader.Read(data)
     if err != nil {
-        return
+        return 0, err
+    } else {
+        if n != 24 {
+            errs := fmt.Sprintf("MARC21: invalid leader: expected 24 bytes, read %d", n)
+            err = errors.New(errs)
+        } else {
+            l, err = strconv.Atoi(string(data[0:5]))
+            if err != nil {
+                errs := fmt.Sprintf("MARC21: invalid record length: %s", err)
+                err = errors.New(errs)
+            }
+        }
     }
-    if n != 24 {
-        errs := fmt.Sprintf("MARC21: invalid leader: expected 24 bytes, read %d", n)
-        err = errors.New(errs)
-        return
-    }
-    _length, err := strconv.Atoi(string(data[0:5]))
-    if err != nil {
-        errs := fmt.Sprintf("MARC21: invalid record length: %s", err)
-        err = errors.New(errs)
-        return
-    }
-    return int64(_length), err
+    return int64(l), err
 }
 
 func main() {
@@ -73,15 +74,15 @@ func main() {
 
     for {
         length, err := record_length(handle)
-        i += 1
         if err == io.EOF {
             break
         }
         if err != nil {
             panic(err)
         }
+        i += 1
         cumulative += length
-        handle.Seek(int64(cumulative), 0)
+        handle.Seek(cumulative, 0)
     }
     fmt.Println(i)
 }
