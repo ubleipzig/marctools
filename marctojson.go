@@ -1,6 +1,7 @@
 // Turn MARC into JSON.
 // The JSON format was choosen with Elasticsearch queries in mind. Also
-// the format proposed [in this blog post](http://dilettantes.code4lib.org/blog/2010/09/a-proposal-to-serialize-marc-in-json/)
+// the format proposed
+// [in this blog post](http://dilettantes.code4lib.org/blog/2010/09/a-proposal-to-serialize-marc-in-json/)
 // had some verbose elements, such as an extra subfields key.
 //
 // Java version (without original and sha1)
