@@ -154,6 +154,8 @@ class SplitMarc(luigi.Task):
 
         with self.output().open('w') as output:
             for fn in os.listdir('.'):
+                if 'luigi-tmp' in fn:
+                    continue
                 if fnmatch.fnmatch(fn, '%s*' % (realprefix)):
                     output.write('%s\n' % fn)
 
@@ -221,11 +223,21 @@ class MarcToJSONMerged(luigi.Task):
             if not code == 0:
                 raise RuntimeError('Could not concatenate files.')
         luigi.File(stopover).move(self.output().fn)
+
+        # remove partial JSON files
         for target in self.input():
             try:
                 os.remove(target.fn)
             except OSError as err:
                 print(err, file=sys.stderr)
+
+        # remove SplitMarc artefacts
+        for fn in os.listdir('.'):
+            if fnmatch.fnmatch(fn, 'SplitMarc-*'):
+                try:
+                    os.remove(fn)
+                except OSError as err:
+                    print(err, file=sys.stderr)
 
     def output(self):
         base, _ = os.path.splitext(self.filename)
