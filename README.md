@@ -174,7 +174,8 @@ Performance data points:
 
   The resulting JSON file is about 2.1G in size. A similar conversion to TSV
 
-      $ time marctotsv -f NA -s "|" test-tit.mrc 001 020.a 020.z 020.9 100.a 245.a 245.b 245.c 260.a 260.b 260.c 700.a 776.z > test.tsv
+      $ time marctotsv -f NA -s "|" test-tit.mrc 001 020.a 020.z 020.9 100.a \
+        245.a 245.b 245.c 260.a 260.b 260.c 700.a 776.z > test.tsv
 
       real  5m39.058s
       user  4m10.628s
