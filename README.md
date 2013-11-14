@@ -256,7 +256,7 @@ Just like `yaz-marcdump -s [PREFIX] -C [CHUNKSIZE] FILE`, but a bit faster.
 marccount
 ---------
 
-Count the number of records in a file (fast).
+Count the number of records in a file (fast). Can be about 4 times faster than `yaz-marcdump -np file.mrc | tail -1 | awk '{print $3}'`
 
 
 marciter
@@ -268,7 +268,7 @@ For development and benchmarks only.
 Retired
 -------
 
-`loktotsv`.
+`loktotsv`, which was just a `marctotsv` with a fixed set of fields.
 
 
 License
