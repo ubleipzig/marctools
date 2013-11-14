@@ -161,6 +161,19 @@ Performance data points:
   8 minutes, so about 8349 records per second. That's about four times
   faster than the Java version.
 
+* A conversion to a 7 fields plus leader of a 4.3G file in *plain* mode
+  takes about 7m27.258s.
+
+  Command:
+
+      $ time marctojson -p -l -r 001,020,100,245,260,700,776 test.mrc > test.json
+
+      real  7m27.258s
+      user  5m24.932s
+      sys   1m38.876s
+
+  The resulting JSON file is about 2.1G in size.
+
 * As comparison, the baseline iteration, which only creates the MARC data structures takes about 4 minutes
   in Go, which amounts to about 17425 records per seconds.
 
@@ -176,12 +189,15 @@ comparison, it's only here for framing).
 
 Example usage:
 
-    $ ./marctojson -h
-        Usage of ./marctojson:
-          -i=false: ignore marc errors (not recommended)
-          -m="": a key=value pair to pass to meta
-          -r="": only dump the given tags (comma separated list)
-          -v=false: prints current program version
+    $ marctojson
+    Usage: marctojson [OPTIONS] MARCFILE
+      -i=false: ignore marc errors (not recommended)
+      -l=false: dump the leader as well
+      -m="": a key=value pair(s) to pass to meta
+      -p=false: plain mode: dump without content and meta
+      -r="": only dump the given tags (e.g. 001,003)
+      -v=false: prints current program version and exit
+
 
     $ ./marctojson -r 001,260 test-tit.mrc|head -1|json_pp
     {
@@ -213,7 +229,7 @@ Example usage:
     }
 
 
-    $ ./marctojson -r 001,005,260 -m date=`date +"%Y-%-m-%d"` test-tit.mrc|head -1|json_pp
+    $ ./marctojson -r 001,005,260 -m date=`date +"%Y-%-m-%d"` test-tit.mrc | head -1 | json_pp
     {
        "content_type" : "application/marc",
        "content" : {
@@ -252,11 +268,15 @@ marcsplit
 Just like `yaz-marcdump -s [PREFIX] -C [CHUNKSIZE] FILE`, but a bit faster.
 
 
-
 marccount
 ---------
 
-Count the number of records in a file (fast). Can be about 4 times faster than `yaz-marcdump -np file.mrc | tail -1 | awk '{print $3}'`
+Count the number of records in a file (fast). Can be about 4 times faster than
+
+    yaz-marcdump -np file.mrc | tail -1 | awk '{print $3}'
+
+for files with a lot of small records. Up to 20 times faster,
+when the Linux file system cache is warmed up.
 
 
 marciter

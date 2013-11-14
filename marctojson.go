@@ -46,7 +46,7 @@ import (
     "strings"
 )
 
-const app_version = "1.1.0"
+const app_version = "1.1.1"
 
 // Turn a list of key=value,key=value strings into a map.
 func stringToMap(s string) map[string]string {
@@ -68,10 +68,12 @@ func stringToMap(s string) map[string]string {
 func main() {
 
     ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
-    version := flag.Bool("v", false, "prints current program version")
+    version := flag.Bool("v", false, "prints current program version and exit")
 
     metaVar := flag.String("m", "", "a key=value pair to pass to meta")
     filterVar := flag.String("r", "", "only dump the given tags (e.g. 001,003)")
+    leaderVar := flag.Bool("l", false, "dump the leader as well")
+    plainVar := flag.Bool("p", false, "plain mode: dump without content and meta")
 
     var PrintUsage = func() {
         fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -125,27 +127,26 @@ func main() {
             }
         }
 
-        // the final map
-        mainMap := make(map[string]interface{})
         // content map
-        marcMap := make(map[string]interface{})
-        // the expanded leader
-        leaderMap := make(map[string]string)
+        contentMap := make(map[string]interface{})
 
-        leader := record.Leader
-        leaderMap["status"] = string(leader.Status)
-        leaderMap["cs"] = string(leader.CharacterEncoding)
-        leaderMap["length"] = fmt.Sprintf("%d", leader.Length)
-        leaderMap["type"] = string(leader.Type)
-        leaderMap["impldef"] = string(leader.ImplementationDefined[:5])
-        leaderMap["ic"] = fmt.Sprintf("%d", leader.IndicatorCount)
-        leaderMap["lol"] = fmt.Sprintf("%d", leader.LengthOfLength)
-        leaderMap["losp"] = fmt.Sprintf("%d", leader.LengthOfStartPos)
-        leaderMap["sfcl"] = fmt.Sprintf("%d", leader.SubfieldCodeLength)
-        leaderMap["ba"] = fmt.Sprintf("%d", leader.BaseAddress)
-        leaderMap["raw"] = string(leader.Bytes())
-
-        marcMap["leader"] = leaderMap
+        // include the
+        if *leaderVar {
+            leaderMap := make(map[string]string)
+            leader := record.Leader
+            leaderMap["status"] = string(leader.Status)
+            leaderMap["cs"] = string(leader.CharacterEncoding)
+            leaderMap["length"] = fmt.Sprintf("%d", leader.Length)
+            leaderMap["type"] = string(leader.Type)
+            leaderMap["impldef"] = string(leader.ImplementationDefined[:5])
+            leaderMap["ic"] = fmt.Sprintf("%d", leader.IndicatorCount)
+            leaderMap["lol"] = fmt.Sprintf("%d", leader.LengthOfLength)
+            leaderMap["losp"] = fmt.Sprintf("%d", leader.LengthOfStartPos)
+            leaderMap["sfcl"] = fmt.Sprintf("%d", leader.SubfieldCodeLength)
+            leaderMap["ba"] = fmt.Sprintf("%d", leader.BaseAddress)
+            leaderMap["raw"] = string(leader.Bytes())
+            contentMap["leader"] = leaderMap
+        }
 
         for _, field := range record.Fields {
             tag := field.GetTag()
@@ -156,7 +157,7 @@ func main() {
                 }
             }
             if strings.HasPrefix(tag, "00") {
-                marcMap[tag] = field.(*marc21.ControlField).Data
+                contentMap[tag] = field.(*marc21.ControlField).Data
             } else {
                 datafield := field.(*marc21.DataField)
                 subfieldMap := make(map[string]interface{})
@@ -181,24 +182,35 @@ func main() {
                         subfieldMap[code] = subfield.Value
                     }
                 }
-                _, present := marcMap[tag]
+                _, present := contentMap[tag]
                 if !present {
                     subfields := make([]interface{}, 0)
-                    marcMap[tag] = subfields
+                    contentMap[tag] = subfields
                 }
-                marcMap[tag] = append(marcMap[tag].([]interface{}), subfieldMap)
+                contentMap[tag] = append(contentMap[tag].([]interface{}), subfieldMap)
             }
         }
 
-        mainMap["content"] = marcMap
-        mainMap["meta"] = metamap
-        mainMap["content_type"] = "application/marc"
+        if *plainVar {
+            b, err := json.Marshal(contentMap)
+            if err != nil {
+                panic(fmt.Sprintf("error: %s", err))
+            }
+            os.Stdout.Write(b)
+            fmt.Println()
+        } else {
+            // the final map
+            mainMap := make(map[string]interface{})
 
-        b, err := json.Marshal(mainMap)
-        if err != nil {
-            panic(fmt.Sprintf("error: %s", err))
+            mainMap["content"] = contentMap
+            mainMap["meta"] = metamap
+
+            b, err := json.Marshal(mainMap)
+            if err != nil {
+                panic(fmt.Sprintf("error: %s", err))
+            }
+            os.Stdout.Write(b)
+            fmt.Println()
         }
-        os.Stdout.Write(b)
-        fmt.Println()
     }
 }
