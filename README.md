@@ -172,7 +172,15 @@ Performance data points:
       user  5m24.932s
       sys   1m38.876s
 
-  The resulting JSON file is about 2.1G in size.
+  The resulting JSON file is about 2.1G in size. A similar conversion to TSV
+
+      $ time marctotsv -f NA -s "|" test-tit.mrc 001 020.a 020.z 020.9 100.a 245.a 245.b 245.c 260.a 260.b 260.c 700.a 776.z > test.tsv
+
+      real  5m39.058s
+      user  4m10.628s
+      sys   1m29.868s
+
+  takes about 5 minutes with a output file size of about 700M.
 
 * As comparison, the baseline iteration, which only creates the MARC data structures takes about 4 minutes
   in Go, which amounts to about 17425 records per seconds.
