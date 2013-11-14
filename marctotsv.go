@@ -10,13 +10,14 @@ import (
     "strings"
 )
 
-const app_version = "1.1.0"
+const app_version = "1.1.1"
 
 func main() {
 
     fillna := flag.String("f", "<NULL>", "fill missing values with this")
     ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
     skip := flag.Bool("k", false, "skip lines with missing values")
+    separator := flag.String("s", "", "separator to use for multiple values")
     version := flag.Bool("v", false, "prints current program version")
 
     var PrintUsage = func() {
@@ -93,9 +94,19 @@ func main() {
                 }
             } else if resf.MatchString(tag) {
                 parts := strings.Split(tag, ".")
-                subfields := record.GetSubFields(parts[0], []byte(parts[1])[0])
+                code := []byte(parts[1])[0]
+                subfields := record.GetSubFields(parts[0], code)
                 if len(subfields) > 0 {
-                    line = append(line, subfields[0].Value)
+                    if *separator == "" {
+                        // only use the first value
+                        line = append(line, subfields[0].Value)
+                    } else {
+                        var values []string
+                        for _, subfield := range subfields {
+                            values = append(values, subfield.Value)
+                        }
+                        line = append(line, strings.Join(values, *separator))
+                    }
                 } else {
                     if *skip {
                         skipline = true

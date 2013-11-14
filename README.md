@@ -43,11 +43,13 @@ marctotsv
 ---------
 
     $ marctotsv -h
-    Usage of ./marctotsv:
+    Usage: ./marctotsv [OPTIONS] MARCFILE TAG [TAG, ...]
       -f="<NULL>": fill missing values with this
       -i=false: ignore marc errors (not recommended)
       -k=false: skip lines with missing values
+      -s="": separator to use for multiple values
       -v=false: prints current program version
+
 
 
 Convert MARC21 to tsv. If a given tag or subfield has multiple values, just
@@ -131,6 +133,20 @@ Literals can be passed along (as long as they do not look like tags):
     9781420094237   c   Hello   x y z
     9780849397776   c   Hello   x y z
     ...
+
+
+To convert repeated subfield values, you can specifiy a separator string. If
+a separator string is present, multiple subfield values will be joined using
+that separator:
+
+
+    $ ./marctotsv -f NA -s "|" test.mrc 001 773.w 800.w 810.w 811.w 830.w
+    ...
+    007717717 (DE-576)007717709 NA  (DE-576)005674956 NA  NA
+    007717725 (DE-576)007717709 NA  (DE-576)005674956 NA  NA
+    007717997 NA  NA  NA  NA  (DE-576)008007659|(DE-576)014490781
+    ...
+
 
 
 marctojson
