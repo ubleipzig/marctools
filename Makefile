@@ -11,12 +11,10 @@ all: $(targets)
 $(HOME)/bin/%: %
 	ln -s $(shell pwd)/$< $@
 
-install-home: $(installed)
-	@echo "Installed:"
-	@echo $(installed)
+install-home: $(targets) $(installed)
 
-clean-bin:
+clean-installed:
 	rm -f $(installed)
 
-clean: clean-bin
+clean: clean-installed
 	rm $(targets)
