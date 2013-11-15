@@ -6,7 +6,10 @@ Included: [`marcdump`](https://github.com/miku/gomarckit#marcdump),
 [`marctojson`](https://github.com/miku/gomarckit#marctojson),
 [`marcsplit`](https://github.com/miku/gomarckit#marcsplit),
 [`marccount`](https://github.com/miku/gomarckit#marccount),
-[`marciter`](https://github.com/miku/gomarckit#marciter). Based on [marc21](https://gitorious.org/marc21-go/marc21) by [Dan Scott](https://gitorious.org/~dbs) and William Waites.
+[`marciter`](https://github.com/miku/gomarckit#marciter).
+
+Based on [marc21](https://gitorious.org/marc21-go/marc21) by
+[Dan Scott](https://gitorious.org/~dbs) and William Waites.
 
 Build
 -----
@@ -21,7 +24,8 @@ You'll [need a Go installation](http://golang.org/doc/install):
 marcdump
 --------
 
-Just like `yaz-marcdump`. The Go version is about 4-5x slower than the [C version](http://git.indexdata.com/?p=yaz.git;a=blob;f=util/marcdump.c;h=f92204e386431f044f06dddd8baa1c9db08d69c9;hb=HEAD).
+Just like `yaz-marcdump`. The Go version is about 4-5x slower than the
+[C version](http://git.indexdata.com/?p=yaz.git;a=blob;f=util/marcdump.c;h=f92204e386431f044f06dddd8baa1c9db08d69c9;hb=HEAD).
 
 
     $ ./marcdump test.mrc
@@ -53,8 +57,9 @@ marctotsv
 
 
 Convert MARC21 to tsv. If a given tag or subfield has multiple values, just
-the first one is considered. Only useful for control fields or non-repeatable fields
-with a single subfield.
+the first one is considered. Most useful for control fields or non-repeatable fields
+with a single subfield. For repeated fields, use the `-s` flag to specify a value
+delimiter.
 
 Examples:
 
