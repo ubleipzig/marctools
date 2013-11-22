@@ -1,8 +1,4 @@
-// Reimplementation of
-//
-//     yaz-marcdump -s prefix -C 1000 file.mrc
-//
-// in Go.
+// Count records in a MARC file
 package main
 
 import (
