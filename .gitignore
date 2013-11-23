@@ -28,4 +28,5 @@ marctojson
 marcsplit
 marctotsv
 marccount
+marcxmltojson
 test-*
