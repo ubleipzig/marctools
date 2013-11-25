@@ -332,7 +332,9 @@ Example input (snippet):
 
 
 Go [XML unmarshaller](http://golang.org/pkg/encoding/xml/) is not streaming,
-which limits the size of the files that can be handled.
+which limits the size of the files that can be handled. Converting a 500M
+XML file takes about 1m and is about twice as fast as a corresponding Python
+version.
 
 
 
