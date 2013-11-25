@@ -313,10 +313,14 @@ Example input (snippet):
     ...
     <marc:datafield tag="830" ind1=" " ind2="0">
     <marc:subfield code="a"/>
-    <marc:subfield code="p">Caucasian Sketches, Suite 1, Op. 10 -- Caucasian Sketches, Suite 2, Op. 42, "Iveria"</marc:subfield>
+    <marc:subfield code="p">Caucasian Sketches, Suite 1, Op. 10 -- Caucasian
+    Sketches, Suite 2, Op. 42, "Iveria"
+    </marc:subfield>
     </marc:datafield>
     <marc:datafield tag="856" ind1="4" ind2="0">
-    <marc:subfield code="u">http://univportal.naxosmusiclibrary.com/catalogue/item.asp?cid=8.220369</marc:subfield>
+    <marc:subfield code="u">
+    http://univportal.naxosmusiclibrary.com/catalogue/item.asp?cid=8.220369
+    </marc:subfield>
     <marc:subfield code="z">Verbindung zu Naxos Music Library</marc:subfield>
     </marc:datafield>
     <marc:datafield tag="902" ind1=" " ind2=" ">
