@@ -4,6 +4,7 @@ gomarckit
 Included: [`marcdump`](https://github.com/miku/gomarckit#marcdump), 
 [`marctotsv`](https://github.com/miku/gomarckit#marctotsv),
 [`marctojson`](https://github.com/miku/gomarckit#marctojson),
+[`marcxmltojson`](https://github.com/miku/gomarckit#marcxmltojson),
 [`marcsplit`](https://github.com/miku/gomarckit#marcsplit),
 [`marccount`](https://github.com/miku/gomarckit#marccount),
 [`marciter`](https://github.com/miku/gomarckit#marciter).
@@ -274,6 +275,61 @@ Example usage:
           "date" : "2013-10-30"
        }
     }
+
+
+marcxmltojson
+-------------
+
+
+Convert MARC XML to JSON.
+
+    $ marcxmltojson
+    Usage: marcxmltojson MARCFILE
+      -m="": a key=value pair to pass to meta
+      -p=false: plain mode: dump without content and meta
+      -v=false: prints current program version and exit
+
+Example input (snippet):
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <marc:collection xmlns:marc="http://www.loc.gov/MARC21/slim">
+    <marc:record xmlns:marc="http://www.loc.gov/MARC21/slim">
+    <marc:leader>     njm a22     2u 4500</marc:leader>
+    <marc:controlfield tag="001">NML00000001</marc:controlfield>
+    <marc:controlfield tag="003">DE-Khm1</marc:controlfield>
+    <marc:controlfield tag="005">20130916115438</marc:controlfield>
+    <marc:controlfield tag="006">m||||||||h||||||||</marc:controlfield>
+    <marc:controlfield tag="007">cr nnannnu uuu</marc:controlfield>
+    <marc:controlfield tag="008">130916s2013</marc:controlfield>
+    <marc:datafield tag="028" ind1="1" ind2="1">
+    <marc:subfield code="a">8.220369</marc:subfield>
+    <marc:subfield code="b">Naxos Digital Services Ltd</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="035" ind1=" " ind2=" ">
+    <marc:subfield code="a">(DE-Khm1)NML00000001</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="040" ind1=" " ind2=" ">
+    <marc:subfield code="a">DE-Khm1</marc:subfield>
+    ...
+    <marc:datafield tag="830" ind1=" " ind2="0">
+    <marc:subfield code="a"/>
+    <marc:subfield code="p">Caucasian Sketches, Suite 1, Op. 10 -- Caucasian Sketches, Suite 2, Op. 42, "Iveria"</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="856" ind1="4" ind2="0">
+    <marc:subfield code="u">http://univportal.naxosmusiclibrary.com/catalogue/item.asp?cid=8.220369</marc:subfield>
+    <marc:subfield code="z">Verbindung zu Naxos Music Library</marc:subfield>
+    </marc:datafield>
+    <marc:datafield tag="902" ind1=" " ind2=" ">
+    <marc:subfield code="a">130916</marc:subfield>
+    </marc:datafield>
+    </marc:record>
+    ...
+    </marc:collection>
+
+
+Go [XML unmarshaller](http://golang.org/pkg/encoding/xml/) is not streaming,
+which limits the size of the files that can be handled.
+
 
 
 marcsplit
