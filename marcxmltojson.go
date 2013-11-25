@@ -36,6 +36,7 @@ import (
     "fmt"
     "io/ioutil"
     "os"
+    "runtime"
     "strings"
 )
 
@@ -127,6 +128,8 @@ func (record *Record) ToMap() map[string]interface{} {
 
 func main() {
 
+    version := flag.Bool("v", false, "prints current program version and exit")
+    verbose := flag.Bool("verbose", false, "print final memstats")
     plainVar := flag.Bool("p", false, "plain mode: dump without content and meta")
     metaVar := flag.String("m", "", "a key=value pair to pass to meta")
 
@@ -136,6 +139,11 @@ func main() {
     }
 
     flag.Parse()
+
+    if *version {
+        fmt.Println(app_version)
+        os.Exit(0)
+    }
 
     if flag.NArg() < 1 {
         PrintUsage()
@@ -179,5 +187,16 @@ func main() {
         }
         os.Stdout.Write(b)
         fmt.Println()
+    }
+
+    if *verbose {
+        memstats := runtime.MemStats{}
+        runtime.ReadMemStats(&memstats)
+        fmt.Fprintf(os.Stderr, "Alloc: %dM\n", (memstats.Alloc / 1048576))
+        fmt.Fprintf(os.Stderr, "TotalAlloc: %dM\n", (memstats.TotalAlloc / 1048576))
+        fmt.Fprintf(os.Stderr, "Sys: %dM\n", (memstats.Sys / 1048576))
+        fmt.Fprintf(os.Stderr, "Lookups: %d\n", memstats.Lookups)
+        fmt.Fprintf(os.Stderr, "Mallocs: %d\n", memstats.Mallocs)
+        fmt.Fprintf(os.Stderr, "Frees: %d\n", memstats.Frees)
     }
 }
