@@ -40,7 +40,7 @@ import (
     "strings"
 )
 
-const app_version = "1.0"
+const app_version = "1.0.1"
 
 type ControlField struct {
     Value string `xml:",chardata"`
@@ -129,7 +129,7 @@ func (record *Record) ToMap() map[string]interface{} {
 func main() {
 
     version := flag.Bool("v", false, "prints current program version and exit")
-    verbose := flag.Bool("verbose", false, "print final memstats")
+    verbose := flag.Bool("verbose", false, "print memstats and record count")
     plainVar := flag.Bool("p", false, "plain mode: dump without content and meta")
     metaVar := flag.String("m", "", "a key=value pair to pass to meta")
 
@@ -198,5 +198,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Lookups: %d\n", memstats.Lookups)
         fmt.Fprintf(os.Stderr, "Mallocs: %d\n", memstats.Mallocs)
         fmt.Fprintf(os.Stderr, "Frees: %d\n", memstats.Frees)
+
+        fmt.Fprintf(os.Stderr, "Records: %d\n", len(collection.Records))
     }
 }
