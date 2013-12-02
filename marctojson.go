@@ -12,11 +12,21 @@
 // user    24m13.468s
 // sys      0m17.348s
 //
+// With Go 1.1
+// -----------
 //
 // $ time ./marctojson test-tit.mrc > test-tit.json.2
 // real    14m44.299s
 // user    11m24.328s
 // sys      1m49.128s
+
+// With Go 1.2 (2013-12-02)
+// ------------------------
+// $ time marctojson test-tit.mrc > test-tit.json.2
+
+// real    13m24.399s
+// user    10m24.968s
+// sys     1m46.240s
 //
 //
 // $ time ./marctojson.py MarcToJSONMerged --filename test-tit.mrc --workers 4
