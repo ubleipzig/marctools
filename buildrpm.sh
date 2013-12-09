@@ -1,5 +1,7 @@
 #!/bin/bash
 
+hash rpmbuild 2> /dev/null || { echo >&2 "[EE] rpmbuild executable required"; exit 1; }
+
 if [ -z "$1" ];then
    echo "You didn't specify anything to build";
    exit 1;

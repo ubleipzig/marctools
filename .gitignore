@@ -21,6 +21,7 @@ _testmain.go
 
 *.exe
 *.rpm
+.vagrant/
 
 loktotsv
 marcdump

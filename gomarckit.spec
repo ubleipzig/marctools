@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       gomarckit
-Version:    1.3
+Version:    1.3.0
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -34,19 +34,16 @@ Other:
 
 %install
 # create directories where the files will be located
-mkdir -p $RPM_BUILD_ROOT/opt/gomarckit/bin
-mkdir -p $RPM_BUILD_ROOT/etc/profile.d
+mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 
 # put the files in to the relevant directories.
 # the argument on -m is the permissions expressed as octal. (See chmod man page for details.)
-pwd
-install -m 755 marctotsv $RPM_BUILD_ROOT/opt/gomarckit/bin
-install -m 755 marctojson $RPM_BUILD_ROOT/opt/gomarckit/bin
-install -m 755 marcxmltojson $RPM_BUILD_ROOT/opt/gomarckit/bin
-install -m 755 marcsplit $RPM_BUILD_ROOT/opt/gomarckit/bin
-install -m 755 marccount $RPM_BUILD_ROOT/opt/gomarckit/bin
-install -m 755 marcdump $RPM_BUILD_ROOT/opt/gomarckit/bin
-install -m 755 gomarckit.sh $RPM_BUILD_ROOT/etc/profile.d
+install -m 755 marctotsv $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marctojson $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marcxmltojson $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marcsplit $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marccount $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marcdump $RPM_BUILD_ROOT/usr/local/sbin
 
 
 %post
@@ -61,13 +58,12 @@ rm -rf %{_topdir}/BUILD/%{name}
 # list files owned by the package here
 %files
 %defattr(-,root,root)
-/etc/profile.d/gomarckit.sh
-/opt/gomarckit/bin/marctotsv
-/opt/gomarckit/bin/marctojson
-/opt/gomarckit/bin/marcxmltojson
-/opt/gomarckit/bin/marcsplit
-/opt/gomarckit/bin/marccount
-/opt/gomarckit/bin/marcdump
+/usr/local/sbin/marctotsv
+/usr/local/sbin/marctojson
+/usr/local/sbin/marcxmltojson
+/usr/local/sbin/marcsplit
+/usr/local/sbin/marccount
+/usr/local/sbin/marcdump
 
 
 
