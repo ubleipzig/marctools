@@ -1,6 +1,8 @@
 gomarckit
 =========
 
+Current release: https://github.com/miku/gomarckit/releases/tag/v1.3
+
 Included: [`marcdump`](https://github.com/miku/gomarckit#marcdump), 
 [`marctotsv`](https://github.com/miku/gomarckit#marctotsv),
 [`marctojson`](https://github.com/miku/gomarckit#marctojson),
