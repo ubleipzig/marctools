@@ -18,3 +18,19 @@ clean-installed:
 
 clean: clean-installed
 	rm $(targets)
+
+# buildrpm: https://gist.github.com/miku/7874111
+rpm: $(targets)
+	mkdir -p $(HOME)/rpmbuild/BUILD
+	mkdir -p $(HOME)/rpmbuild/SOURCES
+	mkdir -p $(HOME)/rpmbuild/SPECS
+	mkdir -p $(HOME)/rpmbuild/RPMS
+	cp gomarckit.spec $(HOME)/rpmbuild/SPECS
+	cp gomarckit.sh $(HOME)/rpmbuild/BUILD
+	cp marctotsv $(HOME)/rpmbuild/BUILD
+	cp marctojson $(HOME)/rpmbuild/BUILD
+	cp marcxmltojson $(HOME)/rpmbuild/BUILD
+	cp marcdump $(HOME)/rpmbuild/BUILD
+	cp marcsplit $(HOME)/rpmbuild/BUILD
+	cp marccount $(HOME)/rpmbuild/BUILD
+	buildrpm gomarckit
