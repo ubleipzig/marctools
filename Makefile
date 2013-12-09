@@ -33,4 +33,5 @@ rpm: $(targets)
 	cp marcdump $(HOME)/rpmbuild/BUILD
 	cp marcsplit $(HOME)/rpmbuild/BUILD
 	cp marccount $(HOME)/rpmbuild/BUILD
-	buildrpm gomarckit
+	./buildrpm.sh gomarckit
+	cp $(HOME)/rpmbuild/RPMS/x86_64/*rpm .
