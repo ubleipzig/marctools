@@ -17,7 +17,8 @@ clean-installed:
 	rm -f $(installed)
 
 clean: clean-installed
-	rm $(targets)
+	rm -f $(targets)
+	rm -f gomarckit-*.rpm
 
 # buildrpm: https://gist.github.com/miku/7874111
 rpm: $(targets)
