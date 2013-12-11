@@ -22,16 +22,8 @@ clean: clean-installed
 
 # buildrpm: https://gist.github.com/miku/7874111
 rpm: $(targets)
-	mkdir -p $(HOME)/rpmbuild/BUILD
-	mkdir -p $(HOME)/rpmbuild/SOURCES
-	mkdir -p $(HOME)/rpmbuild/SPECS
-	mkdir -p $(HOME)/rpmbuild/RPMS
+	mkdir -p $(HOME)/rpmbuild/{BUILD,SOURCES,SPECS,RPMS}
 	cp gomarckit.spec $(HOME)/rpmbuild/SPECS
-	cp marctotsv $(HOME)/rpmbuild/BUILD
-	cp marctojson $(HOME)/rpmbuild/BUILD
-	cp marcxmltojson $(HOME)/rpmbuild/BUILD
-	cp marcdump $(HOME)/rpmbuild/BUILD
-	cp marcsplit $(HOME)/rpmbuild/BUILD
-	cp marccount $(HOME)/rpmbuild/BUILD
+	cp marctotsv marctojson marcxmltojson marcdump marcsplit marccount $(HOME)/rpmbuild/BUILD
 	./buildrpm.sh gomarckit
 	cp $(HOME)/rpmbuild/RPMS/x86_64/*rpm .
