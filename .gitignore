@@ -31,4 +31,5 @@ marcsplit
 marctotsv
 marccount
 marcxmltojson
+marcuniq
 test-*
