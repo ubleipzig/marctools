@@ -3,14 +3,16 @@ gomarckit
 
 Current release: https://github.com/miku/gomarckit/releases/tag/v1.3
 
-Included: [`marcdump`](https://github.com/miku/gomarckit#marcdump), 
-[`marctotsv`](https://github.com/miku/gomarckit#marctotsv),
-[`marctojson`](https://github.com/miku/gomarckit#marctojson),
-[`marcxmltojson`](https://github.com/miku/gomarckit#marcxmltojson),
-[`marcsplit`](https://github.com/miku/gomarckit#marcsplit),
-[`marccount`](https://github.com/miku/gomarckit#marccount),
-[`marcuniq`](https://github.com/miku/gomarckit#marcuniq),
-[`marciter`](https://github.com/miku/gomarckit#marciter).
+Included:
+
+* [`marccount`](https://github.com/miku/gomarckit#marccount)
+* [`marcdump`](https://github.com/miku/gomarckit#marcdump)
+* [`marciter`](https://github.com/miku/gomarckit#marciter)
+* [`marcsplit`](https://github.com/miku/gomarckit#marcsplit)
+* [`marctojson`](https://github.com/miku/gomarckit#marctojson)
+* [`marctotsv`](https://github.com/miku/gomarckit#marctotsv)
+* [`marcuniq`](https://github.com/miku/gomarckit#marcuniq)
+* [`marcxmltojson`](https://github.com/miku/gomarckit#marcxmltojson)
 
 Based on [marc21](https://gitorious.org/marc21-go/marc21) by
 [Dan Scott](https://gitorious.org/~dbs) and William Waites.
