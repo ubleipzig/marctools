@@ -2,6 +2,7 @@ package main
 
 import (
     "./marc21"
+    "bufio"
     "flag"
     "fmt"
     "io"
@@ -40,7 +41,7 @@ func main() {
     ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
     version := flag.Bool("v", false, "prints current program version")
     outfile := flag.String("o", "", "output file (or stdout if none given)")
-    exclude := flag.String("x", "", "comma separated list of ids to exclude")
+    exclude := flag.String("x", "", "comma separated list of ids to exclude (or filename with one id per line)")
 
     var PrintUsage = func() {
         fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -91,9 +92,39 @@ func main() {
 
     // exclude list
     excludedIds := NewStringSet()
-    for _, value := range strings.Split(*exclude, ",") {
-        excludedIds.Add(strings.TrimSpace(value))
+
+    if _, err := os.Stat(*exclude); err != nil {
+        if os.IsNotExist(err) {
+            fmt.Fprintf(os.Stderr, "excluded ids interpreted as string\n")
+            for _, value := range strings.Split(*exclude, ",") {
+                excludedIds.Add(strings.TrimSpace(value))
+            }
+        } else if err != nil {
+            panic(err)
+        }
+    } else {
+        fmt.Fprintf(os.Stderr, "excluded ids interpreted as file\n")
+
+        // read one id per line from file
+        xfi, err := os.Open(*exclude)
+        if err != nil {
+            panic(err)
+        }
+
+        defer func() {
+            if err := xfi.Close(); err != nil {
+                panic(err)
+            }
+        }()
+
+        scanner := bufio.NewScanner(xfi)
+        for scanner.Scan() {
+            excludedIds.Add(strings.TrimSpace(scanner.Text()))
+        }
     }
+
+    fmt.Fprintf(os.Stderr, "%d ids to exclude loaded\n", excludedIds.Size())
+
     // collect the excluded ids here
     excluded := make([]string, 0, 0)
 
