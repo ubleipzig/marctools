@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       gomarckit
-Version:    1.3.2
+Version:    1.3.3
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -71,6 +71,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Mon Jan 06 2014 Martin Czygan
+- 1.3.3 release
+- allow files marcuniq -x
+
 * Mon Jan 06 2014 Martin Czygan
 - 1.3.2 release
 - added -x flag to marcuniq
