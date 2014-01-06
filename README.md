@@ -371,9 +371,13 @@ Like `uniq` but consider MARC files and their 001 fields.
 
 The `-x` option is a bit unrelated. It lets in addition specify ids, that
 should be ignored completely. It can be a comma separated string or a filename
-with one id per line. Example:
+with one id per line. Example with filename:
 
     $ marcuniq -x excludes.txt -o filtered.mrc file.mrc
+
+Example with inline excludes:
+
+    $ marcuniq -x '15270, 15298, 15318, 15335' file.mrc > filtered.mrc
 
 
 marciter
