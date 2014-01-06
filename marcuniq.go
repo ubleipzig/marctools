@@ -9,6 +9,8 @@ import (
     "os"
 )
 
+const app_version = "1.3.1"
+
 // poor mans string set
 type StringSet struct {
     set map[string]bool
@@ -33,14 +35,7 @@ func (set *StringSet) Size() int {
     return len(set.set)
 }
 
-type SeekMap struct {
-    offset int64
-    length int64
-}
-
 func main() {
-
-    const app_version = "1.3.1"
 
     ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
     version := flag.Bool("v", false, "prints current program version")
