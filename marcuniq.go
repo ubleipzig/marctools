@@ -5,8 +5,8 @@ import (
     "flag"
     "fmt"
     "io"
-    "log"
     "os"
+    "strings"
 )
 
 const app_version = "1.3.1"
@@ -40,6 +40,7 @@ func main() {
     ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
     version := flag.Bool("v", false, "prints current program version")
     outfile := flag.String("o", "", "output file (or stdout if none given)")
+    exclude := flag.String("x", "", "comma separated list of ids to exclude")
 
     var PrintUsage = func() {
         fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -88,6 +89,14 @@ func main() {
         }()
     }
 
+    // exclude list
+    excludedIds := NewStringSet()
+    for _, value := range strings.Split(*exclude, ",") {
+        excludedIds.Add(strings.TrimSpace(value))
+    }
+    // collect the excluded ids here
+    excluded := make([]string, 0, 0)
+
     // keep track of all ids
     ids := NewStringSet()
     // collect the duplicate ids; array, since same id may occur many times
@@ -116,6 +125,8 @@ func main() {
         id := fields[0].(*marc21.ControlField).Data
         if ids.Contains(id) {
             skipped = append(skipped, id)
+        } else if excludedIds.Contains(id) {
+            excluded = append(excluded, id)
         } else {
             ids.Add(id)
             fi.Seek(head, 0)
@@ -131,6 +142,7 @@ func main() {
         counter += 1
     }
 
-    log.Printf("%d records\n", counter)
-    log.Printf("%d uniq, %d skipped\n", ids.Size(), len(skipped))
+    fmt.Fprintf(os.Stderr, "%d records read\n", counter)
+    fmt.Fprintf(os.Stderr, "%d records written, %d skipped, %d excluded\n",
+        ids.Size(), len(skipped), len(excluded))
 }
