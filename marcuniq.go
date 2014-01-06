@@ -88,8 +88,6 @@ func main() {
         }()
     }
 
-    log.Printf("%v", output)
-
     // keep track of all ids
     ids := NewStringSet()
     // collect the duplicate ids; array, since same id may occur many times
