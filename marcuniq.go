@@ -77,7 +77,7 @@ func main() {
     if *outfile == "" {
         output = os.Stdout
     } else {
-        output, err := os.Create(*outfile)
+        output, err = os.Create(*outfile)
         if err != nil {
             panic(err)
         }
@@ -87,6 +87,8 @@ func main() {
             }
         }()
     }
+
+    log.Printf("%v", output)
 
     // keep track of all ids
     ids := NewStringSet()
@@ -131,7 +133,6 @@ func main() {
         counter += 1
     }
 
-    log.Printf("Looped over %d records.\n", counter)
-    log.Printf("Uniq: %d\n", ids.Size())
-    log.Printf("Skipped: %d\n", len(skipped))
+    log.Printf("%d records\n", counter)
+    log.Printf("%d uniq, %d skipped\n", ids.Size(), len(skipped))
 }
