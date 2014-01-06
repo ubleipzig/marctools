@@ -9,6 +9,7 @@ Included: [`marcdump`](https://github.com/miku/gomarckit#marcdump),
 [`marcxmltojson`](https://github.com/miku/gomarckit#marcxmltojson),
 [`marcsplit`](https://github.com/miku/gomarckit#marcsplit),
 [`marccount`](https://github.com/miku/gomarckit#marccount),
+[`marcuniq`](https://github.com/miku/gomarckit#marcuniq),
 [`marciter`](https://github.com/miku/gomarckit#marciter).
 
 Based on [marc21](https://gitorious.org/marc21-go/marc21) by
@@ -355,6 +356,24 @@ Count the number of records in a file (fast). Can be about 4 times faster than
 
 for files with a lot of small records. Up to 20 times faster,
 when the Linux file system cache is warmed up.
+
+
+marcuniq
+--------
+
+Like `uniq` but consider MARC files and their 001 fields.
+
+    Usage: marcuniq [OPTIONS] MARCFILE
+      -i=false: ignore marc errors (not recommended)
+      -o="": output file (or stdout if none given)
+      -v=false: prints current program version
+      -x="": comma separated list of ids to exclude (or filename with one id per line)
+
+The `-x` option is a bit unrelated. It lets in addition specify ids, that
+should be ignored completely. It can be a comma separated string or a filename
+with one id per line. Example:
+
+    $ marcuniq -x excludes.txt -o filtered.mrc file.mrc
 
 
 marciter
