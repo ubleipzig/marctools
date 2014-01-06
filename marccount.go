@@ -10,7 +10,7 @@ import (
     "strconv"
 )
 
-const app_version = "1.3.0"
+const app_version = "1.3.1"
 
 func record_length(reader io.Reader) (length int64, err error) {
     var l int

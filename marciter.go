@@ -20,7 +20,7 @@ import (
     "os"
 )
 
-const app_version = "1.3.0"
+const app_version = "1.3.1"
 
 func main() {
 

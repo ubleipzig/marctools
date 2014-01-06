@@ -24,6 +24,6 @@ clean: clean-installed
 rpm: $(targets)
 	mkdir -p $(HOME)/rpmbuild/{BUILD,SOURCES,SPECS,RPMS}
 	cp gomarckit.spec $(HOME)/rpmbuild/SPECS
-	cp marctotsv marctojson marcxmltojson marcdump marcsplit marccount $(HOME)/rpmbuild/BUILD
+	cp marctotsv marctojson marcxmltojson marcdump marcsplit marccount marcuniq $(HOME)/rpmbuild/BUILD
 	./buildrpm.sh gomarckit
 	cp $(HOME)/rpmbuild/RPMS/x86_64/*rpm .

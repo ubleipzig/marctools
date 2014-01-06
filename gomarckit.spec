@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       gomarckit
-Version:    1.3.0
+Version:    1.3.1
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -21,6 +21,7 @@ Other:
 * marcsplit
 * marccount
 * marcdump
+* marcuniq
 
 
 %prep
@@ -44,6 +45,7 @@ install -m 755 marcxmltojson $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcsplit $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marccount $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcdump $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marcuniq $RPM_BUILD_ROOT/usr/local/sbin
 
 
 %post
@@ -64,10 +66,15 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/marcsplit
 /usr/local/sbin/marccount
 /usr/local/sbin/marcdump
+/usr/local/sbin/marcuniq
 
 
 
 %changelog
+* Mon Jan 06 2014 Martin Czygan
+- 1.3.1 release
+- added marcuniq
+
 * Mon Dec 09 2013 Martin Czygan
 - 1.3 release
 - added Go 1.2 benchmark
