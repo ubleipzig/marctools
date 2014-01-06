@@ -93,37 +93,38 @@ func main() {
     // exclude list
     excludedIds := NewStringSet()
 
-    if _, err := os.Stat(*exclude); err != nil {
-        if os.IsNotExist(err) {
-            fmt.Fprintf(os.Stderr, "excluded ids interpreted as string\n")
-            for _, value := range strings.Split(*exclude, ",") {
-                excludedIds.Add(strings.TrimSpace(value))
-            }
-        } else if err != nil {
-            panic(err)
-        }
-    } else {
-        fmt.Fprintf(os.Stderr, "excluded ids interpreted as file\n")
-
-        // read one id per line from file
-        xfi, err := os.Open(*exclude)
-        if err != nil {
-            panic(err)
-        }
-
-        defer func() {
-            if err := xfi.Close(); err != nil {
+    if *exclude != "" {
+        if _, err := os.Stat(*exclude); err != nil {
+            if os.IsNotExist(err) {
+                fmt.Fprintf(os.Stderr, "excluded ids interpreted as string\n")
+                for _, value := range strings.Split(*exclude, ",") {
+                    excludedIds.Add(strings.TrimSpace(value))
+                }
+            } else if err != nil {
                 panic(err)
             }
-        }()
+        } else {
+            fmt.Fprintf(os.Stderr, "excluded ids interpreted as file\n")
 
-        scanner := bufio.NewScanner(xfi)
-        for scanner.Scan() {
-            excludedIds.Add(strings.TrimSpace(scanner.Text()))
+            // read one id per line from file
+            xfi, err := os.Open(*exclude)
+            if err != nil {
+                panic(err)
+            }
+
+            defer func() {
+                if err := xfi.Close(); err != nil {
+                    panic(err)
+                }
+            }()
+
+            scanner := bufio.NewScanner(xfi)
+            for scanner.Scan() {
+                excludedIds.Add(strings.TrimSpace(scanner.Text()))
+            }
         }
+        fmt.Fprintf(os.Stderr, "%d ids to exclude loaded\n", excludedIds.Size())
     }
-
-    fmt.Fprintf(os.Stderr, "%d ids to exclude loaded\n", excludedIds.Size())
 
     // collect the excluded ids here
     excluded := make([]string, 0, 0)
