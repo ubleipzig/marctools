@@ -22,6 +22,7 @@ _testmain.go
 *.exe
 *.rpm
 .vagrant/
+Vagrantfile
 
 loktotsv
 marccount
