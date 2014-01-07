@@ -73,10 +73,9 @@ marctotsv
 
 
 
-Convert MARC21 to tsv. If a given tag or subfield has multiple values, just
-the first one is considered. Most useful for control fields or non-repeatable fields
-with a single subfield. For repeated fields, use the `-s` flag to specify a value
-delimiter.
+Convert MARC21 to TSV (tab-separated values). By default, if a given tag or subfield has multiple values, just the first one is considered. Most useful for control fields or non-repeatable fields with a single subfield.
+
+For repeated fields, use the `-s` flag to specify a value delimiter.
 
 Examples:
 
@@ -98,7 +97,7 @@ Empty tag values get a default fill value `<NULL>`:
     385411057   087701723   20120910090145  DE-540
     ...
 
-Use a custom `fillna` tag:
+Use a custom *fill NA* tag with `-f`:
 
     $ ./marctotsv test.mrc -f UNDEF 001 004 005 852.a
     ...
@@ -108,7 +107,7 @@ Use a custom `fillna` tag:
     385411057   087701723   20120910090145  DE-540
     ...
 
-Or skip non-complete row entirely:
+Or skip non-complete row entirely with `-k` (hard to see):
 
     $ ./marctotsv test.mrc -k 001 004 005 852.a
     ...
@@ -176,6 +175,16 @@ marctojson
 
 Similar output to [marctojson](https://github.com/miku/marctojson) (Java version).
 The Go version is a bit more lightweight and faster.
+
+----
+
+Note: The JSON format is tailored for a project, which uses [Elasticsearch](http://www.elasticsearch.org/). The idea was to make queries as convenient as possible.
+Here a some example queries:
+
+    $ curl localhost:9200/_search?q=content.001:007717717
+    $ curl localhost:9200/_search?q=content.020.a:0-684-84328-5
+
+----
 
 Performance data points:
 
