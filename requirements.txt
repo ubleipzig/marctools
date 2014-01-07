@@ -1,5 +1,0 @@
-argparse==1.2.1
-colorama==0.2.7
-distribute==0.6.34
--e git+ssh://git@github.com/spotify/luigi.git@cffc24f2e8c7ce283bae39fec3dbb1f3fcf06d99#egg=luigi-dev
-wsgiref==0.1.2
