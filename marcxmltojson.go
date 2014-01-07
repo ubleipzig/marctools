@@ -40,7 +40,7 @@ import (
     "strings"
 )
 
-const app_version = "1.3.4"
+const app_version = "1.3.5"
 
 type ControlField struct {
     Value string `xml:",chardata"`

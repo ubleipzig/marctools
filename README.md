@@ -387,8 +387,8 @@ Example with inline excludes:
 marcmap
 -------
 
-Generate tab separated values of the id, offset and length of the MARC records
-in a file:
+Generate tab separated values of the id (001), offset and length of the
+MARC records in a file:
 
     Usage: ./marcmap [OPTIONS] MARCFILE
       -i=false: ignore marc errors (not recommended)
@@ -402,6 +402,11 @@ Example:
     1000570320  1657  861
     1000570045  2518  908
     1000555798  3426  823
+
+This tool uses `yaz-marcdump` and `awk` internally to be more performant.
+A 4.3G file with 4007803 records takes less than two minutes to map.
+(The original version without the external commands needed to parse each record
+and took about four minutes on the above file.)
 
 
 marciter

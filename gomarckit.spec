@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       gomarckit
-Version:    1.3.4
+Version:    1.3.5
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -73,6 +73,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Tue Jan 07 2014 Martin Czygan
+- 1.3.5 release
+- make marcmap fast (yaz-marcdump and awk required)
+
 * Tue Jan 07 2014 Martin Czygan
 - 1.3.4 release
 - added marcmap utility
