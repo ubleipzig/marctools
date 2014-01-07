@@ -1,7 +1,9 @@
 gomarckit
 =========
 
-Current release: https://github.com/miku/gomarckit/releases/tag/v1.3
+Various MARC command line utilities, with an eye on performance. 
+
+Current release: https://github.com/miku/gomarckit/releases/latest
 
 Included:
 
