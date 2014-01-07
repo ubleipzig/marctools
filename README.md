@@ -3,7 +3,7 @@ gomarckit
 
 Various MARC command line utilities, with an eye on performance. 
 
-Current release: https://github.com/miku/gomarckit/releases/latest
+Current release (as RPM): https://github.com/miku/gomarckit/releases/latest
 
 Included:
 
