@@ -29,6 +29,14 @@ You'll [need a Go installation](http://golang.org/doc/install):
     $ cd gomarckit
     $ make
 
+To symlink the executables:
+
+    $ make install-home
+
+To clean everything:
+
+    $ make clean
+
 
 marcdump
 --------
