@@ -1,15 +1,5 @@
-// Simple tool to test baseline iteration speed of marc records in Go.
-// Using [marc21](https://gitorious.org/marc21-go/marc21).
-//
-// Test file: 4007756 records, 4.3G
-//
-// A baseline iteration, which only creates the MARC data structures takes about
-// 4 minutes in Go, which amounts to about 17425 records per seconds.
-//
-// A simple yaz-marcdump -np seems to iterate over the same 4007756 records in
-// about 30 seconds (133591 records per second) and a dev/nulled iteration about 65
-// seconds (61657 records per second). So C is still three three to four times
-// faster.
+// Create a seekmap of the form (sorted by OFFSET)
+// ID OFFSET LENGTH
 package main
 
 import (
@@ -24,8 +14,8 @@ const app_version = "1.3.4"
 
 func main() {
 
-    ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
     version := flag.Bool("v", false, "prints current program version")
+    ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
 
     var PrintUsage = func() {
         fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -46,7 +36,8 @@ func main() {
 
     fi, err := os.Open(flag.Args()[0])
     if err != nil {
-        panic(err)
+        fmt.Printf("%s\n", err)
+        os.Exit(1)
     }
 
     defer func() {
@@ -55,9 +46,9 @@ func main() {
         }
     }()
 
-    counter := 0
     for {
-        _, err := marc21.ReadRecord(fi)
+        head, _ := fi.Seek(0, os.SEEK_CUR)
+        record, err := marc21.ReadRecord(fi)
         if err == io.EOF {
             break
         }
@@ -69,7 +60,11 @@ func main() {
                 panic(err)
             }
         }
-        counter += 1
+        tail, _ := fi.Seek(0, os.SEEK_CUR)
+        length := tail - head
+
+        fields := record.GetFields("001")
+        id := fields[0].(*marc21.ControlField).Data
+        fmt.Printf("%s\t%d\t%d\n", id, head, length)
     }
-    fmt.Printf("Looped over %d records.\n", counter)
 }

@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       gomarckit
-Version:    1.3.3
+Version:    1.3.4
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -17,11 +17,12 @@ Highlights:
 
 Other:
 
-* marcxmltojson (non-streaming)
-* marcsplit
 * marccount
 * marcdump
+* marcmap
+* marcsplit
 * marcuniq
+* marcxmltojson (non-streaming)
 
 
 %prep
@@ -39,13 +40,14 @@ mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 
 # put the files in to the relevant directories.
 # the argument on -m is the permissions expressed as octal. (See chmod man page for details.)
-install -m 755 marctotsv $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marctojson $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marcxmltojson $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marcsplit $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marccount $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcdump $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marcmap $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marcsplit $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marctojson $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marctotsv $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcuniq $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marcxmltojson $RPM_BUILD_ROOT/usr/local/sbin
 
 
 %post
@@ -60,17 +62,21 @@ rm -rf %{_topdir}/BUILD/%{name}
 # list files owned by the package here
 %files
 %defattr(-,root,root)
-/usr/local/sbin/marctotsv
-/usr/local/sbin/marctojson
-/usr/local/sbin/marcxmltojson
-/usr/local/sbin/marcsplit
 /usr/local/sbin/marccount
 /usr/local/sbin/marcdump
+/usr/local/sbin/marcmap
+/usr/local/sbin/marcsplit
+/usr/local/sbin/marctojson
+/usr/local/sbin/marctotsv
 /usr/local/sbin/marcuniq
-
+/usr/local/sbin/marcxmltojson
 
 
 %changelog
+* Tue Jan 07 2014 Martin Czygan
+- 1.3.4 release
+- added marcmap utility
+
 * Mon Jan 06 2014 Martin Czygan
 - 1.3.3 release
 - allow files marcuniq -x

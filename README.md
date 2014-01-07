@@ -10,6 +10,7 @@ Included:
 * [`marccount`](https://github.com/miku/gomarckit#marccount)
 * [`marcdump`](https://github.com/miku/gomarckit#marcdump)
 * [`marciter`](https://github.com/miku/gomarckit#marciter)
+* [`marcmap`](https://github.com/miku/gomarckit#marcmap)
 * [`marcsplit`](https://github.com/miku/gomarckit#marcsplit)
 * [`marctojson`](https://github.com/miku/gomarckit#marctojson)
 * [`marctotsv`](https://github.com/miku/gomarckit#marctotsv)
@@ -344,7 +345,6 @@ XML file takes about 1m and is about twice as fast as a corresponding Python
 version.
 
 
-
 marcsplit
 ---------
 
@@ -382,6 +382,26 @@ with one id per line. Example with filename:
 Example with inline excludes:
 
     $ marcuniq -x '15270, 15298, 15318, 15335' file.mrc > filtered.mrc
+
+
+marcmap
+-------
+
+Generate tab separated values of the id, offset and length of the MARC records
+in a file:
+
+    Usage: ./marcmap [OPTIONS] MARCFILE
+      -i=false: ignore marc errors (not recommended)
+      -v=false: prints current program version
+
+Example:
+
+    $ marcmap file.mrc|head -5
+    1000574288  0 880
+    1000572307  880 777
+    1000570320  1657  861
+    1000570045  2518  908
+    1000555798  3426  823
 
 
 marciter

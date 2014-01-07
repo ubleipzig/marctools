@@ -7,7 +7,7 @@ import "fmt"
 import "io"
 import "os"
 
-const app_version = "1.3.3"
+const app_version = "1.3.4"
 
 func main() {
 

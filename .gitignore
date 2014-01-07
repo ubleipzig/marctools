@@ -24,12 +24,13 @@ _testmain.go
 .vagrant/
 
 loktotsv
+marccount
 marcdump
 marciter
-marctojson
+marcmap
 marcsplit
+marctojson
 marctotsv
-marccount
-marcxmltojson
 marcuniq
+marcxmltojson
 test-*
