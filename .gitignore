@@ -37,3 +37,4 @@ marctotsv
 marcuniq
 marcxmltojson
 test-*
+*.man
