@@ -433,6 +433,13 @@ A 4.3G file with 4007803 records takes less than two minutes to map.
 (The original version without the external commands needed to parse each record
 and took about four minutes on the above file.)
 
+----
+
+Note: Since this tools won't parse the record, it cannot at the moment handle
+files with records, that have no ID value (no 001 field).
+
+----
+
 Since 1.3.6: You can use the `-o FILE` flag to specify a filename where
 a sqlite3 representation of the data is written into a table called
 `seekmap(id, offset, length)`. Example:
