@@ -433,6 +433,15 @@ A 4.3G file with 4007803 records takes less than two minutes to map.
 (The original version without the external commands needed to parse each record
 and took about four minutes on the above file.)
 
+Since 1.3.6: You can use the `-o FILE` flag to specify a filename where
+a sqlite3 representation of the data is written into a table called
+`seekmap(id, offset, length)`. Example:
+
+    $ marcmap -o test.db test-dups.mrc
+    $ sqlite3 test.db ".schema seekmap"
+    CREATE TABLE seekmap (id text, offset int, length int);
+    $ sqlite3 test.db "select count(*) from seekmap"
+    102812
 
 marciter
 --------
