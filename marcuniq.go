@@ -132,9 +132,11 @@ func main() {
     // keep track of all ids
     ids := NewStringSet()
     // collect the duplicate ids; array, since same id may occur many times
+    // skipped could be an integer for now, because we do not display the skipped
+    // records (TODO: add flag to display skipped records)
     skipped := make([]string, 0, 0)
-    // just count the total records
-    counter := 0
+    // just count the total records and those without id
+    var counter, without_id int
 
     for {
         head, _ := fi.Seek(0, os.SEEK_CUR)
@@ -154,27 +156,31 @@ func main() {
         length := tail - head
 
         fields := record.GetFields("001")
-        id := fields[0].(*marc21.ControlField).Data
-        if ids.Contains(id) {
-            skipped = append(skipped, id)
-        } else if excludedIds.Contains(id) {
-            excluded = append(excluded, id)
-        } else {
-            ids.Add(id)
-            fi.Seek(head, 0)
-            buf := make([]byte, length)
-            n, err := fi.Read(buf)
-            if err != nil {
-                panic(err)
+        if len(fields) > 0 {
+            id := fields[0].(*marc21.ControlField).Data
+            if ids.Contains(id) {
+                skipped = append(skipped, id)
+            } else if excludedIds.Contains(id) {
+                excluded = append(excluded, id)
+            } else {
+                ids.Add(id)
+                fi.Seek(head, 0)
+                buf := make([]byte, length)
+                n, err := fi.Read(buf)
+                if err != nil {
+                    panic(err)
+                }
+                if _, err := output.Write(buf[:n]); err != nil {
+                    panic(err)
+                }
             }
-            if _, err := output.Write(buf[:n]); err != nil {
-                panic(err)
-            }
+        } else if len(fields) == 0 {
+            without_id += 1
         }
         counter += 1
     }
 
     fmt.Fprintf(os.Stderr, "%d records read\n", counter)
-    fmt.Fprintf(os.Stderr, "%d records written, %d skipped, %d excluded\n",
-        ids.Size(), len(skipped), len(excluded))
+    fmt.Fprintf(os.Stderr, "%d records written, %d skipped, %d excluded, %d without ID (001)\n",
+        ids.Size(), len(skipped), len(excluded), without_id)
 }
