@@ -10,7 +10,7 @@ import (
     "strings"
 )
 
-const app_version = "1.3.5"
+const app_version = "1.3.6"
 
 // poor mans string set
 type StringSet struct {
