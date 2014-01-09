@@ -414,8 +414,8 @@ marcmap
 Generate tab separated values of the id (001), offset and length of the
 MARC records in a file:
 
-    Usage: ./marcmap [OPTIONS] MARCFILE
-      -i=false: ignore marc errors (not recommended)
+    Usage: marcmap [OPTIONS] MARCFILE
+      -o="": output to sqlite3 file
       -v=false: prints current program version
 
 Example:
