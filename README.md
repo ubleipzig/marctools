@@ -23,17 +23,25 @@ Based on [marc21](https://gitorious.org/marc21-go/marc21) by
 Build
 -----
 
-You'll [need a Go installation](http://golang.org/doc/install):
+You'll [need a Go installation](http://golang.org/doc/install).
+
+Go library dependencies:
+
+* [github.com/mattn/go-sqlite3](https://github.com/mattn/go-sqlite3)
+
+Build:
 
     $ git clone git@github.com:miku/gomarckit.git
     $ cd gomarckit
     $ make
 
-To symlink the executables:
+
+Symlink the executables:
 
     $ make install-home
 
-To clean everything:
+
+Clean everything:
 
     $ make clean
 

@@ -3,9 +3,11 @@
 package main
 
 import (
+    "database/sql"
     "errors"
     "flag"
     "fmt"
+    _ "github.com/mattn/go-sqlite3"
     "io"
     "log"
     "os"
@@ -40,6 +42,7 @@ func record_length(reader io.Reader) (length int64, err error) {
 func main() {
 
     version := flag.Bool("v", false, "prints current program version")
+    output := flag.String("o", "", "output to sqlite3 file")
 
     var PrintUsage = func() {
         fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -92,16 +95,62 @@ func main() {
     }
 
     ids := strings.Split(string(out), "\n")
-
     var i, offset int64
-    for {
-        length, err := record_length(fi)
-        if err == io.EOF {
-            break
+
+    if *output == "" {
+        // plain TSV format
+        for {
+            length, err := record_length(fi)
+            if err == io.EOF {
+                break
+            }
+            fmt.Printf("%s\t%d\t%d\n", ids[i], offset, length)
+            offset += length
+            i += 1
+            fi.Seek(offset, 0)
         }
-        fmt.Printf("%s\t%d\t%d\n", ids[i], offset, length)
-        offset += length
-        i += 1
-        fi.Seek(offset, 0)
+    } else {
+        // dump results into sqlite3
+        if *output == "" {
+            panic("sqlite3 target filename required")
+        }
+
+        db, err := sql.Open("sqlite3", *output)
+        if err != nil {
+            log.Fatal(err)
+        }
+        defer db.Close()
+
+        init := `CREATE TABLE seekmap (id text, offset int, length int)`
+        _, err = db.Exec(init)
+        if err != nil {
+            panic(fmt.Sprintf("%q: %s\n", err, init))
+        }
+
+        tx, err := db.Begin()
+        if err != nil {
+            panic(err)
+        }
+        stmt, err := tx.Prepare("INSERT INTO seekmap VALUES (?, ?, ?)")
+        if err != nil {
+            panic(err)
+        }
+        defer stmt.Close()
+
+        for {
+            length, err := record_length(fi)
+            if err == io.EOF {
+                break
+            }
+            _, err = stmt.Exec(ids[i], offset, length)
+            if err != nil {
+                panic(err)
+            }
+
+            offset += length
+            i += 1
+            fi.Seek(offset, 0)
+        }
+        tx.Commit()
     }
 }
