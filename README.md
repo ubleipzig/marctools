@@ -9,7 +9,6 @@ Included:
 
 * [`marccount`](https://github.com/miku/gomarckit#marccount)
 * [`marcdump`](https://github.com/miku/gomarckit#marcdump)
-* [`marciter`](https://github.com/miku/gomarckit#marciter)
 * [`marcmap`](https://github.com/miku/gomarckit#marcmap)
 * [`marcsplit`](https://github.com/miku/gomarckit#marcsplit)
 * [`marctojson`](https://github.com/miku/gomarckit#marctojson)
