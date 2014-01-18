@@ -29,11 +29,15 @@ rpm: $(targets)
 	./buildrpm.sh gomarckit
 	cp $(HOME)/rpmbuild/RPMS/x86_64/*rpm .
 
+vagrant.key:
+	curl -sL "https://raw2.github.com/mitchellh/vagrant/master/keys/vagrant" > vagrant.key
+	chmod 0600 vagrant.key
+
 # helper to build RPM on a RHEL6 VM, to link against glibc 2.12
 # Assumes a RHEL6 go installation (http://nareshv.blogspot.de/2013/08/installing-go-lang-11-on-centos-64-64.html)
 # And: sudo yum install git rpm-build
 # Don't forget to vagrant up :)
-rpm-compatible:
-	ssh -o StrictHostKeyChecking=no -i /opt/vagrant/embedded/gems/gems/vagrant-1.3.5/keys/vagrant vagrant@127.0.0.1 -p 2222 "GOPATH=/home/vagrant go get github.com/mattn/go-sqlite3"
-	ssh -o StrictHostKeyChecking=no -i /opt/vagrant/embedded/gems/gems/vagrant-1.3.5/keys/vagrant vagrant@127.0.0.1 -p 2222 "cd /home/vagrant/github/miku/gomarckit && git pull origin master && GOPATH=/home/vagrant make rpm"
-	scp -o port=2222 -o StrictHostKeyChecking=no -i /opt/vagrant/embedded/gems/gems/vagrant-1.3.5/keys/vagrant vagrant@127.0.0.1:/home/vagrant/github/miku/gomarckit/*rpm .
+rpm-compatible: vagrant.key
+	ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 2222 "GOPATH=/home/vagrant go get github.com/mattn/go-sqlite3"
+	ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 2222 "cd /home/vagrant/github/miku/gomarckit && git pull origin master && GOPATH=/home/vagrant make rpm"
+	scp -o port=2222 -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1:/home/vagrant/github/miku/gomarckit/*rpm .

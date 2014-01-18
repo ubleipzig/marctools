@@ -23,6 +23,7 @@ _testmain.go
 *.rpm
 .vagrant/
 Vagrantfile
+vagrant.key
 requirements.txt
 
 loktotsv
