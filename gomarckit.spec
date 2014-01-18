@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       gomarckit
-Version:    1.3.6
+Version:    1.3.7
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -73,6 +73,11 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Sat Jan 19 2014 Martin Czygan
+- 1.3.7 release
+- RHEL6 compatible release (glibc 2.12)
+- added `make rpm-compatible` as build helper
+
 * Tue Jan 09 2014 Martin Czygan
 - 1.3.6 release
 - added marcmap sqlite3 export option via -o

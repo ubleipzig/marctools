@@ -28,3 +28,8 @@ rpm: $(targets)
 	   marcuniq marcmap $(HOME)/rpmbuild/BUILD
 	./buildrpm.sh gomarckit
 	cp $(HOME)/rpmbuild/RPMS/x86_64/*rpm .
+
+# helper to build RPM on a RHEL6 VM, to link against glibc 2.12
+rpm-compatible:
+	ssh -o StrictHostKeyChecking=no -i /opt/vagrant/embedded/gems/gems/vagrant-1.3.5/keys/vagrant vagrant@127.0.0.1 -p 2222 "cd /home/vagrant/github/miku/gomarckit && git pull origin master && make rpm"
+	scp -o port=2222 -o StrictHostKeyChecking=no -i /opt/vagrant/embedded/gems/gems/vagrant-1.3.5/keys/vagrant vagrant@127.0.0.1:/home/vagrant/github/miku/gomarckit/*rpm .
