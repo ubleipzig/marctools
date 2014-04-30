@@ -32,6 +32,7 @@ Build:
 
     $ git clone git@github.com:miku/gomarckit.git
     $ cd gomarckit
+    $ go get github.com/mattn/go-sqlite3
     $ make
 
 
