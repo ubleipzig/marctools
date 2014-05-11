@@ -15,7 +15,7 @@ import (
     "strconv"
 )
 
-const app_version = "1.3.7"
+const app_version = "1.3.8"
 
 func record_length(reader io.Reader) (length int64, err error) {
     data := make([]byte, 24)

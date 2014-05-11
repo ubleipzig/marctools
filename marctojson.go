@@ -56,7 +56,7 @@ import (
     "strings"
 )
 
-const app_version = "1.3.7"
+const app_version = "1.3.8"
 
 // Turn a list of key=value,key=value strings into a map.
 func stringToMap(s string) map[string]string {

@@ -16,7 +16,7 @@ import (
     "strings"
 )
 
-const app_version = "1.3.7"
+const app_version = "1.3.8"
 
 func record_length(reader io.Reader) (length int64, err error) {
     var l int
@@ -121,7 +121,7 @@ func main() {
         }
         defer db.Close()
 
-        init := `CREATE TABLE seekmap (id text, offset int, length int)`
+        init := `CREATE TABLE IF NOT EXISTS seekmap (id text, offset int, length int)`
         _, err = db.Exec(init)
         if err != nil {
             panic(fmt.Sprintf("%q: %s\n", err, init))
@@ -150,6 +150,12 @@ func main() {
             offset += length
             i += 1
             fi.Seek(offset, 0)
+        }
+
+        // create index
+        _, err = tx.Exec("CREATE INDEX idx_seekmap_id ON seekmap (id)")
+        if err != nil {
+            panic(err)
         }
         tx.Commit()
     }

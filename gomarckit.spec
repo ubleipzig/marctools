@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       gomarckit
-Version:    1.3.7
+Version:    1.3.8
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -73,6 +73,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Sat Sun 11 2014 Martin Czygan
+- 1.3.8 release
+- index seekmap sqlite3 table
+
 * Sat Jan 19 2014 Martin Czygan
 - 1.3.7 release
 - RHEL6 compatible release (glibc 2.12)
