@@ -73,7 +73,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
-* Sat Sun 11 2014 Martin Czygan
+* Sun May 11 2014 Martin Czygan
 - 1.3.8 release
 - index seekmap sqlite3 table
 
