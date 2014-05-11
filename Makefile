@@ -2,6 +2,8 @@ sources = $(wildcard *.go)
 targets = $(basename $(sources))
 installed = $(sources:%.go=$(HOME)/bin/%)
 
+SSH = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 2222
+
 all: $(targets)
 
 %: %.go
@@ -37,7 +39,13 @@ vagrant.key:
 # Assumes a RHEL6 go installation (http://nareshv.blogspot.de/2013/08/installing-go-lang-11-on-centos-64-64.html)
 # And: sudo yum install git rpm-build
 # Don't forget to vagrant up :)
+vm-setup: vagrant.key
+	$(SSH) "sudo yum install -y https://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm"
+	$(SSH) "sudo yum install -y golang git rpm-build"
+	$(SSH) "mkdir -p /home/vagrant/github/miku"
+	$(SSH) "cd /home/vagrant/github/miku && git clone https://github.com/miku/gomarckit.git"
+
 rpm-compatible: vagrant.key
-	ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 2222 "GOPATH=/home/vagrant go get github.com/mattn/go-sqlite3"
-	ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 2222 "cd /home/vagrant/github/miku/gomarckit && git pull origin master && GOPATH=/home/vagrant make rpm"
+	$(SSH) "GOPATH=/home/vagrant go get github.com/mattn/go-sqlite3"
+	$(SSH) "cd /home/vagrant/github/miku/gomarckit && git pull origin master && GOPATH=/home/vagrant make rpm"
 	scp -o port=2222 -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1:/home/vagrant/github/miku/gomarckit/*rpm .
