@@ -30,175 +30,175 @@
 package main
 
 import (
-    "encoding/json"
-    "encoding/xml"
-    "flag"
-    "fmt"
-    "io/ioutil"
-    "os"
-    "runtime"
-    "strings"
+	"encoding/json"
+	"encoding/xml"
+	"flag"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"runtime"
+	"strings"
 )
 
 const app_version = "1.3.8"
 
 type ControlField struct {
-    Value string `xml:",chardata"`
-    Tag   string `xml:"tag,attr"`
+	Value string `xml:",chardata"`
+	Tag   string `xml:"tag,attr"`
 }
 
 type Subfield struct {
-    Value string `xml:",chardata"`
-    Code  string `xml:"code,attr"`
+	Value string `xml:",chardata"`
+	Code  string `xml:"code,attr"`
 }
 
 type DataField struct {
-    Tag       string     `xml:"tag,attr"`
-    Ind1      string     `xml:"ind1,attr"`
-    Ind2      string     `xml:"ind2,attr"`
-    Subfields []Subfield `xml:"http://www.loc.gov/MARC21/slim subfield"`
+	Tag       string     `xml:"tag,attr"`
+	Ind1      string     `xml:"ind1,attr"`
+	Ind2      string     `xml:"ind2,attr"`
+	Subfields []Subfield `xml:"http://www.loc.gov/MARC21/slim subfield"`
 }
 
 type Record struct {
-    Leader        string         `xml:"http://www.loc.gov/MARC21/slim leader"`
-    ControlFields []ControlField `xml:"http://www.loc.gov/MARC21/slim controlfield"`
-    DataFields    []DataField    `xml:"http://www.loc.gov/MARC21/slim datafield"`
+	Leader        string         `xml:"http://www.loc.gov/MARC21/slim leader"`
+	ControlFields []ControlField `xml:"http://www.loc.gov/MARC21/slim controlfield"`
+	DataFields    []DataField    `xml:"http://www.loc.gov/MARC21/slim datafield"`
 }
 
 type Collection struct {
-    XMLName xml.Name `xml:"http://www.loc.gov/MARC21/slim collection"`
-    Records []Record `xml:"http://www.loc.gov/MARC21/slim record"`
+	XMLName xml.Name `xml:"http://www.loc.gov/MARC21/slim collection"`
+	Records []Record `xml:"http://www.loc.gov/MARC21/slim record"`
 }
 
 // Turn a list of key=value,key=value strings into a map.
 func stringToMap(s string) map[string]string {
-    result := make(map[string]string)
-    if len(s) == 0 {
-        return result
-    }
-    for _, pair := range strings.Split(s, ",") {
-        kv := strings.Split(pair, "=")
-        if len(kv) != 2 {
-            panic(fmt.Sprintf("Could not parse key-value parameter: %s", s))
-        } else {
-            result[kv[0]] = kv[1]
-        }
-    }
-    return result
+	result := make(map[string]string)
+	if len(s) == 0 {
+		return result
+	}
+	for _, pair := range strings.Split(s, ",") {
+		kv := strings.Split(pair, "=")
+		if len(kv) != 2 {
+			panic(fmt.Sprintf("Could not parse key-value parameter: %s", s))
+		} else {
+			result[kv[0]] = kv[1]
+		}
+	}
+	return result
 }
 
 // Convert a single unmarshalled record struct into a map.
 func (record *Record) ToMap() map[string]interface{} {
-    dict := make(map[string]interface{})
-    dict["leader"] = record.Leader
-    for _, field := range record.ControlFields {
-        dict[field.Tag] = field.Value
-    }
-    for _, field := range record.DataFields {
-        submap := make(map[string]interface{})
-        submap["ind1"] = field.Ind1
-        submap["ind2"] = field.Ind2
-        for _, subfield := range field.Subfields {
-            value, present := submap[subfield.Code]
-            if present {
-                switch t := value.(type) {
-                default:
-                    panic(fmt.Sprintf("unexpected type: %T", t))
-                case string:
-                    values := make([]string, 0)
-                    values = append(values, value.(string))
-                    values = append(values, subfield.Value)
-                    submap[subfield.Code] = values
-                case []string:
-                    submap[subfield.Code] = append(submap[subfield.Code].([]string), subfield.Value)
-                }
-            } else {
-                submap[subfield.Code] = subfield.Value
-            }
-        }
-        _, present := dict[field.Tag]
-        if !present {
-            subfields := make([]interface{}, 0)
-            dict[field.Tag] = subfields
-        }
-        dict[field.Tag] = append(dict[field.Tag].([]interface{}), submap)
-    }
-    return dict
+	dict := make(map[string]interface{})
+	dict["leader"] = record.Leader
+	for _, field := range record.ControlFields {
+		dict[field.Tag] = field.Value
+	}
+	for _, field := range record.DataFields {
+		submap := make(map[string]interface{})
+		submap["ind1"] = field.Ind1
+		submap["ind2"] = field.Ind2
+		for _, subfield := range field.Subfields {
+			value, present := submap[subfield.Code]
+			if present {
+				switch t := value.(type) {
+				default:
+					panic(fmt.Sprintf("unexpected type: %T", t))
+				case string:
+					values := make([]string, 0)
+					values = append(values, value.(string))
+					values = append(values, subfield.Value)
+					submap[subfield.Code] = values
+				case []string:
+					submap[subfield.Code] = append(submap[subfield.Code].([]string), subfield.Value)
+				}
+			} else {
+				submap[subfield.Code] = subfield.Value
+			}
+		}
+		_, present := dict[field.Tag]
+		if !present {
+			subfields := make([]interface{}, 0)
+			dict[field.Tag] = subfields
+		}
+		dict[field.Tag] = append(dict[field.Tag].([]interface{}), submap)
+	}
+	return dict
 }
 
 func main() {
 
-    version := flag.Bool("v", false, "prints current program version and exit")
-    verbose := flag.Bool("verbose", false, "print memstats and record count")
-    plainVar := flag.Bool("p", false, "plain mode: dump without content and meta")
-    metaVar := flag.String("m", "", "a key=value pair to pass to meta")
+	version := flag.Bool("v", false, "prints current program version and exit")
+	verbose := flag.Bool("verbose", false, "print memstats and record count")
+	plainVar := flag.Bool("p", false, "plain mode: dump without content and meta")
+	metaVar := flag.String("m", "", "a key=value pair to pass to meta")
 
-    var PrintUsage = func() {
-        fmt.Fprintf(os.Stderr, "Usage: %s MARCFILE\n", os.Args[0])
-        flag.PrintDefaults()
-    }
+	var PrintUsage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s MARCFILE\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 
-    flag.Parse()
+	flag.Parse()
 
-    if *version {
-        fmt.Println(app_version)
-        os.Exit(0)
-    }
+	if *version {
+		fmt.Println(app_version)
+		os.Exit(0)
+	}
 
-    if flag.NArg() < 1 {
-        PrintUsage()
-        os.Exit(1)
-    }
+	if flag.NArg() < 1 {
+		PrintUsage()
+		os.Exit(1)
+	}
 
-    handle, err := os.Open(flag.Args()[0])
-    if err != nil {
-        fmt.Println("Error opening file:", err)
-        os.Exit(1)
-    }
+	handle, err := os.Open(flag.Args()[0])
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		os.Exit(1)
+	}
 
-    defer func() {
-        if err := handle.Close(); err != nil {
-            panic(err)
-        }
-    }()
+	defer func() {
+		if err := handle.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
-    b, err := ioutil.ReadAll(handle)
-    if err != nil {
-        fmt.Println("Error reading file:", err)
-        os.Exit(1)
-    }
+	b, err := ioutil.ReadAll(handle)
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		os.Exit(1)
+	}
 
-    metamap := stringToMap(*metaVar)
+	metamap := stringToMap(*metaVar)
 
-    collection := Collection{}
-    err = xml.Unmarshal(b, &collection)
+	collection := Collection{}
+	err = xml.Unmarshal(b, &collection)
 
-    for _, record := range collection.Records {
-        recordMap := record.ToMap()
-        result := recordMap
-        if !*plainVar {
-            result = make(map[string]interface{})
-            result["content"] = recordMap
-            result["meta"] = metamap
-        }
-        b, err = json.Marshal(result)
-        if err != nil {
-            panic(fmt.Sprintf("Conversion error: %s", err))
-        }
-        os.Stdout.Write(b)
-        fmt.Println()
-    }
+	for _, record := range collection.Records {
+		recordMap := record.ToMap()
+		result := recordMap
+		if !*plainVar {
+			result = make(map[string]interface{})
+			result["content"] = recordMap
+			result["meta"] = metamap
+		}
+		b, err = json.Marshal(result)
+		if err != nil {
+			panic(fmt.Sprintf("Conversion error: %s", err))
+		}
+		os.Stdout.Write(b)
+		fmt.Println()
+	}
 
-    if *verbose {
-        memstats := runtime.MemStats{}
-        runtime.ReadMemStats(&memstats)
-        fmt.Fprintf(os.Stderr, "Alloc: %dM\n", (memstats.Alloc / 1048576))
-        fmt.Fprintf(os.Stderr, "TotalAlloc: %dM\n", (memstats.TotalAlloc / 1048576))
-        fmt.Fprintf(os.Stderr, "Sys: %dM\n", (memstats.Sys / 1048576))
-        fmt.Fprintf(os.Stderr, "Lookups: %d\n", memstats.Lookups)
-        fmt.Fprintf(os.Stderr, "Mallocs: %d\n", memstats.Mallocs)
-        fmt.Fprintf(os.Stderr, "Frees: %d\n", memstats.Frees)
+	if *verbose {
+		memstats := runtime.MemStats{}
+		runtime.ReadMemStats(&memstats)
+		fmt.Fprintf(os.Stderr, "Alloc: %dM\n", (memstats.Alloc / 1048576))
+		fmt.Fprintf(os.Stderr, "TotalAlloc: %dM\n", (memstats.TotalAlloc / 1048576))
+		fmt.Fprintf(os.Stderr, "Sys: %dM\n", (memstats.Sys / 1048576))
+		fmt.Fprintf(os.Stderr, "Lookups: %d\n", memstats.Lookups)
+		fmt.Fprintf(os.Stderr, "Mallocs: %d\n", memstats.Mallocs)
+		fmt.Fprintf(os.Stderr, "Frees: %d\n", memstats.Frees)
 
-        fmt.Fprintf(os.Stderr, "Records: %d\n", len(collection.Records))
-    }
+		fmt.Fprintf(os.Stderr, "Records: %d\n", len(collection.Records))
+	}
 }

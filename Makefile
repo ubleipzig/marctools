@@ -7,7 +7,7 @@ SSH = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 2222
 all: $(targets)
 
 %: %.go
-	gofmt -w -tabs=false -tabwidth=4 $<
+	go fmt $<
 	go build -o $@ $<
 
 $(HOME)/bin/%: %
