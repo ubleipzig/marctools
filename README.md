@@ -3,7 +3,9 @@ gomarckit
 
 Various MARC command line utilities, with an eye on performance. 
 
-Current release (as RPM): https://github.com/miku/gomarckit/releases/latest
+[![gh release](http://img.shields.io/github/release/miku/gomarckit.svg?style=flat)](https://pypi.python.org/pypi/siskin)
+
+
 
 Included:
 
