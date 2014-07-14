@@ -3,6 +3,7 @@ marctools
 
 Various MARC utilities.
 
+[![Build Status](https://travis-ci.org/miku/marctools.svg)](https://travis-ci.org/miku/marctools)
 
 Installation
 ------------
