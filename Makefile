@@ -2,8 +2,10 @@
 test:
 	go test
 
-all:
+fmt:
 	go fmt ./...
+
+all: fmt
 	go get -d && go build
 
 install:
