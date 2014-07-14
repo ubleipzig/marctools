@@ -8,8 +8,11 @@ Various MARC utilities.
 Installation
 ------------
 
-You can use debs or rpms, depending on your system.
-
-If you can or want to use your Go workspace, you can
+You will provide debs or rpms, soon. Meanwhile you would need to use your Go workspace:
 
     go get github.com/miku/marctools/cmd/{marccount,marcdump}
+
+Executables installed:
+
+    marccount
+    marcdump
