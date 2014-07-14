@@ -1,12 +1,12 @@
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
-	go test
+	go get -d && go test
 
 fmt:
 	go fmt ./...
 
-all: fmt
-	go get -d && go build
+all: fmt test
+	go build
 
 install:
 	go install
