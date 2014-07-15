@@ -3,8 +3,11 @@ package marctools
 import (
 	"bytes"
 	"database/sql"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -125,6 +128,30 @@ func TestMarcMapSqlite(t *testing.T) {
 	default:
 		if offset != "2766" || length != "1057" {
 			t.Errorf("(%s, %s), want: (2766, 1057)\n", offset, length)
+		}
+	}
+}
+
+func TestMarcSplitDirectoryPrefix(t *testing.T) {
+	dir, err := ioutil.TempDir("", "marctools-TestMarcSplitDirectoryPrefix-")
+	if err != nil {
+		t.Errorf("%s\n", err)
+	}
+
+	prefix := "prefix-"
+	MarcSplitDirectoryPrefix("./fixtures/authoritybibs.mrc", 3, dir, prefix)
+
+	expectedFiles := []string{filepath.Join(dir, fmt.Sprintf("%s%08d", prefix, 0)),
+		filepath.Join(dir, fmt.Sprintf("%s%08d", prefix, 1)),
+		filepath.Join(dir, fmt.Sprintf("%s%08d", prefix, 2))}
+
+	for _, filename := range expectedFiles {
+		if _, err := os.Stat(filename); os.IsNotExist(err) {
+			t.Errorf("%s expected: %s\n", filename, err)
+		}
+		recordCount := RecordCount(filename)
+		if recordCount != 3 {
+			t.Errorf("unexpected record count in %s: %d, want: %d", filename, recordCount, 3)
 		}
 	}
 }

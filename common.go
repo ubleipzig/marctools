@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -218,4 +219,81 @@ func MarcMapSqlite(infile, outfile string) {
 		log.Fatalln(err)
 	}
 	tx.Commit()
+}
+
+// writeSplit writes bytes beginning at offset from file into output
+// number of bytes copied is given by the buffer length
+func writeSplit(file, output *os.File, offset int64, buffer []byte) {
+	file.Seek(offset, 0)
+	file.Read(buffer)
+	output.Write(buffer)
+	err := output.Close()
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+// createSplitFile returns a writeable file object
+func createSplitFile(directory, prefix string, fileno int64) *os.File {
+	filename := filepath.Join(directory, fmt.Sprintf("%s%08d", prefix, fileno))
+	output, err := os.Create(filename)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return output
+}
+
+// MarcSplit splits a file into parts, each containing at most size records
+// and writes the to specified directory, using a specific prefix
+func MarcSplitDirectoryPrefix(infile string, size int64, directory, prefix string) {
+	file, err := os.Open(infile)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Fatalln(err)
+		}
+	}()
+
+	var i, length, cumulative, offset, batch, fileno int64
+
+	for {
+		length, err = recordLength(file)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if i%size == 0 && i > 0 {
+			output := createSplitFile(directory, prefix, fileno)
+			buffer := make([]byte, batch)
+			writeSplit(file, output, offset, buffer)
+
+			batch = 0
+			fileno += 1
+			offset = cumulative
+		}
+		cumulative += length
+		batch += length
+		file.Seek(int64(cumulative), 0)
+		i += 1
+	}
+
+	output := createSplitFile(directory, prefix, fileno)
+	buffer := make([]byte, batch)
+	writeSplit(file, output, offset, buffer)
+}
+
+// MarcSplit splits a file into parts, each containing at most size records
+// and writes the to specified directory
+func MarcSplitDirectory(infile string, size int64, directory string) {
+	MarcSplitDirectoryPrefix(infile, size, directory, "split-")
+}
+
+// MarcSplit splits a file into parts, each containing at most size records
+func MarcSplit(infile string, size int64) {
+	MarcSplitDirectoryPrefix(infile, size, ".", "split-")
 }
