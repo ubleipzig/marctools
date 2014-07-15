@@ -13,12 +13,30 @@ import (
 	"runtime"
 )
 
+type Work struct {
+	record        *marc21.Record
+	filterMap     map[string]bool
+	includeLeader bool
+	recordMapChan chan map[string]interface{}
+}
+
+func RecordToMap(work Work) {
+	recordMap := marctools.RecordToMap(work.record, work.filterMap, work.includeLeader)
+	work.recordMapChan <- recordMap
+}
+
 // preformance data points:
 // 9798925 records, sequential
 // $ time go run cmd/marctojson/marctojson.go fixtures/biglok.mrc > /dev/null
 // real	7m18.731s
 // user	6m16.256s
 // sys	1m13.612s
+
+// 9798925 records, single short-lived goroutine
+// $ time go run cmd/marctojson/marctojson.go fixtures/biglok.mrc > /dev/null
+// real	12m49.862s
+// user	12m39.992s
+// sys	3m23.380s
 func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -59,6 +77,9 @@ func main() {
 		}
 	}()
 
+	// all recordMaps are placed on this channel
+	recordMapChan := make(chan map[string]interface{})
+
 	filterMap := marctools.StringToMapSet(*filterVar)
 	writer := bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
@@ -77,7 +98,10 @@ func main() {
 			}
 		}
 
-		recordMap := marctools.RecordToMap(record, filterMap, *leaderVar)
+		work := Work{record: record, filterMap: filterMap, includeLeader: *leaderVar, recordMapChan: recordMapChan}
+		// recordMap := marctools.RecordToMap(record, filterMap, *leaderVar)
+		go RecordToMap(work)
+		recordMap := <-recordMapChan
 
 		if *plainVar {
 			b, err := json.Marshal(recordMap)
