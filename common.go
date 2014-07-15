@@ -1,9 +1,7 @@
 package marctools
 
 import (
-	"bufio"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
@@ -380,8 +378,6 @@ func recordToContentMap(record *marc21.Record, filterMap map[string]bool) map[st
 				value, present := subfieldMap[code]
 				if present {
 					switch t := value.(type) {
-					default:
-						log.Fatalf("unexpected type: %T", t)
 					case string:
 						values := make([]string, 0)
 						values = append(values, value.(string))
@@ -389,6 +385,8 @@ func recordToContentMap(record *marc21.Record, filterMap map[string]bool) map[st
 						subfieldMap[code] = values
 					case []string:
 						subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
+					default:
+						log.Fatalf("unexpected type: %T", t)
 					}
 				} else {
 					subfieldMap[code] = subfield.Value
@@ -407,77 +405,10 @@ func recordToContentMap(record *marc21.Record, filterMap map[string]bool) map[st
 
 // recordToMap converts a record to a map, optionally keeping only the tags
 // given in filterMap. If includeLeader is true, the leader is converted as well.
-func recordToMap(record *marc21.Record, filterMap map[string]bool, includeLeader bool) map[string]interface{} {
+func RecordToMap(record *marc21.Record, filterMap map[string]bool, includeLeader bool) map[string]interface{} {
 	contentMap := recordToContentMap(record, filterMap)
 	if includeLeader {
 		contentMap["leader"] = recordToLeaderMap(record)
 	}
 	return contentMap
-}
-
-func MarcToJsonFile(infile, metaString, filterString string, outfile *os.File, includeLeader, plainMode, ignore bool) {
-	file, err := os.Open(infile)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	defer func() {
-		if err := file.Close(); err != nil {
-			log.Fatalln(err)
-		}
-	}()
-
-	// poor mans set of tags, that should be converted
-	filterMap := StringToMapSet(filterString)
-
-	writer := bufio.NewWriter(outfile)
-	defer writer.Flush()
-
-	for {
-		record, err := marc21.ReadRecord(file)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			if ignore {
-				fmt.Fprintf(os.Stderr, "Skipping, since -i was set. Error: %s\n", err)
-				continue
-			} else {
-				log.Fatalln(err)
-			}
-		}
-
-		if plainMode {
-			b, err := json.Marshal(recordToMap(record, filterMap, includeLeader))
-			if err != nil {
-				log.Fatalf("error: %s", err)
-			}
-			writer.Write(b)
-			writer.Write([]byte("\n"))
-		} else {
-			// the final map
-			mainMap := make(map[string]interface{})
-
-			mainMap["content"] = recordToMap(record, filterMap, includeLeader)
-
-			metamap, err := KeyValueStringToMap(metaString)
-			if err != nil {
-				log.Fatalln(err)
-			}
-
-			mainMap["meta"] = metamap
-
-			b, err := json.Marshal(mainMap)
-			if err != nil {
-				log.Fatalf("error: %s", err)
-			}
-			writer.Write(b)
-			writer.Write([]byte("\n"))
-		}
-	}
-}
-
-// MarcToJsonFile with leader included, non-plain mode and strict error checking
-func MarcToJson(infile, metaString, filterString string) {
-	MarcToJsonFile(infile, metaString, filterString, os.Stdout, true, false, false)
 }
