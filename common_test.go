@@ -64,7 +64,8 @@ func TestIdList(t *testing.T) {
 		}
 		for i := 0; i < len(ids); i++ {
 			if ids[i] != tt.out[i] {
-				t.Errorf("List element mismatch in IdList(%s)[%d] => %+v, want: %+v", tt.in, i, ids[i], tt.out[i])
+				t.Errorf("List element mismatch in IdList(%s)[%d] => %+v, want: %+v",
+					tt.in, i, ids[i], tt.out[i])
 			}
 		}
 	}
