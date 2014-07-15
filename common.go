@@ -336,6 +336,85 @@ func MarcSplit(infile string, size int64) {
 	MarcSplitDirectoryPrefix(infile, size, ".", "split-")
 }
 
+// recordToLeaderMap extracts the leader from a given record and puts it in a map
+func recordToLeaderMap(record *marc21.Record) map[string]string {
+	leaderMap := make(map[string]string)
+	leader := record.Leader
+	leaderMap["status"] = string(leader.Status)
+	leaderMap["cs"] = string(leader.CharacterEncoding)
+	leaderMap["length"] = fmt.Sprintf("%d", leader.Length)
+	leaderMap["type"] = string(leader.Type)
+	leaderMap["impldef"] = string(leader.ImplementationDefined[:5])
+	leaderMap["ic"] = fmt.Sprintf("%d", leader.IndicatorCount)
+	leaderMap["lol"] = fmt.Sprintf("%d", leader.LengthOfLength)
+	leaderMap["losp"] = fmt.Sprintf("%d", leader.LengthOfStartPos)
+	leaderMap["sfcl"] = fmt.Sprintf("%d", leader.SubfieldCodeLength)
+	leaderMap["ba"] = fmt.Sprintf("%d", leader.BaseAddress)
+	leaderMap["raw"] = string(leader.Bytes())
+	return leaderMap
+}
+
+// recordToContentMap converts a record into a map, optionally only the tags
+// given in filterMap
+func recordToContentMap(record *marc21.Record, filterMap map[string]bool) map[string]interface{} {
+	contentMap := make(map[string]interface{})
+	hasFilter := len(filterMap) > 0
+
+	for _, field := range record.Fields {
+		tag := field.GetTag()
+		if hasFilter {
+			_, present := filterMap[tag]
+			if !present {
+				continue
+			}
+		}
+		if strings.HasPrefix(tag, "00") {
+			contentMap[tag] = field.(*marc21.ControlField).Data
+		} else {
+			datafield := field.(*marc21.DataField)
+			subfieldMap := make(map[string]interface{})
+			subfieldMap["ind1"] = string(datafield.Ind1)
+			subfieldMap["ind2"] = string(datafield.Ind2)
+			for _, subfield := range datafield.SubFields {
+				code := fmt.Sprintf("%c", subfield.Code)
+				value, present := subfieldMap[code]
+				if present {
+					switch t := value.(type) {
+					default:
+						log.Fatalf("unexpected type: %T", t)
+					case string:
+						values := make([]string, 0)
+						values = append(values, value.(string))
+						values = append(values, subfield.Value)
+						subfieldMap[code] = values
+					case []string:
+						subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
+					}
+				} else {
+					subfieldMap[code] = subfield.Value
+				}
+			}
+			_, present := contentMap[tag]
+			if !present {
+				subfields := make([]interface{}, 0)
+				contentMap[tag] = subfields
+			}
+			contentMap[tag] = append(contentMap[tag].([]interface{}), subfieldMap)
+		}
+	}
+	return contentMap
+}
+
+// recordToMap converts a record to a map, optionally keeping only the tags
+// given in filterMap. If includeLeader is true, the leader is converted as well.
+func recordToMap(record *marc21.Record, filterMap map[string]bool, includeLeader bool) map[string]interface{} {
+	contentMap := recordToContentMap(record, filterMap)
+	if includeLeader {
+		contentMap["leader"] = recordToLeaderMap(record)
+	}
+	return contentMap
+}
+
 func MarcToJsonFile(infile, metaString, filterString string, outfile *os.File, includeLeader, plainMode, ignore bool) {
 	file, err := os.Open(infile)
 	if err != nil {
@@ -348,15 +427,8 @@ func MarcToJsonFile(infile, metaString, filterString string, outfile *os.File, i
 		}
 	}()
 
-	// meta keyvalues
-	metamap, err := KeyValueStringToMap(metaString)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
 	// poor mans set of tags, that should be converted
 	filterMap := StringToMapSet(filterString)
-	hasFilter := len(filterMap) > 0
 
 	writer := bufio.NewWriter(outfile)
 	defer writer.Flush()
@@ -375,72 +447,8 @@ func MarcToJsonFile(infile, metaString, filterString string, outfile *os.File, i
 			}
 		}
 
-		// content map
-		contentMap := make(map[string]interface{})
-
-		// include the
-		if includeLeader {
-			leaderMap := make(map[string]string)
-			leader := record.Leader
-			leaderMap["status"] = string(leader.Status)
-			leaderMap["cs"] = string(leader.CharacterEncoding)
-			leaderMap["length"] = fmt.Sprintf("%d", leader.Length)
-			leaderMap["type"] = string(leader.Type)
-			leaderMap["impldef"] = string(leader.ImplementationDefined[:5])
-			leaderMap["ic"] = fmt.Sprintf("%d", leader.IndicatorCount)
-			leaderMap["lol"] = fmt.Sprintf("%d", leader.LengthOfLength)
-			leaderMap["losp"] = fmt.Sprintf("%d", leader.LengthOfStartPos)
-			leaderMap["sfcl"] = fmt.Sprintf("%d", leader.SubfieldCodeLength)
-			leaderMap["ba"] = fmt.Sprintf("%d", leader.BaseAddress)
-			leaderMap["raw"] = string(leader.Bytes())
-			contentMap["leader"] = leaderMap
-		}
-
-		for _, field := range record.Fields {
-			tag := field.GetTag()
-			if hasFilter {
-				_, present := filterMap[tag]
-				if !present {
-					continue
-				}
-			}
-			if strings.HasPrefix(tag, "00") {
-				contentMap[tag] = field.(*marc21.ControlField).Data
-			} else {
-				datafield := field.(*marc21.DataField)
-				subfieldMap := make(map[string]interface{})
-				subfieldMap["ind1"] = string(datafield.Ind1)
-				subfieldMap["ind2"] = string(datafield.Ind2)
-				for _, subfield := range datafield.SubFields {
-					code := fmt.Sprintf("%c", subfield.Code)
-					value, present := subfieldMap[code]
-					if present {
-						switch t := value.(type) {
-						default:
-							log.Fatalf("unexpected type: %T", t)
-						case string:
-							values := make([]string, 0)
-							values = append(values, value.(string))
-							values = append(values, subfield.Value)
-							subfieldMap[code] = values
-						case []string:
-							subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
-						}
-					} else {
-						subfieldMap[code] = subfield.Value
-					}
-				}
-				_, present := contentMap[tag]
-				if !present {
-					subfields := make([]interface{}, 0)
-					contentMap[tag] = subfields
-				}
-				contentMap[tag] = append(contentMap[tag].([]interface{}), subfieldMap)
-			}
-		}
-
 		if plainMode {
-			b, err := json.Marshal(contentMap)
+			b, err := json.Marshal(recordToMap(record, filterMap, includeLeader))
 			if err != nil {
 				log.Fatalf("error: %s", err)
 			}
@@ -450,7 +458,13 @@ func MarcToJsonFile(infile, metaString, filterString string, outfile *os.File, i
 			// the final map
 			mainMap := make(map[string]interface{})
 
-			mainMap["content"] = contentMap
+			mainMap["content"] = recordToMap(record, filterMap, includeLeader)
+
+			metamap, err := KeyValueStringToMap(metaString)
+			if err != nil {
+				log.Fatalln(err)
+			}
+
 			mainMap["meta"] = metamap
 
 			b, err := json.Marshal(mainMap)
@@ -463,6 +477,7 @@ func MarcToJsonFile(infile, metaString, filterString string, outfile *os.File, i
 	}
 }
 
+// MarcToJsonFile with leader included, non-plain mode and strict error checking
 func MarcToJson(infile, metaString, filterString string) {
 	MarcToJsonFile(infile, metaString, filterString, os.Stdout, true, false, false)
 }
