@@ -13,6 +13,7 @@ install:
 
 clean:
 	go clean
+	rm -f coverage.out
 
 cover:
 	go get -d && go test -v	-coverprofile=coverage.out
