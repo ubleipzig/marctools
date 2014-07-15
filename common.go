@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/miku/marc21"
 	"io"
 	"log"
 	"os"
@@ -69,31 +70,67 @@ func RecordCount(filename string) int64 {
 
 // IdList returns a slice of strings, containing all ids of the given marc file
 func IdList(filename string) []string {
+	fallback := false
 	yaz, err := exec.LookPath("yaz-marcdump")
 	if err != nil {
-		log.Fatalln("yaz-marcdump is required")
+		// log.Fatalln("yaz-marcdump is required")
+		fallback = true
 	}
 
 	awk, err := exec.LookPath("awk")
 	if err != nil {
-		log.Fatalln("awk is required")
-	}
-
-	command := fmt.Sprintf("%s '%s' | %s ' /^001 / {print $2}'", yaz, filename, awk)
-	out, err := exec.Command("bash", "-c", command).Output()
-	if err != nil {
-		log.Fatalln(err)
+		// log.Fatalln("awk is required")
+		fallback = true
 	}
 
 	var ids []string
-	for _, line := range strings.Split(string(out), "\n") {
-		line = strings.TrimSpace(line)
-		if len(line) == 0 {
-			continue
-		} else {
-			ids = append(ids, strings.TrimSpace(line))
+
+	if fallback {
+		// use slower iteration over records
+		fi, err := os.Open(filename)
+		if err != nil {
+			log.Fatalf("%s\n", err)
+		}
+		defer func() {
+			if err := fi.Close(); err != nil {
+				log.Fatalf("%s\n", err)
+			}
+		}()
+
+		for {
+			record, err := marc21.ReadRecord(fi)
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatalf("%s\n", err)
+			}
+
+			fields := record.GetFields("001")
+			if len(fields) == 1 {
+				ids = append(ids, strings.TrimSpace(fields[0].(*marc21.ControlField).Data))
+			} else {
+				log.Fatalf("Unusual 001 field count: %s\n", len(fields))
+			}
+		}
+	} else {
+		// fast version using yaz and awk
+		command := fmt.Sprintf("%s '%s' | %s ' /^001 / {print $2}'", yaz, filename, awk)
+		out, err := exec.Command("bash", "-c", command).Output()
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		for _, line := range strings.Split(string(out), "\n") {
+			line = strings.TrimSpace(line)
+			if len(line) == 0 {
+				continue
+			} else {
+				ids = append(ids, strings.TrimSpace(line))
+			}
 		}
 	}
+
 	return ids
 }
 
