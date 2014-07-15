@@ -1,7 +1,9 @@
 package marctools
 
 import (
+	"bufio"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
@@ -16,6 +18,42 @@ import (
 )
 
 const AppVersion = "1.4.0"
+
+// KeyValueStringToMap turns a string like "key1=value1, key2=value2" into a map.
+func KeyValueStringToMap(s string) (map[string]string, error) {
+	result := make(map[string]string)
+	var err error
+	if len(s) > 0 {
+		for _, pair := range strings.Split(s, ",") {
+			kv := strings.Split(pair, "=")
+			if len(kv) != 2 {
+				err = errors.New(fmt.Sprintf("Could not parse key-value parameter: %s", s))
+			} else {
+				key := strings.TrimSpace(kv[0])
+				value := strings.TrimSpace(kv[1])
+				if len(key) == 0 || len(value) == 0 {
+					err = errors.New(fmt.Sprintf("Empty key or values not allowed: %s", s))
+				} else {
+					result[key] = value
+				}
+			}
+		}
+	}
+	return result, err
+}
+
+// StringToMapSet takes a string of the form "val1,val2, val3" and turns it
+// into a poor mans set, a map[string]bool that is.
+func StringToMapSet(s string) map[string]bool {
+	result := make(map[string]bool)
+	if len(s) > 0 {
+		tags := strings.Split(s, ",")
+		for _, value := range tags {
+			result[strings.TrimSpace(value)] = true
+		}
+	}
+	return result
+}
 
 // recordLength returns the length of the marc record as stored in the leader
 func recordLength(reader io.Reader) (length int64, err error) {
@@ -296,4 +334,135 @@ func MarcSplitDirectory(infile string, size int64, directory string) {
 // MarcSplit splits a file into parts, each containing at most size records
 func MarcSplit(infile string, size int64) {
 	MarcSplitDirectoryPrefix(infile, size, ".", "split-")
+}
+
+func MarcToJsonFile(infile, metaString, filterString string, outfile *os.File, includeLeader, plainMode, ignore bool) {
+	file, err := os.Open(infile)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Fatalln(err)
+		}
+	}()
+
+	// meta keyvalues
+	metamap, err := KeyValueStringToMap(metaString)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// poor mans set of tags, that should be converted
+	filterMap := StringToMapSet(filterString)
+	hasFilter := len(filterMap) > 0
+
+	writer := bufio.NewWriter(outfile)
+	defer writer.Flush()
+
+	for {
+		record, err := marc21.ReadRecord(file)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			if ignore {
+				fmt.Fprintf(os.Stderr, "Skipping, since -i was set. Error: %s\n", err)
+				continue
+			} else {
+				log.Fatalln(err)
+			}
+		}
+
+		// content map
+		contentMap := make(map[string]interface{})
+
+		// include the
+		if includeLeader {
+			leaderMap := make(map[string]string)
+			leader := record.Leader
+			leaderMap["status"] = string(leader.Status)
+			leaderMap["cs"] = string(leader.CharacterEncoding)
+			leaderMap["length"] = fmt.Sprintf("%d", leader.Length)
+			leaderMap["type"] = string(leader.Type)
+			leaderMap["impldef"] = string(leader.ImplementationDefined[:5])
+			leaderMap["ic"] = fmt.Sprintf("%d", leader.IndicatorCount)
+			leaderMap["lol"] = fmt.Sprintf("%d", leader.LengthOfLength)
+			leaderMap["losp"] = fmt.Sprintf("%d", leader.LengthOfStartPos)
+			leaderMap["sfcl"] = fmt.Sprintf("%d", leader.SubfieldCodeLength)
+			leaderMap["ba"] = fmt.Sprintf("%d", leader.BaseAddress)
+			leaderMap["raw"] = string(leader.Bytes())
+			contentMap["leader"] = leaderMap
+		}
+
+		for _, field := range record.Fields {
+			tag := field.GetTag()
+			if hasFilter {
+				_, present := filterMap[tag]
+				if !present {
+					continue
+				}
+			}
+			if strings.HasPrefix(tag, "00") {
+				contentMap[tag] = field.(*marc21.ControlField).Data
+			} else {
+				datafield := field.(*marc21.DataField)
+				subfieldMap := make(map[string]interface{})
+				subfieldMap["ind1"] = string(datafield.Ind1)
+				subfieldMap["ind2"] = string(datafield.Ind2)
+				for _, subfield := range datafield.SubFields {
+					code := fmt.Sprintf("%c", subfield.Code)
+					value, present := subfieldMap[code]
+					if present {
+						switch t := value.(type) {
+						default:
+							log.Fatalf("unexpected type: %T", t)
+						case string:
+							values := make([]string, 0)
+							values = append(values, value.(string))
+							values = append(values, subfield.Value)
+							subfieldMap[code] = values
+						case []string:
+							subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
+						}
+					} else {
+						subfieldMap[code] = subfield.Value
+					}
+				}
+				_, present := contentMap[tag]
+				if !present {
+					subfields := make([]interface{}, 0)
+					contentMap[tag] = subfields
+				}
+				contentMap[tag] = append(contentMap[tag].([]interface{}), subfieldMap)
+			}
+		}
+
+		if plainMode {
+			b, err := json.Marshal(contentMap)
+			if err != nil {
+				log.Fatalf("error: %s", err)
+			}
+			writer.Write(b)
+			writer.Write([]byte("\n"))
+		} else {
+			// the final map
+			mainMap := make(map[string]interface{})
+
+			mainMap["content"] = contentMap
+			mainMap["meta"] = metamap
+
+			b, err := json.Marshal(mainMap)
+			if err != nil {
+				log.Fatalf("error: %s", err)
+			}
+			writer.Write(b)
+			writer.Write([]byte("\n"))
+		}
+	}
+}
+
+func MarcToJson(infile, metaString, filterString string) {
+	MarcToJsonFile(infile, metaString, filterString, os.Stdout, true, false, false)
 }

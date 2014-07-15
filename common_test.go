@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -152,6 +153,60 @@ func TestMarcSplitDirectoryPrefix(t *testing.T) {
 		recordCount := RecordCount(filename)
 		if recordCount != 3 {
 			t.Errorf("unexpected record count in %s: %d, want: %d", filename, recordCount, 3)
+		}
+	}
+}
+
+var kvtests = []struct {
+	in  string
+	out map[string]string
+}{
+	{"key=value", map[string]string{"key": "value"}},
+	{"k1=v1, k2=v2", map[string]string{"k1": "v1", "k2": "v2"}},
+	{"k1 = v1,k2=   v2", map[string]string{"k1": "v1", "k2": "v2"}},
+	{"k1=v1, k1=v2", map[string]string{"k1": "v2"}},
+}
+
+func TestKeyValueStringToMap(t *testing.T) {
+	for _, tt := range kvtests {
+		out, err := KeyValueStringToMap(tt.in)
+		if err != nil {
+			t.Errorf("KeyValueStringToMap(%s) err'd: %s", tt.in, err)
+		}
+		eq := reflect.DeepEqual(out, tt.out)
+		if !eq {
+			t.Errorf("KeyValueStringToMap(%s) => %+v, want: %+v", tt.in, out, tt.out)
+		}
+	}
+
+	failures := []string{"key=",
+		"keyvalue",
+		"key=value=value",
+		"key=value=value,=",
+		"k1=v1,,, k1=v2"}
+	for _, value := range failures {
+		out, err := KeyValueStringToMap(value)
+		if err == nil {
+			t.Errorf("KeyValueStringToMap(%s) => %s, want: err!", value, out)
+		}
+	}
+}
+
+var stosettests = []struct {
+	in  string
+	out map[string]bool
+}{
+	{"key", map[string]bool{"key": true}},
+	{"k1,k2", map[string]bool{"k1": true, "k2": true}},
+	{"k1,  k2", map[string]bool{"k1": true, "k2": true}},
+}
+
+func TestStringToMapSet(t *testing.T) {
+	for _, tt := range stosettests {
+		out := StringToMapSet(tt.in)
+		eq := reflect.DeepEqual(out, tt.out)
+		if !eq {
+			t.Errorf("StringToMapSet(%s) => %+v, want: %+v", tt.in, out, tt.out)
 		}
 	}
 }
