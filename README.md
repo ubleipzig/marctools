@@ -1,6 +1,6 @@
 ----
 
-Note: This project is being [overhauled](https://github.com/miku/marctools): getting more standards-compliant and possibly faster as well.
+Note: This project is currently being overhauled: getting more standards-compliant and possibly faster as well.
 
 ----
 
