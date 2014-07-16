@@ -1,6 +1,11 @@
 gomarckit
 =========
 
+----
+Note: This project is being [overhauled](https://github.com/miku/marctools): getting more standards-compliant and possibly faster as well.
+----
+
+
 Various MARC command line utilities, with an eye on performance. 
 
 [![gh release](http://img.shields.io/github/release/miku/gomarckit.svg?style=flat)](https://github.com/miku/gomarckit/releases)
