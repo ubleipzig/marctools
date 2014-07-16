@@ -2,7 +2,9 @@ gomarckit
 =========
 
 ----
+
 Note: This project is being [overhauled](https://github.com/miku/marctools): getting more standards-compliant and possibly faster as well.
+
 ----
 
 
