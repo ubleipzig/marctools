@@ -78,10 +78,12 @@ func FanInWriter(writer io.Writer, in chan *[]byte, done chan bool) {
 // $ time ./marctojson.go fixtures/biglok.mrc > /dev/null
 // real    9m4.779s
 // user    13m52.302s
-// sys 6m41.470s
+// sys     6m41.470s
+// ----
+// real    5m39.045s
+// user    13m4.612s
+// sys     3m3.564s
 func main() {
-
-	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
 	version := flag.Bool("v", false, "prints current program version and exit")
@@ -91,6 +93,7 @@ func main() {
 	leaderVar := flag.Bool("l", false, "dump the leader as well")
 	plainVar := flag.Bool("p", false, "plain mode: dump without content and meta")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 
 	var PrintUsage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -98,6 +101,10 @@ func main() {
 	}
 
 	flag.Parse()
+
+	if *numWorkers > 0 {
+		runtime.GOMAXPROCS(*numWorkers)
+	}
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -149,7 +156,7 @@ func main() {
 	var wg sync.WaitGroup
 
 	// start the workers
-	for i := 0; i < runtime.NumCPU(); i++ {
+	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
 		go Worker(queue, results, &wg)
 	}
