@@ -1,4 +1,7 @@
-// convert marc to json
+// Convert marc to json.
+
+// Performance data point: Converting 6537611 records (7G) into /dev/null
+// take about 9m31s on a Core i5-3470 (about 11k records/s).
 package main
 
 import (
@@ -59,7 +62,7 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 	}
 }
 
-// FanInWriter takes a writer and a channel of byte slices and writes the out
+// FanInWriter writes the channel content to the writer
 func FanInWriter(writer io.Writer, in chan *[]byte, done chan bool) {
 	for b := range in {
 		writer.Write(*b)
@@ -70,15 +73,15 @@ func FanInWriter(writer io.Writer, in chan *[]byte, done chan bool) {
 
 func main() {
 
-	ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	ignoreErrors := flag.Bool("i", false, "ignore marc errors (not recommended)")
+	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	version := flag.Bool("v", false, "prints current program version and exit")
 
-	metaVar := flag.String("m", "", "a key=value pair to pass to meta")
 	filterVar := flag.String("r", "", "only dump the given tags (e.g. 001,003)")
-	leaderVar := flag.Bool("l", false, "dump the leader as well")
-	plainVar := flag.Bool("p", false, "plain mode: dump without content and meta")
-	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
-	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
+	includeLeader := flag.Bool("l", false, "dump the leader as well")
+	metaVar := flag.String("m", "", "a key=value pair to pass to meta")
+	plainMode := flag.Bool("p", false, "plain mode: dump without content and meta")
 
 	var PrintUsage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -131,16 +134,11 @@ func main() {
 	results := make(chan *[]byte)
 	done := make(chan bool)
 
-	// could use some other writer here, via flag?
 	writer := bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
-
-	// start the writer
 	go FanInWriter(writer, results, done)
 
 	var wg sync.WaitGroup
-
-	// start the workers
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
 		go Worker(queue, results, &wg)
@@ -152,8 +150,8 @@ func main() {
 			break
 		}
 		if err != nil {
-			if *ignore {
-				fmt.Fprintf(os.Stderr, "skipping error: %s\n", err)
+			if *ignoreErrors {
+				log.Printf("skipping: %s\n", err)
 				continue
 			} else {
 				log.Fatalln(err)
@@ -163,13 +161,12 @@ func main() {
 		work := Work{Record: record,
 			FilterMap:     &filterMap,
 			MetaMap:       &metaMap,
-			IncludeLeader: *leaderVar,
-			PlainMode:     *plainVar,
-			IgnoreErrors:  *ignore}
+			IncludeLeader: *includeLeader,
+			PlainMode:     *plainMode,
+			IgnoreErrors:  *ignoreErrors}
 		queue <- &work
 	}
 
-	// cleanup
 	close(queue)
 	wg.Wait()
 	close(results)
