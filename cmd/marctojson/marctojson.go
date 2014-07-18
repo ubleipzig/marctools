@@ -28,11 +28,11 @@ type Work struct {
 func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for work := range in {
-		recordMap := marctools.RecordToMap(work.Record, *work.FilterMap, *work.IncludeLeader)
-		if *work.PlainMode {
+		recordMap := marctools.RecordToMap(work.Record, work.FilterMap, work.IncludeLeader)
+		if work.PlainMode {
 			b, err := json.Marshal(recordMap)
 			if err != nil {
-				if !*work.IgnoreErrors {
+				if !work.IgnoreErrors {
 					log.Fatalln(err)
 				}
 			}
@@ -44,7 +44,7 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 			}
 			b, err := json.Marshal(m)
 			if err != nil {
-				if !*work.IgnoreErrors {
+				if !work.IgnoreErrors {
 					log.Fatalln(err)
 				}
 			}
@@ -171,9 +171,9 @@ func main() {
 		work := Work{Record: record,
 			FilterMap:     &filterMap,
 			MetaMap:       &metaMap,
-			IncludeLeader: leaderVar,
-			PlainMode:     plainVar,
-			IgnoreErrors:  ignore}
+			IncludeLeader: *leaderVar,
+			PlainMode:     *plainVar,
+			IgnoreErrors:  *ignore}
 		queue <- &work
 	}
 

@@ -354,14 +354,16 @@ func recordToLeaderMap(record *marc21.Record) map[string]string {
 
 // recordToContentMap converts a record into a map, optionally only the tags
 // given in filterMap
-func recordToContentMap(record *marc21.Record, filterMap map[string]bool) map[string]interface{} {
+func recordToContentMap(record *marc21.Record, filterMap *map[string]bool) map[string]interface{} {
 	contentMap := make(map[string]interface{})
-	hasFilter := len(filterMap) > 0
+
+	filter := *filterMap
+	hasFilter := len(filter) > 0
 
 	for _, field := range record.Fields {
 		tag := field.GetTag()
 		if hasFilter {
-			_, present := filterMap[tag]
+			_, present := filter[tag]
 			if !present {
 				continue
 			}
@@ -405,7 +407,7 @@ func recordToContentMap(record *marc21.Record, filterMap map[string]bool) map[st
 
 // recordToMap converts a record to a map, optionally keeping only the tags
 // given in filterMap. If includeLeader is true, the leader is converted as well.
-func RecordToMap(record *marc21.Record, filterMap map[string]bool, includeLeader bool) map[string]interface{} {
+func RecordToMap(record *marc21.Record, filterMap *map[string]bool, includeLeader bool) map[string]interface{} {
 	contentMap := recordToContentMap(record, filterMap)
 	if includeLeader {
 		contentMap["leader"] = recordToLeaderMap(record)
