@@ -1,3 +1,4 @@
+// convert marc to json
 package main
 
 import (
@@ -17,14 +18,19 @@ import (
 )
 
 type Work struct {
-	Record        *marc21.Record
-	FilterMap     *map[string]bool
+	// MARC record
+	Record *marc21.Record
+	// which tags to include
+	FilterMap *map[string]bool
+	// meta information
 	MetaMap       *map[string]string
 	IncludeLeader bool
-	PlainMode     bool
-	IgnoreErrors  bool
+	// only dump the content
+	PlainMode    bool
+	IgnoreErrors bool
 }
 
+// Worker takes a Work item and sends the result (serialized json) on the out channel
 func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for work := range in {
@@ -53,6 +59,7 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 	}
 }
 
+// FanInWriter takes a writer and a channel of byte slices and writes the out
 func FanInWriter(writer io.Writer, in chan *[]byte, done chan bool) {
 	for b := range in {
 		writer.Write(*b)
@@ -61,28 +68,6 @@ func FanInWriter(writer io.Writer, in chan *[]byte, done chan bool) {
 	done <- true
 }
 
-// preformance data points:
-// 9798925 records, sequential
-// $ time go run cmd/marctojson/marctojson.go fixtures/biglok.mrc > /dev/null
-// real	7m18.731s
-// user	6m16.256s
-// sys	1m13.612s
-
-// 9798925 records, single short-lived goroutine
-// $ time go run cmd/marctojson/marctojson.go fixtures/biglok.mrc > /dev/null
-// real	12m49.862s
-// user	12m39.992s
-// sys	3m23.380s
-
-// 9798925 records, NumCPU parallel
-// $ time ./marctojson.go fixtures/biglok.mrc > /dev/null
-// real    9m4.779s
-// user    13m52.302s
-// sys     6m41.470s
-// ----
-// real    5m39.045s
-// user    13m4.612s
-// sys     3m3.564s
 func main() {
 
 	ignore := flag.Bool("i", false, "ignore marc errors (not recommended)")
@@ -184,10 +169,9 @@ func main() {
 		queue <- &work
 	}
 
+	// cleanup
 	close(queue)
 	wg.Wait()
-
-	// wait for the writer to finish, but not too long
 	close(results)
 	select {
 	case <-time.After(1e9):
