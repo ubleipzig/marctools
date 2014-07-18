@@ -39,6 +39,9 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 			if err != nil {
 				if !work.IgnoreErrors {
 					log.Fatalln(err)
+				} else {
+					log.Printf("[EE] %s\n", err)
+					continue
 				}
 			}
 			out <- &b
@@ -51,6 +54,9 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 			if err != nil {
 				if !work.IgnoreErrors {
 					log.Fatalln(err)
+				} else {
+					log.Printf("[EE] %s\n", err)
+					continue
 				}
 			}
 			out <- &b
