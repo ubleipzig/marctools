@@ -13,6 +13,7 @@ import (
 func main() {
 
 	version := flag.Bool("v", false, "prints current program version")
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
 
 	var PrintUsage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -20,6 +21,15 @@ func main() {
 	}
 
 	flag.Parse()
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 
 	if *version {
 		fmt.Println(marctools.AppVersion)
