@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -405,7 +406,7 @@ func recordToContentMap(record *marc21.Record, filterMap *map[string]bool) map[s
 	return contentMap
 }
 
-// recordToMap converts a record to a map, optionally keeping only the tags
+// RecordToMap converts a record to a map, optionally keeping only the tags
 // given in filterMap. If includeLeader is true, the leader is converted as well.
 func RecordToMap(record *marc21.Record, filterMap *map[string]bool, includeLeader bool) map[string]interface{} {
 	contentMap := recordToContentMap(record, filterMap)
@@ -413,4 +414,88 @@ func RecordToMap(record *marc21.Record, filterMap *map[string]bool, includeLeade
 		contentMap["leader"] = recordToLeaderMap(record)
 	}
 	return contentMap
+}
+
+var REGEX_SUBFIELD = regexp.MustCompile(`^([\d]{3})\.([a-z0-9])$`)
+var REGEX_CONTROLFIELD = regexp.MustCompile(`^[\d]{3}$`)
+
+// RecordToTSV turns a single record into a single TSV line
+func RecordToTSV(record *marc21.Record,
+	tags *[]string,
+	fillna, separator *string,
+	skipIncompleteLines *bool) string {
+
+	var line []string
+	skipThisLine := false
+
+	for _, tag := range *tags {
+		if REGEX_CONTROLFIELD.MatchString(tag) {
+			fields := record.GetFields(tag)
+			if len(fields) > 0 {
+				line = append(line, fields[0].(*marc21.ControlField).Data)
+			} else {
+				if *skipIncompleteLines {
+					skipThisLine = true
+					break
+				}
+				line = append(line, *fillna) // or any fill value
+			}
+		} else if REGEX_SUBFIELD.MatchString(tag) {
+			parts := strings.Split(tag, ".")
+			code := []byte(parts[1])[0]
+			subfields := record.GetSubFields(parts[0], code)
+			if len(subfields) > 0 {
+				if *separator == "" {
+					// only use the first value
+					line = append(line, subfields[0].Value)
+				} else {
+					var values []string
+					for _, subfield := range subfields {
+						values = append(values, subfield.Value)
+					}
+					line = append(line, strings.Join(values, *separator))
+				}
+			} else {
+				if *skipIncompleteLines {
+					skipThisLine = true
+					break
+				}
+				line = append(line, *fillna) // or any fill value
+			}
+		} else if strings.HasPrefix(tag, "@") {
+			leader := record.Leader
+			switch tag {
+			case "@Length":
+				line = append(line, fmt.Sprintf("%d", leader.Length))
+			case "@Status":
+				line = append(line, string(leader.Status))
+			case "@Type":
+				line = append(line, string(leader.Type))
+			case "@ImplementationDefined":
+				line = append(line, string(leader.ImplementationDefined[:5]))
+			case "@CharacterEncoding":
+				line = append(line, string(leader.CharacterEncoding))
+			case "@BaseAddress":
+				line = append(line, fmt.Sprintf("%d", leader.BaseAddress))
+			case "@IndicatorCount":
+				line = append(line, fmt.Sprintf("%d", leader.IndicatorCount))
+			case "@SubfieldCodeLength":
+				line = append(line, fmt.Sprintf("%d", leader.SubfieldCodeLength))
+			case "@LengthOfLength":
+				line = append(line, fmt.Sprintf("%d", leader.LengthOfLength))
+			case "@LengthOfStartPos":
+				line = append(line, fmt.Sprintf("%d", leader.LengthOfStartPos))
+			default:
+				log.Fatalf("unknown tag: %s", tag)
+			}
+		} else if !strings.HasPrefix(tag, "-") {
+			line = append(line, strings.TrimSpace(tag))
+		}
+	}
+
+	if skipThisLine {
+		return ""
+	} else {
+		return fmt.Sprintf("%s\n", strings.Join(line, "\t"))
+	}
 }
