@@ -2,6 +2,7 @@
 
 // Performance data point: Converting 6537611 records (7G) into /dev/null
 // take about 9m31s on a Core i5-3470 (about 11k records/s).
+// To take a cpu profile use -cpuprofile flag (example output: https://cdn.mediacru.sh/5rLMpxn5qnJk.svg).
 package main
 
 import (
