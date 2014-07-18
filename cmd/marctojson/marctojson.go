@@ -21,16 +21,12 @@ import (
 )
 
 type Work struct {
-	// MARC record
-	Record *marc21.Record
-	// which tags to include
-	FilterMap *map[string]bool
-	// meta information
-	MetaMap       *map[string]string
+	Record        *marc21.Record     // MARC record
+	FilterMap     *map[string]bool   // which tags to include
+	MetaMap       *map[string]string // meta information
 	IncludeLeader bool
-	// only dump the content
-	PlainMode    bool
-	IgnoreErrors bool
+	PlainMode     bool // only dump the content
+	IgnoreErrors  bool
 }
 
 // Worker takes a Work item and sends the result (serialized json) on the out channel
@@ -151,7 +147,7 @@ func main() {
 		}
 		if err != nil {
 			if *ignoreErrors {
-				log.Printf("skipping: %s\n", err)
+				log.Printf("[EE] %s\n", err)
 				continue
 			} else {
 				log.Fatalln(err)
