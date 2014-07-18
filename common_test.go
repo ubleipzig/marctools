@@ -215,23 +215,37 @@ func TestStringToMapSet(t *testing.T) {
 }
 
 var recordmaptests = []struct {
-	in  string
-	out string
+	record        string
+	filterMap     map[string]bool
+	includeLeader bool
+	out           string
 }{
+	// test with includeLeader=false
 	{`00613cam a2200229Ma 4500001001600000005001700016008004100033020001500074035002300089040002500112041001800137043001200155050002400167049000900191082001600200082001600216100003000232245002200262250002300284260004700307300002900354testdeweybrowse20110419140028.0110214s1992    it a     b    001 0 ita d  a8820737493  a(OCoLC)ocm30585539  aRBNcRBNdOCLCGdPVU1 aitaalathlat  ae-it---14aDG848.15b.V53 1992  aPVUM  a123.45 .I39  a123.46 .Q391 aPerson, Fake,d1668-1744.10aDewey browse test  aFictional edition.  aMorano :bCentro di Studi Vichiani,c1992.  a296 p. :bill. ;c24 cm.`,
+		map[string]bool{},
+		false,
 		`{"001":"testdeweybrowse","005":"20110419140028.0","008":"110214s1992    it a     b    001 0 ita d","020":[{"a":"8820737493","ind1":" ","ind2":" "}],"035":[{"a":"(OCoLC)ocm30585539","ind1":" ","ind2":" "}],"040":[{"a":"RBN","c":"RBN","d":["OCLCG","PVU"],"ind1":" ","ind2":" "}],"041":[{"a":["ita","lat"],"h":"lat","ind1":"1","ind2":" "}],"043":[{"a":"e-it---","ind1":" ","ind2":" "}],"049":[{"a":"PVUM","ind1":" ","ind2":" "}],"050":[{"a":"DG848.15","b":".V53 1992","ind1":"1","ind2":"4"}],"082":[{"a":"123.45 .I39","ind1":" ","ind2":" "},{"a":"123.46 .Q39","ind1":" ","ind2":" "}],"100":[{"a":"Person, Fake,","d":"1668-1744.","ind1":"1","ind2":" "}],"245":[{"a":"Dewey browse test","ind1":"1","ind2":"0"}],"250":[{"a":"Fictional edition.","ind1":" ","ind2":" "}],"260":[{"a":"Morano :","b":"Centro di Studi Vichiani,","c":"1992.","ind1":" ","ind2":" "}],"300":[{"a":"296 p. :","b":"ill. ;","c":"24 cm.","ind1":" ","ind2":" "}]}`},
+	// test with includeLeader=true
+	{`00613cam a2200229Ma 4500001001600000005001700016008004100033020001500074035002300089040002500112041001800137043001200155050002400167049000900191082001600200082001600216100003000232245002200262250002300284260004700307300002900354testdeweybrowse20110419140028.0110214s1992    it a     b    001 0 ita d  a8820737493  a(OCoLC)ocm30585539  aRBNcRBNdOCLCGdPVU1 aitaalathlat  ae-it---14aDG848.15b.V53 1992  aPVUM  a123.45 .I39  a123.46 .Q391 aPerson, Fake,d1668-1744.10aDewey browse test  aFictional edition.  aMorano :bCentro di Studi Vichiani,c1992.  a296 p. :bill. ;c24 cm.`,
+		map[string]bool{},
+		true,
+		`{"001":"testdeweybrowse","005":"20110419140028.0","008":"110214s1992    it a     b    001 0 ita d","020":[{"a":"8820737493","ind1":" ","ind2":" "}],"035":[{"a":"(OCoLC)ocm30585539","ind1":" ","ind2":" "}],"040":[{"a":"RBN","c":"RBN","d":["OCLCG","PVU"],"ind1":" ","ind2":" "}],"041":[{"a":["ita","lat"],"h":"lat","ind1":"1","ind2":" "}],"043":[{"a":"e-it---","ind1":" ","ind2":" "}],"049":[{"a":"PVUM","ind1":" ","ind2":" "}],"050":[{"a":"DG848.15","b":".V53 1992","ind1":"1","ind2":"4"}],"082":[{"a":"123.45 .I39","ind1":" ","ind2":" "},{"a":"123.46 .Q39","ind1":" ","ind2":" "}],"100":[{"a":"Person, Fake,","d":"1668-1744.","ind1":"1","ind2":" "}],"245":[{"a":"Dewey browse test","ind1":"1","ind2":"0"}],"250":[{"a":"Fictional edition.","ind1":" ","ind2":" "}],"260":[{"a":"Morano :","b":"Centro di Studi Vichiani,","c":"1992.","ind1":" ","ind2":" "}],"300":[{"a":"296 p. :","b":"ill. ;","c":"24 cm.","ind1":" ","ind2":" "}],"leader":{"ba":"229","cs":"a","ic":"2","impldef":"m Ma ","length":"613","lol":"4","losp":"5","raw":"00613cam a2200229Ma 4500","sfcl":"2","status":"c","type":"a"}}`},
+	// test with includeLeader=false and a simple filter
+	{`00613cam a2200229Ma 4500001001600000005001700016008004100033020001500074035002300089040002500112041001800137043001200155050002400167049000900191082001600200082001600216100003000232245002200262250002300284260004700307300002900354testdeweybrowse20110419140028.0110214s1992    it a     b    001 0 ita d  a8820737493  a(OCoLC)ocm30585539  aRBNcRBNdOCLCGdPVU1 aitaalathlat  ae-it---14aDG848.15b.V53 1992  aPVUM  a123.45 .I39  a123.46 .Q391 aPerson, Fake,d1668-1744.10aDewey browse test  aFictional edition.  aMorano :bCentro di Studi Vichiani,c1992.  a296 p. :bill. ;c24 cm.`,
+		map[string]bool{"001": true, "005": true},
+		false,
+		`{"001":"testdeweybrowse","005":"20110419140028.0"}`},
 }
 
 func TestRecordToMap(t *testing.T) {
 
 	for _, tt := range recordmaptests {
-		reader := strings.NewReader(tt.in)
+		reader := strings.NewReader(tt.record)
 		record, err := marc21.ReadRecord(reader)
 		if err != nil {
 			t.Error(err)
 		}
-		filterMap := map[string]bool{}
-		result := RecordToMap(record, &filterMap, false)
+		result := RecordToMap(record, &tt.filterMap, tt.includeLeader)
 		if result == nil {
 			t.Error("RecordToMap should not return nil")
 		}
@@ -240,7 +254,7 @@ func TestRecordToMap(t *testing.T) {
 			t.Error("RecordToMap should return something JSON-serializable")
 		}
 		if string(b) != tt.out {
-			t.Errorf("RecordToMap(%s) => %+v, want: %+v", tt.in, string(b), tt.out)
+			t.Errorf("RecordToMap(%s, %+v, %s) => %+v, want: %+v", tt.record, tt.filterMap, tt.includeLeader, string(b), tt.out)
 		}
 	}
 }
