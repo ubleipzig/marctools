@@ -24,3 +24,4 @@ _testmain.go
 
 coverage.out
 fixtures/biglok.mrc
+*.pprof
