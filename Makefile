@@ -68,10 +68,12 @@ vagrant.key:
 vm-setup: vagrant.key
 	$(SSHCMD) "sudo yum install -y sudo yum install http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm"
 	$(SSHCMD) "sudo yum install -y golang git rpm-build"
-	$(SSHCMD) "mkdir -p /home/vagrant/github/miku"
-	$(SSHCMD) "cd /home/vagrant/github/miku && git clone https://github.com/miku/marctools.git"
+	$(SSHCMD) "mkdir -p /home/vagrant/src/github.com/miku"
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku && git clone https://github.com/miku/marctools.git"
 
 rpm-compatible: vagrant.key
-	$(SSHCMD) "GOPATH=/home/vagrant go get github.com/mattn/go-sqlite3"
-	$(SSHCMD) "cd /home/vagrant/github/miku/marctools && git pull origin master && GOPATH=/home/vagrant make rpm"
-	scp -o port=2222 -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1:/home/vagrant/github/miku/marctools/*rpm .
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && GOPATH=/home/vagrant go get"
+	# $(SSHCMD) "GOPATH=/home/vagrant go get github.com/mattn/go-sqlite3"
+	# $(SSHCMD) "GOPATH=/home/vagrant go get github.com/miku/marc"
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && git pull origin master && pwd && GOPATH=/home/vagrant make rpm"
+	scp -o port=2222 -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1:/home/vagrant/src/github.com/miku/marctools/*rpm .
