@@ -26,3 +26,4 @@ coverage.out
 fixtures/biglok.mrc
 *.pprof
 vagrant.key
+.vagrant
