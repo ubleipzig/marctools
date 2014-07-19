@@ -336,7 +336,7 @@ func MarcSplit(infile string, size int64) {
 }
 
 // recordToLeaderMap extracts the leader from a given record and puts it in a map
-func recordToLeaderMap(record *marc21.Record) map[string]string {
+func recordToLeaderMap(record *marc21.Record) *map[string]string {
 	leaderMap := make(map[string]string)
 	leader := record.Leader
 	leaderMap["status"] = string(leader.Status)
@@ -350,12 +350,12 @@ func recordToLeaderMap(record *marc21.Record) map[string]string {
 	leaderMap["sfcl"] = fmt.Sprintf("%d", leader.SubfieldCodeLength)
 	leaderMap["ba"] = fmt.Sprintf("%d", leader.BaseAddress)
 	leaderMap["raw"] = string(leader.Bytes())
-	return leaderMap
+	return &leaderMap
 }
 
 // recordToContentMap converts a record into a map, optionally only the tags
 // given in filterMap
-func recordToContentMap(record *marc21.Record, filterMap *map[string]bool) map[string]interface{} {
+func recordToContentMap(record *marc21.Record, filterMap *map[string]bool) *map[string]interface{} {
 	contentMap := make(map[string]interface{})
 
 	filter := *filterMap
@@ -403,17 +403,17 @@ func recordToContentMap(record *marc21.Record, filterMap *map[string]bool) map[s
 			contentMap[tag] = append(contentMap[tag].([]interface{}), subfieldMap)
 		}
 	}
-	return contentMap
+	return &contentMap
 }
 
 // RecordToMap converts a record to a map, optionally keeping only the tags
 // given in filterMap. If includeLeader is true, the leader is converted as well.
-func RecordToMap(record *marc21.Record, filterMap *map[string]bool, includeLeader bool) map[string]interface{} {
-	contentMap := recordToContentMap(record, filterMap)
+func RecordToMap(record *marc21.Record, filterMap *map[string]bool, includeLeader bool) *map[string]interface{} {
+	contentMap := *recordToContentMap(record, filterMap)
 	if includeLeader {
 		contentMap["leader"] = recordToLeaderMap(record)
 	}
-	return contentMap
+	return &contentMap
 }
 
 var REGEX_SUBFIELD = regexp.MustCompile(`^([\d]{3})\.([a-z0-9])$`)
@@ -423,7 +423,7 @@ var REGEX_CONTROLFIELD = regexp.MustCompile(`^[\d]{3}$`)
 func RecordToTSV(record *marc21.Record,
 	tags *[]string,
 	fillna, separator *string,
-	skipIncompleteLines *bool) string {
+	skipIncompleteLines *bool) *string {
 
 	var line []string
 	skipThisLine := false
@@ -493,9 +493,9 @@ func RecordToTSV(record *marc21.Record,
 		}
 	}
 
-	if skipThisLine {
-		return ""
-	} else {
-		return fmt.Sprintf("%s\n", strings.Join(line, "\t"))
+	result := ""
+	if !skipThisLine {
+		result = fmt.Sprintf("%s\n", strings.Join(line, "\t"))
 	}
+	return &result
 }

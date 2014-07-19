@@ -38,7 +38,7 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 	for work := range in {
 		recordMap := marctools.RecordToMap(work.Record, work.FilterMap, work.IncludeLeader)
 		if work.PlainMode {
-			b, err := json.Marshal(recordMap)
+			b, err := json.Marshal(*recordMap)
 			if err != nil {
 				if !work.IgnoreErrors {
 					log.Fatalln(err)
@@ -50,7 +50,7 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 			out <- &b
 		} else {
 			m := map[string]interface{}{
-				"content": recordMap,
+				"content": *recordMap,
 				"meta":    *work.MetaMap,
 			}
 			b, err := json.Marshal(m)

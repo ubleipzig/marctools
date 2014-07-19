@@ -29,8 +29,8 @@ func Worker(in chan *Work, out chan *string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for work := range in {
 		line := marctools.RecordToTSV(work.Record, work.Tags, work.FillNA, work.Separator, work.SkipIncompleteLines)
-		if len(line) > 0 {
-			out <- &line
+		if len(*line) > 0 {
+			out <- line
 		}
 	}
 }
