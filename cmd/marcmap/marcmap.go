@@ -6,7 +6,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/miku/marctools"
+	"log"
 	"os"
+	"runtime/pprof"
 )
 
 func main() {
