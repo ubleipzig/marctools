@@ -10,7 +10,7 @@ Installation
 
 We will provide debs or rpms, soon. Meanwhile you would need to use your Go workspace:
 
-    go get github.com/miku/marctools/cmd/{marccount,marcdump,marcmap,marcsplit,marctojson,marctotsv}
+    go get github.com/miku/marctools/cmd/{marccount,marcdump,marcmap,marcsplit,marctojson,marctotsv,marcuniq}
 
 Executables available:
 
@@ -20,3 +20,4 @@ Executables available:
     marcsplit
     marctojson
     marctotsv
+    marcuniq
