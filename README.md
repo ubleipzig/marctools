@@ -292,7 +292,7 @@ Extract two columns:
 Use a custom value for undefined fields with `-f UNDEF`:
 
     $ marctotsv -f UNDEF fixtures/journals.mrc  001 245.a 245.b
-    testsample1 Journal of rational emotive therapy :   the journal of the Institute for Rational-Emotive Therapy.
+    testsample1 Journal of rational emotive therapy :   the journal of the Institute for ...
     testsample2 Rational living.    UNDEF
     testsample3 Psychotherapy in private practice.  UNDEF
     testsample4 Journal of quantitative criminology.    UNDEF
@@ -306,20 +306,20 @@ Use a custom value for undefined fields with `-f UNDEF`:
 Only keep complete rows with `-k`:
 
     $ marctotsv -k fixtures/journals.mrc  001 245.a 245.b
-    testsample1 Journal of rational emotive therapy :   the journal of the Institute for Rational-Emotive Therapy.
+    testsample1 Journal of rational emotive therapy :   the journal of the Institute for ...
 
 Include all values, separated by a pipe via `- s "|"`:
 
     $ marctotsv -s "|" fixtures/journals.mrc  001 710.a
     testsample1 Institute for Rational-Emotive Therapy (New York, N.Y.)
-    testsample2 Institute for Rational-Emotive Therapy (New York, N.Y.)|Institute for Rational Living.
+    testsample2 Institute for Rational-Emotive Therapy (New York, N.Y.)|Institute for ...
     testsample3 <NULL>
     testsample4 LINK (Online service)
     testsample5 Duke University.|ProQuest Psychology Journals.
     testsample6 Indiana University.|Indiana University.
     testsample7 ProQuest Psychology Journals.
     testsample8 ScienceDirect (Online service).
-    testsample9 Society for the Scientific Study of Sex (U.S.)|Society for the Scientific Study of Sexuality (U.S.)|JSTOR (Organization)
+    testsample9 Society for the Scientific Study of Sex (U.S.)|Society for ...|JSTOR
     testsample10    Ingenta (Firm).
 
 marcuniq
@@ -352,7 +352,7 @@ Exclude three IDs and dump do file:
 Development
 -----------
 
-To run the test just type:
+To run the tests just type:
 
     make
 
@@ -369,7 +369,7 @@ To package an RPM, adjust `packaging/marctools.spec`, e.g. update the version, t
 
     make rpm
 
-To package an RPM on a CentOS 6.2 VM with libc **2.12** setup a VM with
+To package an RPM on a CentOS 6.2 with libc **2.12** setup a VM with
 veewee and vagrant. Then run:
 
     vagrant up
@@ -382,7 +382,7 @@ Subsequently build RPMs against libc 2.12 with
 Previous versions
 -----------------
 
-Versions 1.0 upto 1.3.8 (named gomarckit) used a non-standard project layout and lacked
+Versions 1.0 up to 1.3.8 (named gomarckit) used a non-standard project layout and lacked
 tests. Their version history is preserved under the [1.3.8-maint](https://github.com/miku/marctools/tree/1.3.8-maint) branch.
 
 Todo
