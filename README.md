@@ -360,17 +360,22 @@ To open a coverage report in you browser, run:
 
     make cover
 
-To package an RPM, run:
+To package an DEB adjust `debian/marctools/DEBIAN/control`, e.g. update the
+version, then run:
+
+    make deb
+
+To package an RPM, adjust `packaging/marctools.spec`, e.g. update the version, then run:
 
     make rpm
 
-To package an RPM on a CentOS 6.2 machine with libc 2.12 setup a VM with
+To package an RPM on a CentOS 6.2 VM with libc **2.12** setup a VM with
 veewee and vagrant. Then run:
 
     vagrant up
     make vm-setup
 
-Subsequently build RPM against libc 2.12 with
+Subsequently build RPMs against libc 2.12 with
 
     make rpm-compatible
 
@@ -384,7 +389,7 @@ Todo
 ----
 
 * Perform and include some performance benchmarks in README.
-* The MARC21 library used might issue more system calls then needed, e.g.
+* The MARC21 library used might issue more system calls than needed, e.g.
   in the main [Record create loop](https://github.com/miku/marc21/blob/4f0c7faee66f15b198c7a550fb78e2a80a0010ea/marc21_record.go#L33) each data and control field will issue a read system call. It could
   be more efficient to read MARC in larger block and distribute the Record
   parsing itself to the workers.
