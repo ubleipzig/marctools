@@ -35,7 +35,7 @@ Prints the number of records found in a file and then exits.
 marcdump
 --------
 
-Dumps MARC to stdout (just like `yaz-marcdump`):
+Dumps MARC to stdout, similar to [`yaz-marcdump`](http://www.indexdata.com/yaz/doc/yaz-marcdump.html):
 
     $ marcdump fixtures/testbug2.mrc
     001 testbug2
@@ -81,6 +81,8 @@ Dumps a list of id, offset, length tuples to stdout (TSV) or to a sqlite3 databa
     testsample8 9849    1251
     testsample9 11100   2173
     testsample10    13273   1195
+
+Dump listing into an sqlite database:
 
     $ marcmap -o seekmap.db fixtures/journals.mrc
     $ sqlite3 seekmap.db 'select id, offset, length from seekmap'
@@ -131,6 +133,8 @@ Converts MARC to JSON.
       -v=false: prints current program version and exit
       -w=4: number of workers
 
+Default conversion:
+
     $ marctojson fixtures/testbug2.mrc | jsonpp
     {
       "content": {
@@ -170,6 +174,8 @@ Converts MARC to JSON.
       "meta": {}
     }
 
+Dump the leader as well with `-l` and only dump field 040 with `-r 040`:
+
     $ marctojson -l -r 040 fixtures/testbug2.mrc | jsonpp
     {
       "content": {
@@ -202,6 +208,9 @@ Converts MARC to JSON.
       "meta": {}
     }
 
+Restrict JSON to 001 and 245, and use plain mode with `-p`, which has no `meta` or
+`content` key:
+
     $ marctojson -r "001, 245" -p fixtures/testbug2.mrc | jsonpp
     {
       "001": "testbug2",
@@ -215,6 +224,8 @@ Converts MARC to JSON.
         }
       ]
     }
+
+Add some value - here `date="$(date)"` under the meta key:
 
     $ marctojson -r "001, 245" -m date="$(date)" fixtures/testbug2.mrc | jsonpp
     {
@@ -250,6 +261,8 @@ Converts selected MARC tags to tab-separated values (TSV).
       -v=false: prints current program version and exit
       -w=4: number of workers
 
+Extract a single column:
+
     $ marctotsv fixtures/journals.mrc 001
     testsample1
     testsample2
@@ -261,6 +274,8 @@ Converts selected MARC tags to tab-separated values (TSV).
     testsample8
     testsample9
     testsample10
+
+Extract two columns:
 
     $ marctotsv fixtures/journals.mrc 001 245.a
     testsample1 Journal of rational emotive therapy :
@@ -274,6 +289,8 @@ Converts selected MARC tags to tab-separated values (TSV).
     testsample9 The journal of sex research
     testsample10    Journal of phenomenological psychology.
 
+Use a custom value for undefined fields with `-f UNDEF`:
+
     $ marctotsv -f UNDEF fixtures/journals.mrc  001 245.a 245.b
     testsample1 Journal of rational emotive therapy :   the journal of the Institute for Rational-Emotive Therapy.
     testsample2 Rational living.    UNDEF
@@ -286,8 +303,12 @@ Converts selected MARC tags to tab-separated values (TSV).
     testsample9 The journal of sex research UNDEF
     testsample10    Journal of phenomenological psychology. UNDEF
 
+Only keep complete rows with `-k`:
+
     $ marctotsv -k fixtures/journals.mrc  001 245.a 245.b
     testsample1 Journal of rational emotive therapy :   the journal of the Institute for Rational-Emotive Therapy.
+
+Include all values, separated by a pipe via `- s "|"`:
 
     $ marctotsv -s "|" fixtures/journals.mrc  001 710.a
     testsample1 Institute for Rational-Emotive Therapy (New York, N.Y.)
@@ -310,6 +331,8 @@ marcuniq
       -o="": output file (or stdout if none given)
       -v=false: prints current program version
       -x="": comma separated list of ids to exclude (or filename with one id per line)
+
+Exclude three IDs and dump do file:
 
     $ marcuniq -x "testsample1,testsample2,testsample3" -o filtered.mrc fixtures/journals.mrc
     excluded ids interpreted as string
