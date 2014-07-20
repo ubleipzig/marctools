@@ -55,6 +55,7 @@ deb: targets
 
 # rpm building via vagrant
 SSHCMD = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 2222
+SCPCMD = scp -o port=2222 -o StrictHostKeyChecking=no -i vagrant.key
 
 rpm: targets
 	mkdir -p $(HOME)/rpmbuild/BUILD
@@ -80,7 +81,5 @@ vm-setup: vagrant.key
 
 rpm-compatible: vagrant.key
 	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && GOPATH=/home/vagrant go get"
-	# $(SSHCMD) "GOPATH=/home/vagrant go get github.com/mattn/go-sqlite3"
-	# $(SSHCMD) "GOPATH=/home/vagrant go get github.com/miku/marc"
 	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && git pull origin master && pwd && GOPATH=/home/vagrant make rpm"
-	scp -o port=2222 -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1:/home/vagrant/src/github.com/miku/marctools/*rpm .
+	$(SCPCMD) vagrant@127.0.0.1:/home/vagrant/src/github.com/miku/marctools/*rpm .
