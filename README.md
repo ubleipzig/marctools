@@ -374,6 +374,12 @@ Subsequently build RPM against libc 2.12 with
 
     make rpm-compatible
 
+Previous versions
+-----------------
+
+Versions 1.0 upto 1.3.8 (named gomarckit) used a non-standard project layout and lacked
+tests. Their version history is preserved under the [1.3.8-maint](https://github.com/miku/marctools/tree/1.3.8-maint) branch.
+
 Todo
 ----
 
