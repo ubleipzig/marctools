@@ -1,7 +1,7 @@
 marctools
 =========
 
-Various MARC utilities.
+Various MARC utilities with an eye on performance.
 
 [![Build Status](http://img.shields.io/travis/miku/marctools.svg?style=flat)](https://travis-ci.org/miku/marctools)
 
