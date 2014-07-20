@@ -100,7 +100,7 @@ Dump listing into an sqlite database:
 marcsplit
 ---------
 
-Splits a marcfile into smaller pieces.
+Splits a MARC file into smaller pieces.
 
     $ marcsplit -h
     Usage of marcsplit:
@@ -133,7 +133,7 @@ Converts MARC to JSON.
       -v=false: prints current program version and exit
       -w=4: number of workers
 
-Default conversion:
+Default conversion (abbreviated):
 
     $ marctojson fixtures/testbug2.mrc | jsonpp
     {
