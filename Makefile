@@ -15,6 +15,9 @@ clean:
 	go clean
 	rm -f coverage.out
 	rm -f marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq
+	rm -f marctools-*.x86_64.rpm
+	rm -f debian/marctools*.deb
+	rm -rf debian/marctools/usr
 
 cover:
 	go get -d && go test -v	-coverprofile=coverage.out
