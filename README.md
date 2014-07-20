@@ -1,7 +1,5 @@
 ----
-
-Note: This project is currently being overhauled: getting more standards-compliant and possibly faster as well.
-
+Maintenance Branch
 ----
 
 
