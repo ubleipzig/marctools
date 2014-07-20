@@ -50,7 +50,7 @@ Dumps MARC to stdout, similar to [`yaz-marcdump`](http://www.indexdata.com/yaz/d
     049 [  ] [(a) PVUM]
     100 [1 ] [(a) Vico, Giambattista,], [(d) 1668-1744.]
     240 [10] [(a) Principum Neapolitanorum coniurationis anni MDCCI historia.], [(l) Italian & Latin]
-    245 [13] [(a) La congiura dei Principi Napoletani 1701 :], [(b) (prima e seconda stesura) /], [(c) Giambattista Vico ; a cura di Claudia Pandolfi.]
+    245 [13] [(a) La congiura dei Principi Napoletani 1701 :], [(b) (prima e seconda stesura) /], ...
     250 [  ] [(a) Fictional edition.]
     260 [  ] [(a) Morano :], [(b) Centro di Studi Vichiani,], [(c) 1992.]
     300 [  ] [(a) 296 p. :], [(b) ill. ;], [(c) 24 cm.]
@@ -68,7 +68,9 @@ Dumps MARC to stdout, similar to [`yaz-marcdump`](http://www.indexdata.com/yaz/d
 marcmap
 -------
 
-Dumps a list of id, offset, length tuples to stdout (TSV) or to a sqlite3 database:
+Dumps a list of *id, offset, length* tuples to stdout (TSV) or to a sqlite3 database:
+
+By default write to stdout:
 
     $ marcmap fixtures/journals.mrc
     testsample1 0   1571
@@ -82,7 +84,7 @@ Dumps a list of id, offset, length tuples to stdout (TSV) or to a sqlite3 databa
     testsample9 11100   2173
     testsample10    13273   1195
 
-Dump listing into an sqlite database:
+Dump listing into an sqlite database with `-o FILENAME`:
 
     $ marcmap -o seekmap.db fixtures/journals.mrc
     $ sqlite3 seekmap.db 'select id, offset, length from seekmap'
@@ -102,7 +104,7 @@ marcsplit
 
 Splits a MARC file into smaller pieces.
 
-    $ marcsplit -h
+    $ marcsplit
     Usage of marcsplit:
       -C=1: number of records per file
       -cpuprofile="": write cpu profile to file
@@ -122,7 +124,7 @@ marctojson
 
 Converts MARC to JSON.
 
-    $ marctojson -h
+    $ marctojson
     Usage of marctojson:
       -cpuprofile="": write cpu profile to file
       -i=false: ignore marc errors (not recommended)
@@ -225,7 +227,7 @@ Restrict JSON to 001 and 245, and use plain mode with `-p`, which has no `meta` 
       ]
     }
 
-Add some value - here `date="$(date)"` under the meta key:
+Add some value -- here `date="$(date)"` -- under the meta key:
 
     $ marctojson -r "001, 245" -m date="$(date)" fixtures/testbug2.mrc | jsonpp
     {
@@ -325,7 +327,7 @@ Include all values, separated by a pipe via `- s "|"`:
 marcuniq
 --------
 
-    $ marcuniq -h
+    $ marcuniq
     Usage: marcuniq [OPTIONS] MARCFILE
       -i=false: ignore marc errors (not recommended)
       -o="": output file (or stdout if none given)
