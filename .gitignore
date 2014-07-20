@@ -28,3 +28,4 @@ fixtures/biglok.mrc
 vagrant.key
 .vagrant
 NOTES.md
+debian/marctools/usr

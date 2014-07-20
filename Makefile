@@ -21,7 +21,6 @@ cover:
 	go tool cover -html=coverage.out
 
 # executables
-
 targets: marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq
 
 marccount:
@@ -45,8 +44,13 @@ marctotsv:
 marcuniq:
 	go build cmd/marcuniq/marcuniq.go
 
-# rpm building via vagrant
+# experimental deb building
+deb: targets
+	mkdir -p debian/marctools/usr/sbin
+	cp marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq debian/marctools/usr/sbin
+	cd debian && fakeroot dpkg-deb --build marctools
 
+# rpm building via vagrant
 SSHCMD = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 2222
 
 rpm: targets

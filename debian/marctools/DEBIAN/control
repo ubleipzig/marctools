@@ -1,0 +1,10 @@
+Package: marctools
+Version: 1.4.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Essential: no
+Depends: libc6 (>= 2.12)
+Maintainer: Martin Czygan
+Description: Various utilities for working
+    with bibliographic data in the MARC21 format.
