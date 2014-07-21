@@ -227,7 +227,7 @@ Restrict JSON to 001 and 245, and use plain mode with `-p`, which has no `meta` 
       ]
     }
 
-Add some value -- here `date="$(date)"` -- under the meta key:
+Add some value (here the current date) to the meta map:
 
     $ marctojson -r "001, 245" -m date="$(date)" fixtures/testbug2.mrc | jsonpp
     {
