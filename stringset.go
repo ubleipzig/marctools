@@ -2,16 +2,16 @@ package marctools
 
 // poor mans string set
 type StringSet struct {
-	set map[string]bool
+	set map[string]struct{}
 }
 
 func NewStringSet() *StringSet {
-	return &StringSet{set: make(map[string]bool)}
+	return &StringSet{set: make(map[string]struct{})}
 }
 
 func (set *StringSet) Add(s string) bool {
 	_, found := set.set[s]
-	set.set[s] = true
+	set.set[s] = struct{}{}
 	return !found // False if it existed already
 }
 
