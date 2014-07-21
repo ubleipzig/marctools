@@ -135,7 +135,7 @@ Converts MARC to JSON.
       -v=false: prints current program version and exit
       -w=4: number of workers
 
-Default conversion (abbreviated):
+Default conversion (abbreviated, [pretty-printed](https://github.com/jmhodges/jsonpp)):
 
     $ marctojson fixtures/testbug2.mrc | jsonpp
     {
