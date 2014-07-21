@@ -362,8 +362,8 @@ To open a coverage report in you browser, run:
 
     make cover
 
-To package an DEB adjust `debian/marctools/DEBIAN/control`, e.g. update the
-version, then run:
+To package an DEB adjust `debian/marctools/DEBIAN/control`, e.g. [update the
+version](https://github.com/ubleipzig/marctools/commit/0279811c32e8ad78ceeef821e3b950ceb74e22aa), then run:
 
     make deb
 
