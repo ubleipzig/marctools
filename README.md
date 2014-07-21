@@ -8,13 +8,13 @@ Various MARC utilities with an eye on performance.
 Installation
 ------------
 
-For native packages see: [Releases](https://github.com/ubleipzig/marctools/releases)
+For native RPM or DEB packages see: [Releases](https://github.com/ubleipzig/marctools/releases)
 
 If you have a local Go installation, you can just
 
     go get github.com/miku/marctools/cmd/{marccount,marcdump,marcmap,marcsplit,marctojson,...}
 
-Executables available are:
+Executables available:
 
     marccount
     marcdump
