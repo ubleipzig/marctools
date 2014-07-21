@@ -12,7 +12,7 @@ For native RPM or DEB packages see: [Releases](https://github.com/ubleipzig/marc
 
 If you have a local Go installation, you can just
 
-    go get github.com/miku/marctools/cmd/{marccount,marcdump,marcmap,marcsplit,marctojson,...}
+    go get github.com/ubleipzig/marctools/cmd/{marccount,marcdump,marcmap,marcsplit,marctojson,...}
 
 Executables available:
 
@@ -385,7 +385,7 @@ Previous versions
 -----------------
 
 Versions 1.0 up to 1.3.8 (named gomarckit) used a non-standard project layout and lacked
-tests. Their version history is preserved under the [1.3.8-maint](https://github.com/miku/marctools/tree/1.3.8-maint) branch.
+tests. Their version history is preserved under the [1.3.8-maint](https://github.com/ubleipzig/marctools/tree/1.3.8-maint) branch.
 
 Todo
 ----
