@@ -378,21 +378,11 @@ func recordToContentMap(record *marc21.Record, filterMap *map[string]bool) *map[
 			subfieldMap["ind2"] = string(datafield.Ind2)
 			for _, subfield := range datafield.SubFields {
 				code := fmt.Sprintf("%c", subfield.Code)
-				value, present := subfieldMap[code]
+				_, present := subfieldMap[code]
 				if present {
-					switch t := value.(type) {
-					case string:
-						values := make([]string, 0)
-						values = append(values, value.(string))
-						values = append(values, subfield.Value)
-						subfieldMap[code] = values
-					case []string:
-						subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
-					default:
-						log.Fatalf("unexpected type: %T", t)
-					}
+					subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
 				} else {
-					subfieldMap[code] = subfield.Value
+					subfieldMap[code] = []string{subfield.Value}
 				}
 			}
 			_, present := contentMap[tag]

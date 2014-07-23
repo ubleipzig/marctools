@@ -141,75 +141,109 @@ Default conversion (abbreviated, [pretty-printed](https://github.com/jmhodges/js
 
     $ marctojson fixtures/testbug2.mrc | jsonpp
     {
-      "content": {
-        "001": "testbug2",
-        "005": "20110419140028.0",
-        "008": "110214s1992    it a     b    001 0 ita d",
-        "020": [
-          {
-            "a": "8820737493",
-            "ind1": " ",
-            "ind2": " "
-          }
-        ],
-        ...
-        "040": [
-          {
-            "a": "RBN",
-            "c": "RBN",
-            "d": [
-              "OCLCG",
-              "PVU"
-            ],
-            "ind1": " ",
-            "ind2": " "
-          }
-        ],
-        ...
-        "856": [
-          {
-            "ind1": "4",
-            "ind2": "0",
-            "u": "http://fictional.com/sample/url"
-          }
-        ]
-      },
-      ...
-      "meta": {}
+       "content" : {
+          ...
+          "245" : [
+             {
+                "ind1" : "1",
+                "c" : [
+                   "Giambattista Vico ; a cura di Claudia Pandolfi."
+                ],
+                "a" : [
+                   "La congiura dei Principi Napoletani 1701 :"
+                ],
+                "ind2" : "3",
+                "b" : [
+                   "(prima e seconda stesura) /"
+                ]
+             }
+          ],
+          ...
+          "250" : [
+             {
+                "ind2" : " ",
+                "a" : [
+                   "Fictional edition."
+                ],
+                "ind1" : " "
+             }
+          ],
+          "020" : [
+             {
+                "ind2" : " ",
+                "ind1" : " ",
+                "a" : [
+                   "8820737493"
+                ]
+             }
+          ],
+          "490" : [
+             {
+                "v" : [
+                   "2/1"
+                ],
+                "ind2" : " ",
+                "a" : [
+                   "Opere di Giambattista Vico ;"
+                ],
+                "ind1" : "1"
+             }
+          ],
+          "240" : [
+             {
+                "a" : [
+                   "Principum Neapolitanorum coniurationis anni MDCCI historia."
+                ],
+                "ind1" : "1",
+                "l" : [
+                   "Italian & Latin"
+                ],
+                "ind2" : "0"
+             }
+          ],
+          "001" : "testbug2"
+       },
+       "meta" : {}
     }
+
+
 
 Dump the leader as well with `-l` and only dump field 040 with `-r 040`:
 
     $ marctojson -l -r 040 fixtures/testbug2.mrc | jsonpp
     {
-      "content": {
-        "040": [
-          {
-            "a": "RBN",
-            "c": "RBN",
-            "d": [
-              "OCLCG",
-              "PVU"
-            ],
-            "ind1": " ",
-            "ind2": " "
+       "content" : {
+          "040" : [
+             {
+                "ind2" : " ",
+                "c" : [
+                   "RBN"
+                ],
+                "a" : [
+                   "RBN"
+                ],
+                "d" : [
+                   "OCLCG",
+                   "PVU"
+                ],
+                "ind1" : " "
+             }
+          ],
+          "leader" : {
+             "status" : "c",
+             "sfcl" : "2",
+             "lol" : "4",
+             "losp" : "5",
+             "type" : "a",
+             "ba" : "337",
+             "impldef" : "m Ma ",
+             "length" : "1234",
+             "ic" : "2",
+             "raw" : "01234cam a2200337Ma 4500",
+             "cs" : "a"
           }
-        ],
-        "leader": {
-          "ba": "337",
-          "cs": "a",
-          "ic": "2",
-          "impldef": "m Ma ",
-          "length": "1234",
-          "lol": "4",
-          "losp": "5",
-          "raw": "01234cam a2200337Ma 4500",
-          "sfcl": "2",
-          "status": "c",
-          "type": "a"
-        }
-      },
-      "meta": {}
+       },
+       "meta" : {}
     }
 
 Restrict JSON to 001 and 245, and use plain mode with `-p`, which has no `meta` or
@@ -217,37 +251,50 @@ Restrict JSON to 001 and 245, and use plain mode with `-p`, which has no `meta` 
 
     $ marctojson -r "001, 245" -p fixtures/testbug2.mrc | jsonpp
     {
-      "001": "testbug2",
-      "245": [
-        {
-          "a": "La congiura dei Principi Napoletani 1701 :",
-          "b": "(prima e seconda stesura) /",
-          "c": "Giambattista Vico ; a cura di Claudia Pandolfi.",
-          "ind1": "1",
-          "ind2": "3"
-        }
-      ]
+       "001" : "testbug2",
+       "245" : [
+          {
+             "ind1" : "1",
+             "a" : [
+                "La congiura dei Principi Napoletani 1701 :"
+             ],
+             "ind2" : "3",
+             "c" : [
+                "Giambattista Vico ; a cura di Claudia Pandolfi."
+             ],
+             "b" : [
+                "(prima e seconda stesura) /"
+             ]
+          }
+       ]
     }
+
 
 Add some value (here the current date) to the meta map:
 
     $ marctojson -r "001, 245" -m date="$(date)" fixtures/testbug2.mrc | jsonpp
     {
-      "content": {
-        "001": "testbug2",
-        "245": [
-          {
-            "a": "La congiura dei Principi Napoletani 1701 :",
-            "b": "(prima e seconda stesura) /",
-            "c": "Giambattista Vico ; a cura di Claudia Pandolfi.",
-            "ind1": "1",
-            "ind2": "3"
-          }
-        ]
-      },
-      "meta": {
-        "date": "Sun Jul 20 17:36:37 CEST 2014"
-      }
+       "content" : {
+          "001" : "testbug2",
+          "245" : [
+             {
+                "ind2" : "3",
+                "c" : [
+                   "Giambattista Vico ; a cura di Claudia Pandolfi."
+                ],
+                "ind1" : "1",
+                "a" : [
+                   "La congiura dei Principi Napoletani 1701 :"
+                ],
+                "b" : [
+                   "(prima e seconda stesura) /"
+                ]
+             }
+          ]
+       },
+       "meta" : {
+          "date" : "Wed Jul 23 17:21:24 CEST 2014"
+       }
     }
 
 marctotsv
