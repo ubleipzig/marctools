@@ -16,7 +16,7 @@ import (
 	"strings"
 )
 
-const AppVersion = "1.4.1"
+const AppVersion = "1.5.0"
 
 // KeyValueStringToMap turns a string like "key1=value1, key2=value2" into a map.
 func KeyValueStringToMap(s string) (map[string]string, error) {

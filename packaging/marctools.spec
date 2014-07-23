@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       marctools
-Version:    1.4.1
+Version:    1.5.0
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
