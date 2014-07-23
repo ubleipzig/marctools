@@ -68,7 +68,7 @@ rpm: $(TARGETS)
 
 # Helper to build RPM on a RHEL6 VM, to link against glibc 2.12
 vagrant.key:
-	curl -sL "https://raw2.github.com/mitchellh/vagrant/mastekeys/vagrant" > vagrant.key
+	curl -sL "https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant" > vagrant.key
 	chmod 0600 vagrant.key
 
 # Don't forget to vagrant up :) - and add your public key to the guests authorized_keys
