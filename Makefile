@@ -1,3 +1,5 @@
+TARGETS = marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq
+
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
 	go get -d && go test -v
@@ -23,9 +25,6 @@ cover:
 	go get -d && go test -v	-coverprofile=coverage.out
 	go tool cover -html=coverage.out
 
-# executables
-targets: marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq
-
 marccount:
 	go build cmd/marccount/marccount.go
 
@@ -48,7 +47,7 @@ marcuniq:
 	go build cmd/marcuniq/marcuniq.go
 
 # experimental deb building
-deb: targets
+deb: $(TARGETS)
 	mkdir -p debian/marctools/usr/sbin
 	cp marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq debian/marctools/usr/sbin
 	cd debian && fakeroot dpkg-deb --build marctools
@@ -57,7 +56,7 @@ deb: targets
 SSHCMD = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 2222
 SCPCMD = scp -o port=2222 -o StrictHostKeyChecking=no -i vagrant.key
 
-rpm: targets
+rpm: $(TARGETS)
 	mkdir -p $(HOME)/rpmbuild/BUILD
 	mkdir -p $(HOME)/rpmbuild/SOURCES
 	mkdir -p $(HOME)/rpmbuild/SPECS
