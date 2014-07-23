@@ -50,7 +50,7 @@ marcuniq:
 deb: $(TARGETS)
 	mkdir -p debian/marctools/usr/sbin
 	cp marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq debian/marctools/usr/sbin
-	cd debian && fakeroot dpkg-deb --build marctools
+	cd debian && fakeroot dpkg-deb --build marctools .
 
 # rpm building via vagrant
 SSHCMD = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 2222
