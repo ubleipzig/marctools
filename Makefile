@@ -72,7 +72,7 @@ vagrant.key:
 	chmod 0600 vagrant.key
 
 # Don't forget to vagrant up :) - and add your public key to the guests authorized_keys
-vm-setup: vagrant.key
+setup: vagrant.key
 	$(SSHCMD) "sudo yum install -y sudo yum install http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm"
 	$(SSHCMD) "sudo yum install -y golang git rpm-build"
 	$(SSHCMD) "mkdir -p /home/vagrant/src/github.com/miku"
