@@ -1,7 +1,7 @@
 marctools
 =========
 
-Various MARC utilities with an eye on performance.
+Various MARC command line utilities.
 
 [![Build Status](http://img.shields.io/travis/miku/marctools.svg?style=flat)](https://travis-ci.org/miku/marctools)
 
@@ -124,7 +124,11 @@ Splits a MARC file into smaller pieces.
 marctojson
 ----------
 
-Converts MARC to JSON.
+Converts MARC to JSON. This is (between 4 to 8 times) slower than `yaz-marcdump -i marc -o json`,
+but offers a bit more flexibility in the output format, e.g. filtering tags or the leader.
+The output format is minimalistic. It keeps all the information (including order) from MARC,
+but tries to be as brief as possible (there are e.g. no explicit *subfield* keys and
+fields are use only once as keys).
 
     $ marctojson
     Usage of marctojson:
