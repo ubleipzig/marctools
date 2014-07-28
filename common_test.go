@@ -235,6 +235,16 @@ var recordmaptests = []struct {
 		map[string]bool{"001": true, "005": true},
 		false,
 		`{"001":"testdeweybrowse","005":"20110419140028.0"}`},
+	{`00092     2200061   450000100060000004000120000604000120001812345  aValue 1  aValue 2`,
+		map[string]bool{},
+		false,
+		`{"001":"12345","040":[{"a":["Value 1"],"ind1":" ","ind2":" "},{"a":["Value 2"],"ind1":" ","ind2":" "}]}`,
+	},
+	{`00077     2200049   450000100060000004000210000623456  aValue 1aValue 2`,
+		map[string]bool{},
+		false,
+		`{"001":"23456","040":[{"a":["Value 1","Value 2"],"ind1":" ","ind2":" "}]}`,
+	},
 }
 
 func TestRecordToMap(t *testing.T) {
