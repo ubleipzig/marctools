@@ -12,7 +12,7 @@ For native RPM or DEB packages see: [Releases](https://github.com/ubleipzig/marc
 
 If you have a local Go installation, you can just
 
-    go get github.com/ubleipzig/marctools/cmd/{marccount,marcdump,marcmap,marcsplit,marctojson,...}
+    go get github.com/ubleipzig/marctools/cmd/{marctojson,marctotsv,...}
 
 Executables available:
 
