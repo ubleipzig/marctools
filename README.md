@@ -51,8 +51,8 @@ Dumps MARC to stdout, similar to [`yaz-marcdump`](http://www.indexdata.com/yaz/d
     050 [14] [(a) DG848.15], [(b) .V53 1992]
     049 [  ] [(a) PVUM]
     100 [1 ] [(a) Vico, Giambattista,], [(d) 1668-1744.]
-    240 [10] [(a) Principum Neapolitanorum coniurationis anni MDCCI historia.], [(l) Italian & Latin]
-    245 [13] [(a) La congiura dei Principi Napoletani 1701 :], [(b) (prima e seconda stesura) /], ...
+    240 [10] [(a) Principum Neapolitanorum coniurationis anni MDCCI ...
+    245 [13] [(a) La congiura dei Principi Napoletani 1701 :], [(b) (pr ...
     250 [  ] [(a) Fictional edition.]
     260 [  ] [(a) Morano :], [(b) Centro di Studi Vichiani,], [(c) 1992.]
     300 [  ] [(a) 296 p. :], [(b) ill. ;], [(c) 24 cm.]
@@ -61,9 +61,9 @@ Dumps MARC to stdout, similar to [`yaz-marcdump`](http://www.indexdata.com/yaz/d
     504 [  ] [(a) Includes bibliographical references (p. [277]-281) and index.]
     520 [3 ] [(a) Sample abstract.]
     590 [  ] [(a) April11phi]
-    651 [ 0] [(a) Naples (Kingdom)], [(x) History], [(y) Spanish rule, 1442-1707], [(v) Sources.]
+    651 [ 0] [(a) Naples (Kingdom)], [(x) History], [(y) Spanish rule, ....
     700 [1 ] [(a) Pandolfi, Claudia.]
-    800 [1 ] [(a) Vico, Giambattista,], [(d) 1668-1744.], [(t) Works.], [(f) 1982 ;], [(v) 2, pt. 1.]
+    800 [1 ] [(a) Vico, Giambattista,], [(d) 1668-1744.], [(t) Works.], ...
     856 [40] [(u) http://fictional.com/sample/url]
     994 [  ] [(a) C0], [(b) PVU]
 
@@ -347,7 +347,7 @@ Extract two columns:
 Use a custom value for undefined fields with `-f UNDEF`:
 
     $ marctotsv -f UNDEF fixtures/journals.mrc  001 245.a 245.b
-    testsample1 Journal of rational emotive therapy :   the journal of the Institute for ...
+    testsample1 Journal of rational emotive therapy :   the journal of the In ...
     testsample2 Rational living.    UNDEF
     testsample3 Psychotherapy in private practice.  UNDEF
     testsample4 Journal of quantitative criminology.    UNDEF
@@ -361,20 +361,20 @@ Use a custom value for undefined fields with `-f UNDEF`:
 Only keep complete rows with `-k`:
 
     $ marctotsv -k fixtures/journals.mrc  001 245.a 245.b
-    testsample1 Journal of rational emotive therapy :   the journal of the Institute for ...
+    testsample1 Journal of rational emotive therapy :   the journal of the In ...
 
 Include all values, separated by a pipe via `- s "|"`:
 
     $ marctotsv -s "|" fixtures/journals.mrc  001 710.a
     testsample1 Institute for Rational-Emotive Therapy (New York, N.Y.)
-    testsample2 Institute for Rational-Emotive Therapy (New York, N.Y.)|Institute for ...
+    testsample2 Institute for Rational-Emotive Therapy (New York, N.Y.)|Inst ...
     testsample3 <NULL>
     testsample4 LINK (Online service)
     testsample5 Duke University.|ProQuest Psychology Journals.
     testsample6 Indiana University.|Indiana University.
     testsample7 ProQuest Psychology Journals.
     testsample8 ScienceDirect (Online service).
-    testsample9 Society for the Scientific Study of Sex (U.S.)|Society for ...|JSTOR
+    testsample9 Society for the Scientific Study of Sex (U.S.)|Society for ...
     testsample10    Ingenta (Firm).
 
 marcuniq
@@ -389,13 +389,14 @@ marcuniq
 
 Exclude three IDs and dump do file:
 
-    $ marcuniq -x "testsample1,testsample2,testsample3" -o filtered.mrc fixtures/journals.mrc
+    $ marcuniq -x "testsample1,testsample2" -o filtered.mrc fixtures/journals.mrc
     excluded ids interpreted as string
-    3 ids to exclude loaded
+    2 ids to exclude loaded
     10 records read
-    7 records written, 0 skipped, 3 excluded, 0 without ID (001)
+    8 records written, 0 skipped, 2 excluded, 0 without ID (001)
 
     $ marctotsv filtered.mrc 001
+    testsample3
     testsample4
     testsample5
     testsample6
