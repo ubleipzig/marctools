@@ -148,7 +148,7 @@ func IdList(filename string) []string {
 			if len(fields) == 1 {
 				ids = append(ids, strings.TrimSpace(fields[0].(*marc21.ControlField).Data))
 			} else {
-				log.Fatalf("Unusual 001 field count: %s\n", len(fields))
+				log.Fatalf("Unusual 001 field count: %d\n", len(fields))
 			}
 		}
 	} else {
