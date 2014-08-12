@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/miku/marc21"
+	"github.com/miku/marc22"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -250,7 +250,7 @@ var recordmaptests = []struct {
 func TestRecordToMap(t *testing.T) {
 	for _, tt := range recordmaptests {
 		reader := strings.NewReader(tt.record)
-		record, err := marc21.ReadRecord(reader)
+		record, err := marc22.ReadRecord(reader)
 		if err != nil {
 			t.Error(err)
 		}
@@ -323,7 +323,7 @@ var recordtotsvtests = []struct {
 func TestRecordToTSV(t *testing.T) {
 	for _, tt := range recordtotsvtests {
 		reader := strings.NewReader(tt.record)
-		record, err := marc21.ReadRecord(reader)
+		record, err := marc22.ReadRecord(reader)
 		if err != nil {
 			t.Error(err)
 		}

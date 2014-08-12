@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/miku/marc21"
+	"github.com/miku/marc22"
 	"io"
 	"log"
 	"os"
@@ -21,7 +21,7 @@ import (
 const AppVersion = "1.5.0"
 
 type Work struct {
-	Record        *marc21.Record     // MARC record
+	Record        *marc22.Record     // MARC record
 	FilterMap     *map[string]bool   // which tags to include
 	MetaMap       *map[string]string // meta information
 	IncludeLeader bool
@@ -191,7 +191,7 @@ func IdList(filename string) []string {
 		}()
 
 		for {
-			record, err := marc21.ReadRecord(fi)
+			record, err := marc22.ReadRecord(fi)
 			if err == io.EOF {
 				break
 			}
@@ -199,9 +199,9 @@ func IdList(filename string) []string {
 				log.Fatalf("%s\n", err)
 			}
 
-			fields := record.GetFields("001")
+			fields := record.GetControlFields("001")
 			if len(fields) == 1 {
-				ids = append(ids, strings.TrimSpace(fields[0].(*marc21.ControlField).Data))
+				ids = append(ids, strings.TrimSpace(fields[0].Data))
 			} else {
 				log.Fatalf("Unusual 001 field count: %d\n", len(fields))
 			}
@@ -391,9 +391,9 @@ func MarcSplit(infile string, size int64) {
 }
 
 // recordToLeaderMap extracts the leader from a given record and puts it in a map
-func recordToLeaderMap(record *marc21.Record) *map[string]string {
+func recordToLeaderMap(record *marc22.Record) *map[string]string {
 	leaderMap := make(map[string]string)
-	leader := record.Leader
+	leader := record.LeaderParsed
 	leaderMap["status"] = string(leader.Status)
 	leaderMap["cs"] = string(leader.CharacterEncoding)
 	leaderMap["length"] = fmt.Sprintf("%d", leader.Length)
@@ -410,13 +410,13 @@ func recordToLeaderMap(record *marc21.Record) *map[string]string {
 
 // recordToContentMap converts a record into a map, optionally only the tags
 // given in filterMap
-func recordToContentMap(record *marc21.Record, filterMap *map[string]bool) *map[string]interface{} {
+func recordToContentMap(record *marc22.Record, filterMap *map[string]bool) *map[string]interface{} {
 	contentMap := make(map[string]interface{})
 
 	filter := *filterMap
 	hasFilter := len(filter) > 0
 
-	for _, field := range record.Fields {
+	for _, field := range record.ControlFields {
 		tag := field.GetTag()
 		if hasFilter {
 			_, present := filter[tag]
@@ -424,36 +424,45 @@ func recordToContentMap(record *marc21.Record, filterMap *map[string]bool) *map[
 				continue
 			}
 		}
-		if strings.HasPrefix(tag, "00") {
-			contentMap[tag] = field.(*marc21.ControlField).Data
-		} else {
-			datafield := field.(*marc21.DataField)
-			subfieldMap := make(map[string]interface{})
-			subfieldMap["ind1"] = string(datafield.Ind1)
-			subfieldMap["ind2"] = string(datafield.Ind2)
-			for _, subfield := range datafield.SubFields {
-				code := fmt.Sprintf("%c", subfield.Code)
-				_, present := subfieldMap[code]
-				if present {
-					subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
-				} else {
-					subfieldMap[code] = []string{subfield.Value}
-				}
-			}
-			_, present := contentMap[tag]
-			if !present {
-				subfields := make([]interface{}, 0)
-				contentMap[tag] = subfields
-			}
-			contentMap[tag] = append(contentMap[tag].([]interface{}), subfieldMap)
-		}
+		contentMap[tag] = field.Data
 	}
+
+	for _, field := range record.DataFields {
+		tag := field.GetTag()
+		if hasFilter {
+			_, present := filter[tag]
+			if !present {
+				continue
+			}
+		}
+
+		subfieldMap := make(map[string]interface{})
+		subfieldMap["ind1"] = string(field.Ind1)
+		subfieldMap["ind2"] = string(field.Ind2)
+		for _, subfield := range field.SubFields {
+			code := fmt.Sprintf("%c", subfield.Code)
+			_, present := subfieldMap[code]
+			if present {
+				subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
+			} else {
+				subfieldMap[code] = []string{subfield.Value}
+			}
+		}
+		_, present := contentMap[tag]
+		if !present {
+			subfields := make([]interface{}, 0)
+			contentMap[tag] = subfields
+		}
+		contentMap[tag] = append(contentMap[tag].([]interface{}), subfieldMap)
+
+	}
+
 	return &contentMap
 }
 
 // RecordToMap converts a record to a map, optionally keeping only the tags
 // given in filterMap. If includeLeader is true, the leader is converted as well.
-func RecordToMap(record *marc21.Record, filterMap *map[string]bool, includeLeader bool) *map[string]interface{} {
+func RecordToMap(record *marc22.Record, filterMap *map[string]bool, includeLeader bool) *map[string]interface{} {
 	contentMap := *recordToContentMap(record, filterMap)
 	if includeLeader {
 		contentMap["leader"] = recordToLeaderMap(record)
@@ -465,7 +474,7 @@ var REGEX_SUBFIELD = regexp.MustCompile(`^([\d]{3})\.([a-z0-9])$`)
 var REGEX_CONTROLFIELD = regexp.MustCompile(`^[\d]{3}$`)
 
 // RecordToTSV turns a single record into a single TSV line
-func RecordToTSV(record *marc21.Record,
+func RecordToTSV(record *marc22.Record,
 	tags *[]string,
 	fillna, separator *string,
 	skipIncompleteLines *bool) *string {
@@ -475,9 +484,9 @@ func RecordToTSV(record *marc21.Record,
 
 	for _, tag := range *tags {
 		if REGEX_CONTROLFIELD.MatchString(tag) {
-			fields := record.GetFields(tag)
+			fields := record.GetControlFields(tag)
 			if len(fields) > 0 {
-				line = append(line, fields[0].(*marc21.ControlField).Data)
+				line = append(line, fields[0].Data)
 			} else {
 				if *skipIncompleteLines {
 					skipThisLine = true
@@ -508,7 +517,7 @@ func RecordToTSV(record *marc21.Record,
 				line = append(line, *fillna) // or any fill value
 			}
 		} else if strings.HasPrefix(tag, "@") {
-			leader := record.Leader
+			leader := record.LeaderParsed
 			switch tag {
 			case "@Length":
 				line = append(line, fmt.Sprintf("%d", leader.Length))

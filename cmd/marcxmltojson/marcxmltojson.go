@@ -5,7 +5,7 @@ import (
 	"encoding/xml"
 	"flag"
 	"fmt"
-	// "github.com/miku/marc21"
+	"github.com/miku/marc22"
 	"github.com/miku/marctools"
 	"log"
 	"os"
@@ -89,10 +89,8 @@ func main() {
 	}
 
 	decoder := xml.NewDecoder(file)
-	fmt.Println(ignoreErrors, includeLeader, plainMode, filterMap, metaMap)
 
 	for {
-
 		t, _ := decoder.Token()
 		if t == nil {
 			break
@@ -100,9 +98,16 @@ func main() {
 		switch se := t.(type) {
 		case xml.StartElement:
 			if se.Name.Local == "record" {
-				var record marctools.Record
+				var record marc22.Record
 				decoder.DecodeElement(&record, &se)
-				fmt.Println(record)
+
+				work := marctools.Work{Record: &record,
+					FilterMap:     &filterMap,
+					MetaMap:       &metaMap,
+					IncludeLeader: *includeLeader,
+					PlainMode:     *plainMode,
+					IgnoreErrors:  *ignoreErrors}
+				queue <- &work
 			}
 		}
 	}
