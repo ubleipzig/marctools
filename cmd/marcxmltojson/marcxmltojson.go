@@ -1,19 +1,12 @@
-// Convert marc to json.
-
-// Performance data point: Converting 6537611 records (7G) into /dev/null
-// take about 9m31s on a Core i5-3470 (about 11k records/s).
-// To take a cpu profile use -cpuprofile flag (example output: https://cdn.mediacru.sh/5rLMpxn5qnJk.svg).
-// A previous [single threaded Java app](https://github.com/miku/marctojson)
-// took about 46m for the same file (2k records/s).
 package main
 
 import (
 	"bufio"
+	"encoding/xml"
 	"flag"
 	"fmt"
-	"github.com/miku/marc21"
+	// "github.com/miku/marc21"
 	"github.com/miku/marctools"
-	"io"
 	"log"
 	"os"
 	"runtime"
@@ -95,27 +88,23 @@ func main() {
 		go marctools.Worker(queue, results, &wg)
 	}
 
+	decoder := xml.NewDecoder(file)
+	fmt.Println(ignoreErrors, includeLeader, plainMode, filterMap, metaMap)
+
 	for {
-		record, err := marc21.ReadRecord(file)
-		if err == io.EOF {
+
+		t, _ := decoder.Token()
+		if t == nil {
 			break
 		}
-		if err != nil {
-			if *ignoreErrors {
-				log.Printf("[EE] %s\n", err)
-				continue
-			} else {
-				log.Fatalln(err)
+		switch se := t.(type) {
+		case xml.StartElement:
+			if se.Name.Local == "record" {
+				var record marctools.Record
+				decoder.DecodeElement(&record, &se)
+				fmt.Println(record)
 			}
 		}
-
-		work := marctools.Work{Record: record,
-			FilterMap:     &filterMap,
-			MetaMap:       &metaMap,
-			IncludeLeader: *includeLeader,
-			PlainMode:     *plainMode,
-			IgnoreErrors:  *ignoreErrors}
-		queue <- &work
 	}
 
 	close(queue)

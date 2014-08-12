@@ -2,6 +2,7 @@ package marctools
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
@@ -14,9 +15,63 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 const AppVersion = "1.5.0"
+
+type Work struct {
+	Record        *marc21.Record     // MARC record
+	FilterMap     *map[string]bool   // which tags to include
+	MetaMap       *map[string]string // meta information
+	IncludeLeader bool
+	PlainMode     bool // only dump the content
+	IgnoreErrors  bool
+}
+
+// Worker takes a Work item and sends the result (serialized json) on the out channel
+func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for work := range in {
+		recordMap := RecordToMap(work.Record, work.FilterMap, work.IncludeLeader)
+		if work.PlainMode {
+			b, err := json.Marshal(*recordMap)
+			if err != nil {
+				if !work.IgnoreErrors {
+					log.Fatalln(err)
+				} else {
+					log.Printf("[EE] %s\n", err)
+					continue
+				}
+			}
+			out <- &b
+		} else {
+			m := map[string]interface{}{
+				"content": *recordMap,
+				"meta":    *work.MetaMap,
+			}
+			b, err := json.Marshal(m)
+			if err != nil {
+				if !work.IgnoreErrors {
+					log.Fatalln(err)
+				} else {
+					log.Printf("[EE] %s\n", err)
+					continue
+				}
+			}
+			out <- &b
+		}
+	}
+}
+
+// FanInWriter writes the channel content to the writer
+func FanInWriter(writer io.Writer, in chan *[]byte, done chan bool) {
+	for b := range in {
+		writer.Write(*b)
+		writer.Write([]byte("\n"))
+	}
+	done <- true
+}
 
 // KeyValueStringToMap turns a string like "key1=value1, key2=value2" into a map.
 func KeyValueStringToMap(s string) (map[string]string, error) {

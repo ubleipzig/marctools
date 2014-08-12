@@ -16,7 +16,7 @@ install:
 clean:
 	go clean
 	rm -f coverage.out
-	rm -f marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq
+	rm -f marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
 	rm -f marctools-*.x86_64.rpm
 	rm -f debian/marctools*.deb
 	rm -rf debian/marctools/usr
@@ -45,6 +45,9 @@ marctotsv:
 
 marcuniq:
 	go build cmd/marcuniq/marcuniq.go
+
+marcxmltojson:
+	go build cmd/marcxmltojson/marcxmltojson.go
 
 # experimental deb building
 deb: $(TARGETS)
