@@ -437,10 +437,10 @@ func recordToContentMap(record *marc22.Record, filterMap *map[string]bool) *map[
 		}
 
 		subfieldMap := make(map[string]interface{})
-		subfieldMap["ind1"] = string(field.Ind1)
-		subfieldMap["ind2"] = string(field.Ind2)
+		subfieldMap["ind1"] = field.Ind1
+		subfieldMap["ind2"] = field.Ind2
 		for _, subfield := range field.SubFields {
-			code := fmt.Sprintf("%c", subfield.Code)
+			code := fmt.Sprintf("%s", subfield.Code)
 			_, present := subfieldMap[code]
 			if present {
 				subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
@@ -496,7 +496,7 @@ func RecordToTSV(record *marc22.Record,
 			}
 		} else if REGEX_SUBFIELD.MatchString(tag) {
 			parts := strings.Split(tag, ".")
-			code := []byte(parts[1])[0]
+			code := parts[1]
 			subfields := record.GetSubFields(parts[0], code)
 			if len(subfields) > 0 {
 				if *separator == "" {
