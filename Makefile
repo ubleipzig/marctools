@@ -83,3 +83,10 @@ rpm-compatible: vagrant.key
 	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && GOPATH=/home/vagrant go get"
 	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && git pull origin master && pwd && GOPATH=/home/vagrant make rpm"
 	$(SCPCMD) vagrant@127.0.0.1:/home/vagrant/src/github.com/miku/marctools/*rpm .
+
+# local rpm publishing
+REPOPATH = /usr/share/nginx/html/repo/CentOS/6/x86_64
+
+publish: rpm-compatible
+	cp marctools-*.rpm $(REPOPATH)
+	createrepo $(REPOPATH)
