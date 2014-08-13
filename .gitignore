@@ -29,3 +29,14 @@ vagrant.key
 .vagrant
 NOTES.md
 debian/marctools/usr
+debian/marctools_*deb
+
+# executables
+marccount
+marcdump
+marcmap
+marcsplit
+marctojson
+marctotsv
+marcuniq
+marcxmltojson
