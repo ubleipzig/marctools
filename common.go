@@ -18,7 +18,7 @@ import (
 	"sync"
 )
 
-const AppVersion = "1.5.0"
+const AppVersion = "1.5.1"
 
 type Work struct {
 	Record        *marc22.Record     // MARC record
