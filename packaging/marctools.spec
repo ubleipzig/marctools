@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       marctools
-Version:    1.5.0
+Version:    1.5.1
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -22,6 +22,7 @@ Other:
 * marcmap
 * marcsplit
 * marcuniq
+* marcxmltojson
 
 
 %prep
@@ -46,6 +47,7 @@ install -m 755 marcsplit $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marctojson $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marctotsv $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcuniq $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marcxmltojson $RPM_BUILD_ROOT/usr/local/sbin
 
 
 %post
@@ -67,9 +69,15 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/marctojson
 /usr/local/sbin/marctotsv
 /usr/local/sbin/marcuniq
+/usr/local/sbin/marcxmltojson
 
 
 %changelog
+* Wed Aug 13 2014 Martin Czygan
+- 1.5.1 release
+- switched to github.com/miku/marc22 library, which allows XML-deserialization
+- re-added marcxmltojson, this time with a streaming parser
+
 * Sat Jul 19 2014 Martin Czygan
 - 1.4.0 release
 - rebranded to marctools
