@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/miku/marc21"
+	"github.com/miku/marc22"
 	"github.com/miku/marctools"
 	"io"
 	"log"
@@ -53,7 +53,7 @@ func main() {
 	}()
 
 	for {
-		record, err := marc21.ReadRecord(fi)
+		record, err := marc22.ReadRecord(fi)
 		if err == io.EOF {
 			break
 		}

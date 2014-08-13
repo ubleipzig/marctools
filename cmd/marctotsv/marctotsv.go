@@ -5,7 +5,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/miku/marc21"
+	"github.com/miku/marc22"
 	"github.com/miku/marctools"
 	"io"
 	"log"
@@ -116,7 +116,7 @@ func main() {
 	}
 
 	for {
-		record, err := marc21.ReadRecord(file)
+		record, err := marc22.ReadRecord(file)
 		if err == io.EOF {
 			break
 		}

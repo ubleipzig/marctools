@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/miku/marc21"
+	"github.com/miku/marc22"
 	"github.com/miku/marctools"
 	"io"
 	"log"
@@ -132,7 +132,7 @@ func main() {
 
 		fields := record.GetFields("001")
 		if len(fields) > 0 {
-			id := fields[0].(*marc21.ControlField).Data
+			id := fields[0].(*marc22.ControlField).Data
 			if ids.Contains(id) {
 				skipped = append(skipped, id)
 			} else if excludedIds.Contains(id) {
