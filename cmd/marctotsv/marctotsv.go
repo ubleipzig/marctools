@@ -17,7 +17,7 @@ import (
 )
 
 type Work struct {
-	Record              *marc21.Record // MARC record
+	Record              *marc22.Record // MARC record
 	Tags                *[]string      // tags to dump
 	FillNA              *string        // placeholder if value is not available
 	Separator           *string

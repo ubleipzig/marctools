@@ -115,7 +115,7 @@ func main() {
 
 	for {
 		head, _ := fi.Seek(0, os.SEEK_CUR)
-		record, err := marc21.ReadRecord(fi)
+		record, err := marc22.ReadRecord(fi)
 		if err == io.EOF {
 			break
 		}
@@ -130,9 +130,9 @@ func main() {
 		tail, _ := fi.Seek(0, os.SEEK_CUR)
 		length := tail - head
 
-		fields := record.GetFields("001")
+		fields := record.GetControlFields("001")
 		if len(fields) > 0 {
-			id := fields[0].(*marc22.ControlField).Data
+			id := fields[0].Data
 			if ids.Contains(id) {
 				skipped = append(skipped, id)
 			} else if excludedIds.Contains(id) {
