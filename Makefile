@@ -1,4 +1,5 @@
-TARGETS = marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq
+SHELL := /bin/bash
+TARGETS = marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
@@ -52,7 +53,7 @@ marcxmltojson:
 # experimental deb building
 deb: $(TARGETS)
 	mkdir -p debian/marctools/usr/sbin
-	cp marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq debian/marctools/usr/sbin
+	cp $(TARGETS) debian/marctools/usr/sbin
 	cd debian && fakeroot dpkg-deb --build marctools .
 
 # rpm building via vagrant
@@ -60,12 +61,9 @@ SSHCMD = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p 222
 SCPCMD = scp -o port=2222 -o StrictHostKeyChecking=no -i vagrant.key
 
 rpm: $(TARGETS)
-	mkdir -p $(HOME)/rpmbuild/BUILD
-	mkdir -p $(HOME)/rpmbuild/SOURCES
-	mkdir -p $(HOME)/rpmbuild/SPECS
-	mkdir -p $(HOME)/rpmbuild/RPMS
+	mkdir -p $(HOME)/rpmbuild/{BUILD,SOURCES,SPECS,RPMS}
 	cp ./packaging/marctools.spec $(HOME)/rpmbuild/SPECS
-	cp marctotsv marctojson marcdump marcsplit marccount marcuniq marcmap $(HOME)/rpmbuild/BUILD
+	cp $(TARGETS) $(HOME)/rpmbuild/BUILD
 	./packaging/buildrpm.sh marctools
 	cp $(HOME)/rpmbuild/RPMS/x86_64/*rpm .
 
