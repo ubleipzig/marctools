@@ -63,15 +63,15 @@ var idlisttests = []struct {
 		"testsample10"}},
 }
 
-func TestIdList(t *testing.T) {
+func TestIDList(t *testing.T) {
 	for _, tt := range idlisttests {
-		ids := IdList(tt.in)
+		ids := IDList(tt.in)
 		if len(ids) != len(tt.out) {
-			t.Errorf("IdList(%s) => %+v, want: %+v", tt.in, ids, tt.out)
+			t.Errorf("IDList(%s) => %+v, want: %+v", tt.in, ids, tt.out)
 		}
 		for i := 0; i < len(ids); i++ {
 			if ids[i] != tt.out[i] {
-				t.Errorf("List element mismatch in IdList(%s)[%d] => %+v, want: %+v",
+				t.Errorf("List element mismatch in IDList(%s)[%d] => %+v, want: %+v",
 					tt.in, i, ids[i], tt.out[i])
 			}
 		}

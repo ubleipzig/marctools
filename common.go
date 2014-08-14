@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/miku/marc22"
 	"io"
 	"log"
 	"os"
@@ -16,10 +14,17 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	// sqlite3 bindings used by marcmap command
+	_ "github.com/mattn/go-sqlite3"
+	// use marc22 since it can read XML, needed by marcxmltojson
+	"github.com/miku/marc22"
 )
 
+// AppVersion is displayed by all command line tools
 const AppVersion = "1.5.2"
 
+// Work represents the input for a conversion of a single record to JSON
 type Work struct {
 	Record        *marc22.Record     // MARC record
 	FilterMap     *map[string]bool   // which tags to include
@@ -81,12 +86,12 @@ func KeyValueStringToMap(s string) (map[string]string, error) {
 		for _, pair := range strings.Split(s, ",") {
 			kv := strings.Split(pair, "=")
 			if len(kv) != 2 {
-				err = errors.New(fmt.Sprintf("Could not parse key-value parameter: %s", s))
+				err = fmt.Errorf("could not parse key-value parameter: %s", s)
 			} else {
 				key := strings.TrimSpace(kv[0])
 				value := strings.TrimSpace(kv[1])
 				if len(key) == 0 || len(value) == 0 {
-					err = errors.New(fmt.Sprintf("Empty key or values not allowed: %s", s))
+					err = fmt.Errorf("empty key or values not allowed: %s", s)
 				} else {
 					result[key] = value
 				}
@@ -116,16 +121,15 @@ func recordLength(reader io.Reader) (length int64, err error) {
 	n, err := reader.Read(data)
 	if err != nil {
 		return 0, err
+	}
+	if n != 24 {
+		errs := fmt.Sprintf("MARC21: invalid leader: expected 24 bytes, read %d", n)
+		err = errors.New(errs)
 	} else {
-		if n != 24 {
-			errs := fmt.Sprintf("MARC21: invalid leader: expected 24 bytes, read %d", n)
+		l, err = strconv.Atoi(string(data[0:5]))
+		if err != nil {
+			errs := fmt.Sprintf("MARC21: invalid record length: %s", err)
 			err = errors.New(errs)
-		} else {
-			l, err = strconv.Atoi(string(data[0:5]))
-			if err != nil {
-				errs := fmt.Sprintf("MARC21: invalid record length: %s", err)
-				err = errors.New(errs)
-			}
 		}
 	}
 	return int64(l), err
@@ -154,15 +158,15 @@ func RecordCount(filename string) int64 {
 		if err != nil {
 			log.Fatalf("%s\n", err)
 		}
-		i += 1
+		i++
 		cumulative += length
 		handle.Seek(cumulative, 0)
 	}
 	return i
 }
 
-// IdList returns a slice of strings, containing all ids of the given marc file
-func IdList(filename string) []string {
+// IDList returns a slice of strings, containing all ids of the given marc file
+func IDList(filename string) []string {
 	fallback := false
 	yaz, err := exec.LookPath("yaz-marcdump")
 	if err != nil {
@@ -241,7 +245,7 @@ func MarcMap(infile string, writer io.Writer) {
 		}
 	}()
 
-	ids := IdList(infile)
+	ids := IDList(infile)
 	var i, offset int64
 
 	for {
@@ -251,7 +255,7 @@ func MarcMap(infile string, writer io.Writer) {
 		}
 		writer.Write([]byte(fmt.Sprintf("%s\t%d\t%d\n", ids[i], offset, length)))
 		offset += length
-		i += 1
+		i++
 		fi.Seek(offset, 0)
 	}
 }
@@ -287,7 +291,7 @@ func MarcMapSqlite(infile, outfile string) {
 	}
 	defer stmt.Close()
 
-	ids := IdList(infile)
+	ids := IDList(infile)
 	var i, offset int64
 
 	for {
@@ -301,7 +305,7 @@ func MarcMapSqlite(infile, outfile string) {
 		}
 
 		offset += length
-		i += 1
+		i++
 		fi.Seek(offset, 0)
 	}
 
@@ -335,7 +339,7 @@ func createSplitFile(directory, prefix string, fileno int64) *os.File {
 	return output
 }
 
-// MarcSplit splits a file into parts, each containing at most size records
+// MarcSplitDirectoryPrefix splits a file into parts, each containing at most size records
 // and writes the to specified directory, using a specific prefix
 func MarcSplitDirectoryPrefix(infile string, size int64, directory, prefix string) {
 	file, err := os.Open(infile)
@@ -365,13 +369,13 @@ func MarcSplitDirectoryPrefix(infile string, size int64, directory, prefix strin
 			writeSplit(file, output, offset, buffer)
 
 			batch = 0
-			fileno += 1
+			fileno++
 			offset = cumulative
 		}
 		cumulative += length
 		batch += length
 		file.Seek(int64(cumulative), 0)
-		i += 1
+		i++
 	}
 
 	output := createSplitFile(directory, prefix, fileno)
@@ -379,7 +383,7 @@ func MarcSplitDirectoryPrefix(infile string, size int64, directory, prefix strin
 	writeSplit(file, output, offset, buffer)
 }
 
-// MarcSplit splits a file into parts, each containing at most size records
+// MarcSplitDirectory splits a file into parts, each containing at most size records
 // and writes the to specified directory
 func MarcSplitDirectory(infile string, size int64, directory string) {
 	MarcSplitDirectoryPrefix(infile, size, directory, "split-")
@@ -408,8 +412,7 @@ func recordToLeaderMap(record *marc22.Record) *map[string]string {
 	return &leaderMap
 }
 
-// recordToContentMap converts a record into a map, optionally only the tags
-// given in filterMap
+// recordToContentMap converts a record into a map, optionally only the tags given in filterMap
 func recordToContentMap(record *marc22.Record, filterMap *map[string]bool) *map[string]interface{} {
 	contentMap := make(map[string]interface{})
 
@@ -470,8 +473,8 @@ func RecordToMap(record *marc22.Record, filterMap *map[string]bool, includeLeade
 	return &contentMap
 }
 
-var REGEX_SUBFIELD = regexp.MustCompile(`^([\d]{3})\.([a-z0-9])$`)
-var REGEX_CONTROLFIELD = regexp.MustCompile(`^[\d]{3}$`)
+var regexSubfield = regexp.MustCompile(`^([\d]{3})\.([a-z0-9])$`)
+var regexControlfield = regexp.MustCompile(`^[\d]{3}$`)
 
 // RecordToTSV turns a single record into a single TSV line
 func RecordToTSV(record *marc22.Record,
@@ -483,7 +486,7 @@ func RecordToTSV(record *marc22.Record,
 	skipThisLine := false
 
 	for _, tag := range *tags {
-		if REGEX_CONTROLFIELD.MatchString(tag) {
+		if regexControlfield.MatchString(tag) {
 			fields := record.GetControlFields(tag)
 			if len(fields) > 0 {
 				line = append(line, fields[0].Data)
@@ -494,7 +497,7 @@ func RecordToTSV(record *marc22.Record,
 				}
 				line = append(line, *fillna) // or any fill value
 			}
-		} else if REGEX_SUBFIELD.MatchString(tag) {
+		} else if regexSubfield.MatchString(tag) {
 			parts := strings.Split(tag, ".")
 			code := parts[1]
 			subfields := record.GetSubFields(parts[0], code)
