@@ -4,10 +4,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/miku/marctools"
 	"log"
 	"os"
 	"runtime/pprof"
+
+	"github.com/miku/marctools"
 )
 
 func main() {

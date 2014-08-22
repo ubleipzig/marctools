@@ -3,7 +3,6 @@ package marctools
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -44,10 +43,9 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 			if err != nil {
 				if !work.IgnoreErrors {
 					log.Fatalln(err)
-				} else {
-					log.Printf("[EE] %s\n", err)
-					continue
 				}
+				log.Printf("error: %s\n", err)
+				continue
 			}
 			out <- &b
 		} else {
@@ -59,10 +57,9 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 			if err != nil {
 				if !work.IgnoreErrors {
 					log.Fatalln(err)
-				} else {
-					log.Printf("[EE] %s\n", err)
-					continue
 				}
+				log.Printf("[EE] %s\n", err)
+				continue
 			}
 			out <- &b
 		}
@@ -81,24 +78,21 @@ func FanInWriter(writer io.Writer, in chan *[]byte, done chan bool) {
 // KeyValueStringToMap turns a string like "key1=value1, key2=value2" into a map.
 func KeyValueStringToMap(s string) (map[string]string, error) {
 	result := make(map[string]string)
-	var err error
 	if len(s) > 0 {
 		for _, pair := range strings.Split(s, ",") {
 			kv := strings.Split(pair, "=")
 			if len(kv) != 2 {
-				err = fmt.Errorf("could not parse key-value parameter: %s", s)
-			} else {
-				key := strings.TrimSpace(kv[0])
-				value := strings.TrimSpace(kv[1])
-				if len(key) == 0 || len(value) == 0 {
-					err = fmt.Errorf("empty key or values not allowed: %s", s)
-				} else {
-					result[key] = value
-				}
+				return nil, fmt.Errorf("could not parse key-value parameter: %s", s)
 			}
+			k := strings.TrimSpace(kv[0])
+			v := strings.TrimSpace(kv[1])
+			if len(k) == 0 || len(v) == 0 {
+				return nil, fmt.Errorf("empty key or values not allowed: %s", s)
+			}
+			result[k] = v
 		}
 	}
-	return result, err
+	return result, nil
 }
 
 // StringToMapSet takes a string of the form "val1,val2, val3" and turns it
@@ -123,16 +117,13 @@ func recordLength(reader io.Reader) (length int64, err error) {
 		return 0, err
 	}
 	if n != 24 {
-		errs := fmt.Sprintf("MARC21: invalid leader: expected 24 bytes, read %d", n)
-		err = errors.New(errs)
-	} else {
-		l, err = strconv.Atoi(string(data[0:5]))
-		if err != nil {
-			errs := fmt.Sprintf("MARC21: invalid record length: %s", err)
-			err = errors.New(errs)
-		}
+		return 0, fmt.Errorf("marc: invalid leader: expected 24 bytes, read %d", n)
 	}
-	return int64(l), err
+	l, err = strconv.Atoi(string(data[0:5]))
+	if err != nil {
+		return 0, fmt.Errorf("marc: invalid record length: %s", err)
+	}
+	return int64(l), nil
 }
 
 // RecordCount count the number of records in marc file
@@ -204,11 +195,10 @@ func IDList(filename string) []string {
 			}
 
 			fields := record.GetControlFields("001")
-			if len(fields) == 1 {
-				ids = append(ids, strings.TrimSpace(fields[0].Data))
-			} else {
-				log.Fatalf("Unusual 001 field count: %d\n", len(fields))
+			if len(fields) != 1 {
+				log.Fatalf("unusual 001 field count: %d\n", len(fields))
 			}
+			ids = append(ids, strings.TrimSpace(fields[0].Data))
 		}
 	} else {
 		// fast version using yaz and awk
@@ -222,9 +212,8 @@ func IDList(filename string) []string {
 			line = strings.TrimSpace(line)
 			if len(line) == 0 {
 				continue
-			} else {
-				ids = append(ids, strings.TrimSpace(line))
 			}
+			ids = append(ids, strings.TrimSpace(line))
 		}
 	}
 

@@ -4,12 +4,13 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/miku/marc22"
-	"github.com/miku/marctools"
 	"io"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/miku/marc22"
+	"github.com/miku/marctools"
 )
 
 func main() {

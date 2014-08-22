@@ -11,8 +11,6 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/miku/marc22"
-	"github.com/miku/marctools"
 	"io"
 	"log"
 	"os"
@@ -20,6 +18,9 @@ import (
 	"runtime/pprof"
 	"sync"
 	"time"
+
+	"github.com/miku/marc22"
+	"github.com/miku/marctools"
 )
 
 func main() {

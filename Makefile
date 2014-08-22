@@ -8,6 +8,9 @@ test:
 fmt:
 	go fmt ./...
 
+imports:
+	goimports -w .
+
 all: fmt test
 	go build
 

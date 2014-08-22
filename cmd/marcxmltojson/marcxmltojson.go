@@ -5,14 +5,15 @@ import (
 	"encoding/xml"
 	"flag"
 	"fmt"
-	"github.com/miku/marc22"
-	"github.com/miku/marctools"
 	"log"
 	"os"
 	"runtime"
 	"runtime/pprof"
 	"sync"
 	"time"
+
+	"github.com/miku/marc22"
+	"github.com/miku/marctools"
 )
 
 func main() {

@@ -5,14 +5,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/miku/marc22"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
+
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/miku/marc22"
 )
 
 var counttests = []struct {

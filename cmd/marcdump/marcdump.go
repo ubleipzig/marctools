@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/miku/marc22"
-	"github.com/miku/marctools"
 	"io"
 	"log"
 	"os"
 	"runtime/pprof"
+
+	"github.com/miku/marc22"
+	"github.com/miku/marctools"
 )
 
 func main() {
