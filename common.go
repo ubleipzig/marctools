@@ -161,13 +161,11 @@ func IDList(filename string) []string {
 	fallback := false
 	yaz, err := exec.LookPath("yaz-marcdump")
 	if err != nil {
-		// log.Fatalln("yaz-marcdump is required")
 		fallback = true
 	}
 
 	awk, err := exec.LookPath("awk")
 	if err != nil {
-		// log.Fatalln("awk is required")
 		fallback = true
 	}
 
