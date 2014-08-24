@@ -126,10 +126,11 @@ marctojson
 ----------
 
 Converts MARC to JSON. This is (between 4 to 8 times) slower than `yaz-marcdump -i marc -o json`,
-but offers a bit more flexibility in the output format, e.g. filtering tags or the leader.
-Also, the output format is more minimalistic. It keeps all the information (including order) from MARC,
-but tries to be as brief as possible (there are e.g. no explicit *subfield* keys and
-fields are used only once as keys - [example](https://gist.github.com/miku/1313caaf50d685818a44)).
+but offers a bit more flexibility in the output format: It is possible to filter fields,
+omit the leader and to add additional *meta* information.
+Also, the output format is terser. It keeps all the information (including order) from MARC,
+but tries to be as brief as possible, e.g. there are no explicit *subfield* keys and
+fields are used only once as keys. Here is a short [side-by-side comparison](https://gist.github.com/miku/1313caaf50d685818a44).
 
     $ marctojson
     Usage of marctojson:
