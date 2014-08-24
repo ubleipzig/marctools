@@ -16,20 +16,20 @@ import (
 	"github.com/miku/marc22"
 )
 
-var counttests = []struct {
-	in  string
-	out int64
-}{
-	{"./fixtures/authoritybibs.mrc", 9},
-	{"./fixtures/deweybrowse.mrc", 1},
-	{"./fixtures/heb.mrc", 1},
-	{"./fixtures/journals.mrc", 10},
-	{"./fixtures/testbug2.mrc", 1},
-	{"./fixtures/weird_ids.mrc", 8},
-}
-
 func TestCount(t *testing.T) {
-	for _, tt := range counttests {
+	var tests = []struct {
+		in  string
+		out int64
+	}{
+		{"./fixtures/authoritybibs.mrc", 9},
+		{"./fixtures/deweybrowse.mrc", 1},
+		{"./fixtures/heb.mrc", 1},
+		{"./fixtures/journals.mrc", 10},
+		{"./fixtures/testbug2.mrc", 1},
+		{"./fixtures/weird_ids.mrc", 8},
+	}
+
+	for _, tt := range tests {
 		count := RecordCount(tt.in)
 		if count != tt.out {
 			t.Errorf("RecordCount(%s) => %d, want: %d", tt.in, count, tt.out)
@@ -37,35 +37,35 @@ func TestCount(t *testing.T) {
 	}
 }
 
-var idlisttests = []struct {
-	in  string
-	out []string
-}{
-	{"./fixtures/deweybrowse.mrc", []string{"testdeweybrowse"}},
-	{"./fixtures/testbug2.mrc", []string{"testbug2"}},
-	{"./fixtures/heb.mrc", []string{"testbug1"}},
-	// {"./fixtures/weird_ids.mrc", []string{`|||pipe|||"quote`,
-	// 	`dot.dash-underscore__3.colon:18`,
-	// 	`dot.dash-underscore__3.space`,
-	// 	`dollar$ign/slashcombo`,
-	// 	`all'kinds"of'quotes"`,
-	// 	`<angle>brackets&ampersands`,
-	// 	`hashes#coming@ya`,
-	// 	`wehave?sand%stospare`}},
-	{"./fixtures/journals.mrc", []string{"testsample1",
-		"testsample2",
-		"testsample3",
-		"testsample4",
-		"testsample5",
-		"testsample6",
-		"testsample7",
-		"testsample8",
-		"testsample9",
-		"testsample10"}},
-}
-
 func TestIDList(t *testing.T) {
-	for _, tt := range idlisttests {
+	var tests = []struct {
+		in  string
+		out []string
+	}{
+		{"./fixtures/deweybrowse.mrc", []string{"testdeweybrowse"}},
+		{"./fixtures/testbug2.mrc", []string{"testbug2"}},
+		{"./fixtures/heb.mrc", []string{"testbug1"}},
+		// {"./fixtures/weird_ids.mrc", []string{`|||pipe|||"quote`,
+		//  `dot.dash-underscore__3.colon:18`,
+		//  `dot.dash-underscore__3.space`,
+		//  `dollar$ign/slashcombo`,
+		//  `all'kinds"of'quotes"`,
+		//  `<angle>brackets&ampersands`,
+		//  `hashes#coming@ya`,
+		//  `wehave?sand%stospare`}},
+		{"./fixtures/journals.mrc", []string{"testsample1",
+			"testsample2",
+			"testsample3",
+			"testsample4",
+			"testsample5",
+			"testsample6",
+			"testsample7",
+			"testsample8",
+			"testsample9",
+			"testsample10"}},
+	}
+
+	for _, tt := range tests {
 		ids := IDList(tt.in)
 		if len(ids) != len(tt.out) {
 			t.Errorf("IDList(%s) => %+v, want: %+v", tt.in, ids, tt.out)
@@ -79,27 +79,27 @@ func TestIDList(t *testing.T) {
 	}
 }
 
-var marcmaptests = []struct {
-	in  string
-	out string
-}{
-	{"./fixtures/deweybrowse.mrc", "testdeweybrowse\t0\t613\n"},
-	{"./fixtures/journals.mrc",
-		"testsample1\t0\t1571\n" +
-			"testsample2\t1571\t1195\n" +
-			"testsample3\t2766\t1057\n" +
-			"testsample4\t3823\t1361\n" +
-			"testsample5\t5184\t1707\n" +
-			"testsample6\t6891\t1532\n" +
-			"testsample7\t8423\t1426\n" +
-			"testsample8\t9849\t1251\n" +
-			"testsample9\t11100\t2173\n" +
-			"testsample10\t13273\t1195\n"},
-}
-
 func TestMarcMap(t *testing.T) {
+	var tests = []struct {
+		in  string
+		out string
+	}{
+		{"./fixtures/deweybrowse.mrc", "testdeweybrowse\t0\t613\n"},
+		{"./fixtures/journals.mrc",
+			"testsample1\t0\t1571\n" +
+				"testsample2\t1571\t1195\n" +
+				"testsample3\t2766\t1057\n" +
+				"testsample4\t3823\t1361\n" +
+				"testsample5\t5184\t1707\n" +
+				"testsample6\t6891\t1532\n" +
+				"testsample7\t8423\t1426\n" +
+				"testsample8\t9849\t1251\n" +
+				"testsample9\t11100\t2173\n" +
+				"testsample10\t13273\t1195\n"},
+	}
+
 	var b bytes.Buffer
-	for _, tt := range marcmaptests {
+	for _, tt := range tests {
 		b.Reset()
 		MarcMap(tt.in, &b)
 		output := b.String()
@@ -161,18 +161,18 @@ func TestMarcSplitDirectoryPrefix(t *testing.T) {
 	}
 }
 
-var kvtests = []struct {
-	in  string
-	out map[string]string
-}{
-	{"key=value", map[string]string{"key": "value"}},
-	{"k1=v1, k2=v2", map[string]string{"k1": "v1", "k2": "v2"}},
-	{"k1 = v1,k2=   v2", map[string]string{"k1": "v1", "k2": "v2"}},
-	{"k1=v1, k1=v2", map[string]string{"k1": "v2"}},
-}
-
 func TestKeyValueStringToMap(t *testing.T) {
-	for _, tt := range kvtests {
+	var tests = []struct {
+		in  string
+		out map[string]string
+	}{
+		{"key=value", map[string]string{"key": "value"}},
+		{"k1=v1, k2=v2", map[string]string{"k1": "v1", "k2": "v2"}},
+		{"k1 = v1,k2=   v2", map[string]string{"k1": "v1", "k2": "v2"}},
+		{"k1=v1, k1=v2", map[string]string{"k1": "v2"}},
+	}
+
+	for _, tt := range tests {
 		out, err := KeyValueStringToMap(tt.in)
 		if err != nil {
 			t.Errorf("KeyValueStringToMap(%s) err'd: %s", tt.in, err)
@@ -196,17 +196,17 @@ func TestKeyValueStringToMap(t *testing.T) {
 	}
 }
 
-var stosettests = []struct {
-	in  string
-	out map[string]bool
-}{
-	{"key", map[string]bool{"key": true}},
-	{"k1,k2", map[string]bool{"k1": true, "k2": true}},
-	{"k1,  k2", map[string]bool{"k1": true, "k2": true}},
-}
-
 func TestStringToMapSet(t *testing.T) {
-	for _, tt := range stosettests {
+	var tests = []struct {
+		in  string
+		out map[string]bool
+	}{
+		{"key", map[string]bool{"key": true}},
+		{"k1,k2", map[string]bool{"k1": true, "k2": true}},
+		{"k1,  k2", map[string]bool{"k1": true, "k2": true}},
+	}
+
+	for _, tt := range tests {
 		out := StringToMapSet(tt.in)
 		eq := reflect.DeepEqual(out, tt.out)
 		if !eq {
@@ -215,7 +215,7 @@ func TestStringToMapSet(t *testing.T) {
 	}
 }
 
-var recordmaptests = []struct {
+var recordMapTests = []struct {
 	record        string
 	filterMap     map[string]bool
 	includeLeader bool
@@ -249,7 +249,7 @@ var recordmaptests = []struct {
 }
 
 func TestRecordToMap(t *testing.T) {
-	for _, tt := range recordmaptests {
+	for _, tt := range recordMapTests {
 		reader := strings.NewReader(tt.record)
 		record, err := marc22.ReadRecord(reader)
 		if err != nil {
@@ -269,7 +269,7 @@ func TestRecordToMap(t *testing.T) {
 	}
 }
 
-var recordtotsvtests = []struct {
+var recordToTSVTests = []struct {
 	record              string
 	tags                []string
 	fillNA              string
@@ -322,7 +322,7 @@ var recordtotsvtests = []struct {
 }
 
 func TestRecordToTSV(t *testing.T) {
-	for _, tt := range recordtotsvtests {
+	for _, tt := range recordToTSVTests {
 		reader := strings.NewReader(tt.record)
 		record, err := marc22.ReadRecord(reader)
 		if err != nil {
