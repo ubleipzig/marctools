@@ -21,7 +21,7 @@ clean:
 	go clean
 	rm -f coverage.out
 	rm -f marccount marcdb marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
-	rm -f marctools-*.x86_64.rpm
+	rm -f *.x86_64.rpm
 	rm -f debian/marctools*.deb
 	rm -rf debian/marctools/usr
 
