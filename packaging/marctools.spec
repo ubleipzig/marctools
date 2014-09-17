@@ -97,16 +97,16 @@ rm -rf %{_topdir}/BUILD/%{name}
 - 1.3.8 release
 - index seekmap sqlite3 table
 
-* Sat Jan 19 2014 Martin Czygan
+* Sun Jan 19 2014 Martin Czygan
 - 1.3.7 release
 - RHEL6 compatible release (glibc 2.12)
 - added `make rpm-compatible` as build helper
 
-* Tue Jan 09 2014 Martin Czygan
+* Thu Jan 09 2014 Martin Czygan
 - 1.3.6 release
 - added marcmap sqlite3 export option via -o
 
-* Tue Jan 07 2014 Martin Czygan
+* Thu Jan 07 2014 Martin Czygan
 - 1.3.5 release
 - make marcmap fast (yaz-marcdump and awk required)
 
