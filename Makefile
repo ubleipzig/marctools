@@ -71,7 +71,7 @@ rpm: $(TARGETS)
 	cp ./packaging/marctools.spec $(HOME)/rpmbuild/SPECS
 	cp $(TARGETS) $(HOME)/rpmbuild/BUILD
 	./packaging/buildrpm.sh marctools
-	cp $(HOME)/rpmbuild/RPMS/x86_64/*rpm .
+	cp $(HOME)/rpmbuild/RPMS/x86_64/marctools*rpm .
 
 # Helper to build RPM on a RHEL6 VM, to link against glibc 2.12
 vagrant.key:
