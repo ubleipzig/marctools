@@ -33,6 +33,7 @@ debian/marctools_*deb
 
 # executables
 marccount
+marcdb
 marcdump
 marcmap
 marcsplit
