@@ -74,7 +74,7 @@ func main() {
 	defer db.Close()
 
 	// prepare table
-	init := `CREATE TABLE IF NOT EXISTS store (id TEXT, secondary TEXT, record BLOB)`
+	init := `CREATE TABLE IF NOT EXISTS store (id TEXT, secondary TEXT, record BLOB, PRIMARY KEY (id, secondary))`
 	_, err = db.Exec(init)
 	if err != nil {
 		log.Fatalf("%q: %s\n", err, init)
