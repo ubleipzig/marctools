@@ -43,8 +43,9 @@ Turn a marc file into an sqlite3 database for random access. Supports
 *secondary* keys, so you can add an additional value as key, if needed (e.g. a date).
 
     $ marcdb
-    Usage of marcdb:
+    Usage: marcdb [OPTIONS] MARCFILE
       -cpuprofile="": write cpu profile to file
+      -encode=false: base64 encode record before inserting it
       -o="": output sqlite3 filename
       -secondary="": add a secondary value to the row
       -v=false: prints current program version
