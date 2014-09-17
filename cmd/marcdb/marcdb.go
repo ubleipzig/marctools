@@ -52,8 +52,6 @@ func main() {
 	var b bytes.Buffer
 	marctools.MarcMap(filename, &b)
 
-	rows := strings.Split(b.String(), "\n")
-
 	// the input file
 	handle, err := os.Open(filename)
 	if err != nil {
@@ -91,7 +89,7 @@ func main() {
 	}
 	defer stmt.Close()
 
-	for _, row := range rows {
+	for _, row := range strings.Split(b.String(), "\n") {
 		fields := strings.Fields(row)
 		if len(fields) == 0 {
 			continue
