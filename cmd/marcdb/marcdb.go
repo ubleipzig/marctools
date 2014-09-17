@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"database/sql"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"log"
@@ -16,6 +17,7 @@ import (
 
 func main() {
 	secondary := flag.String("secondary", "", "add a secondary value to the row")
+	encodeRecord := flag.Bool("encode", false, "base64 encode record before inserting it")
 	output := flag.String("o", "", "output sqlite3 filename")
 	version := flag.Bool("v", false, "prints current program version")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
@@ -112,9 +114,16 @@ func main() {
 			log.Fatalln(err)
 		}
 
-		_, err = stmt.Exec(fields[0], *secondary, string(buf))
-		if err != nil {
-			log.Fatalln(err)
+		if *encodeRecord {
+			_, err = stmt.Exec(fields[0], *secondary, base64.StdEncoding.EncodeToString(buf))
+			if err != nil {
+				log.Fatalln(err)
+			}
+		} else {
+			_, err = stmt.Exec(fields[0], *secondary, string(buf))
+			if err != nil {
+				log.Fatalln(err)
+			}
 		}
 	}
 
