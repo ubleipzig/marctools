@@ -119,7 +119,7 @@ func main() {
 	}
 
 	// create index
-	_, err = tx.Exec("CREATE INDEX idx_store_id ON store (id)")
+	_, err = tx.Exec("CREATE INDEX IF NOT EXISTS idx_store_id ON store (id)")
 	if err != nil {
 		log.Fatalln(err)
 	}
