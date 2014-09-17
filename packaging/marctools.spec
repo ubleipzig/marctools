@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       marctools
-Version:    1.5.4
+Version:    1.5.5
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -76,6 +76,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Wed Sep 17 2014 Martin Czygan
+- 1.5.5 release
+- added marcdb -encode flag
+
 * Wed Sep 17 2014 Martin Czygan
 - 1.5.3 release
 - new marcdb command
