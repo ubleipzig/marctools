@@ -35,6 +35,27 @@ Prints the number of records found in a file and then exits.
     $ marccount fixtures/journals.mrc
     10
 
+marcdb
+------
+
+Turn a marc file into an sqlite3 database for random access. Supports
+*secondary* keys, so you can add an additional value as key, if needed (e.g. a date).
+
+    $ marcdb
+    Usage of marcdb:
+      -cpuprofile="": write cpu profile to file
+      -o="": output sqlite3 filename
+      -secondary="": add a secondary value to the row
+      -v=false: prints current program version
+
+    $ marcdb -secondary todo -o journals.db fixtures/journals.mrc
+    $ sqlite3 journals.db ".schema"
+    CREATE TABLE store (id TEXT, secondary TEXT, record BLOB, PRIMARY KEY (id, secondary));
+    CREATE INDEX idx_store_id ON store (id);
+
+    $ sqlite3 journals.db "select record from store where id = 'testsample1'" > testsample1.mrc
+    $ sqlite3 journals.db "select record from store where id = 'testsample1' and secondary = 'todo'" > testsample1.mrc
+
 marcdump
 --------
 
@@ -212,8 +233,6 @@ Default conversion (abbreviated, [pretty-printed](https://github.com/jmhodges/js
        "meta" : {}
     }
 
-
-
 Dump the leader as well with `-l` and only dump field 040 with `-r 040`:
 
     $ marctojson -l -r 040 fixtures/testbug2.mrc | jsonpp
@@ -274,7 +293,6 @@ Restrict JSON to 001 and 245, and use plain mode with `-p`, which has no `meta` 
           }
        ]
     }
-
 
 Add some value (here the current date) to the meta map:
 
