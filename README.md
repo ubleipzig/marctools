@@ -54,6 +54,8 @@ Turn a marc file into an sqlite3 database for random access. Supports
     CREATE TABLE store (id TEXT, secondary TEXT, record BLOB, PRIMARY KEY (id, secondary));
     CREATE INDEX idx_store_id ON store (id);
 
+Note: sqlite3 version 3.8.6 has [convenient io helper](http://www.sqlite.org/cli.html#fileio) to extract binary data properly on the command line.
+
     $ sqlite3 journals.db "select record from store where id = 'testsample1'" \
         > testsample1.mrc
     $ sqlite3 journals.db "select record from store where id = 'testsample1' \
