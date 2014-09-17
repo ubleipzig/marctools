@@ -62,6 +62,12 @@ Note: sqlite3 version 3.8.6 has [convenient io helper](http://www.sqlite.org/cli
     $ sqlite3 journals.db "select record from store where id = 'testsample1' \
                            and secondary = 'todo'" > testsample1.mrc
 
+If the `-encode` flag is set, the record will be base64 encoded before insert:
+
+    $ marcdb -encode -o journals.db fixtures/journals.mrc
+    $ sqlite3 journals.db "select record from store where id = 'testsample1'"
+    MDE1NzFjYXMgYTIyMDAzNjExYSA0NSAgMDAxMDAxMjAwMDAw... DE0Hh0=
+
 marcdump
 --------
 
