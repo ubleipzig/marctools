@@ -54,8 +54,10 @@ Turn a marc file into an sqlite3 database for random access. Supports
     CREATE TABLE store (id TEXT, secondary TEXT, record BLOB, PRIMARY KEY (id, secondary));
     CREATE INDEX idx_store_id ON store (id);
 
-    $ sqlite3 journals.db "select record from store where id = 'testsample1'" > testsample1.mrc
-    $ sqlite3 journals.db "select record from store where id = 'testsample1' and secondary = 'todo'" > testsample1.mrc
+    $ sqlite3 journals.db "select record from store where id = 'testsample1'" \
+        > testsample1.mrc
+    $ sqlite3 journals.db "select record from store where id = 'testsample1' \
+                           and secondary = 'todo'" > testsample1.mrc
 
 marcdump
 --------
