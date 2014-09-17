@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       marctools
-Version:    1.5.2
+Version:    1.5.3
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -18,6 +18,7 @@ Highlights:
 Other:
 
 * marccount
+* marcdb
 * marcdump
 * marcmap
 * marcsplit
@@ -41,6 +42,7 @@ mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 # put the files in to the relevant directories.
 # the argument on -m is the permissions expressed as octal. (See chmod man page for details.)
 install -m 755 marccount $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marcdb $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcdump $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcmap $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcsplit $RPM_BUILD_ROOT/usr/local/sbin
@@ -63,6 +65,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 %files
 %defattr(-,root,root)
 /usr/local/sbin/marccount
+/usr/local/sbin/marcdb
 /usr/local/sbin/marcdump
 /usr/local/sbin/marcmap
 /usr/local/sbin/marcsplit
@@ -73,6 +76,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Wed Sep 17 2014 Martin Czygan
+- 1.5.3 release
+- new marcdb command
+
 * Wed Aug 13 2014 Martin Czygan
 - 1.5.1 release
 - switched to github.com/miku/marc22 library, which allows XML-deserialization

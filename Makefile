@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-TARGETS = marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
+TARGETS = marccount marcdb marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
@@ -20,7 +20,7 @@ install:
 clean:
 	go clean
 	rm -f coverage.out
-	rm -f marccount marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
+	rm -f marccount marcdb marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
 	rm -f marctools-*.x86_64.rpm
 	rm -f debian/marctools*.deb
 	rm -rf debian/marctools/usr
@@ -31,6 +31,9 @@ cover:
 
 marccount:
 	go build cmd/marccount/marccount.go
+
+marcdb:
+	go build cmd/marcdb/marcdb.go
 
 marcdump:
 	go build cmd/marcdump/marcdump.go
