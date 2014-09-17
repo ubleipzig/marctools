@@ -19,11 +19,11 @@ install:
 
 clean:
 	go clean
-	rm -f coverage.out
-	rm -f marccount marcdb marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
-	rm -f *.x86_64.rpm
-	rm -f debian/marctools*.deb
-	rm -rf debian/marctools/usr
+	rm -fv coverage.out
+	rm -fv marccount marcdb marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
+	rm -fv *.x86_64.rpm
+	rm -fv debian/marctools*.deb
+	rm -rfv debian/marctools/usr
 
 cover:
 	go get -d && go test -v	-coverprofile=coverage.out
@@ -86,8 +86,8 @@ setup: vagrant.key
 	$(SSHCMD) "cd /home/vagrant/src/github.com/miku && git clone https://github.com/miku/marctools.git"
 
 rpm-compatible: vagrant.key
-	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && GOPATH=/home/vagrant go get"
-	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && git pull origin master && pwd && GOPATH=/home/vagrant make rpm"
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && GOPATH=/home/vagrant go get ./..."
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && git pull origin master && pwd && GOPATH=/home/vagrant make clean rpm"
 	$(SCPCMD) vagrant@127.0.0.1:/home/vagrant/src/github.com/miku/marctools/*rpm .
 
 # local rpm publishing
