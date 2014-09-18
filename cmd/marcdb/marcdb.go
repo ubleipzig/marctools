@@ -114,16 +114,15 @@ func main() {
 			log.Fatalln(err)
 		}
 
+		var s string
 		if *encodeRecord {
-			_, err = stmt.Exec(fields[0], *secondary, base64.StdEncoding.EncodeToString(buf))
-			if err != nil {
-				log.Fatalln(err)
-			}
+			s = base64.StdEncoding.EncodeToString(buf)
 		} else {
-			_, err = stmt.Exec(fields[0], *secondary, string(buf))
-			if err != nil {
-				log.Fatalln(err)
-			}
+			s = string(buf)
+		}
+		_, err = stmt.Exec(fields[0], *secondary, s)
+		if err != nil {
+			log.Fatalln(err)
 		}
 	}
 
