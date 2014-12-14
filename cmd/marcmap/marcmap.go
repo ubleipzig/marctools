@@ -9,7 +9,7 @@ import (
 	"os"
 	"runtime/pprof"
 
-	"github.com/miku/marctools"
+	"github.com/ubleipzig/marctools"
 )
 
 func main() {

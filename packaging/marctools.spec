@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       marctools
-Version:    1.5.5
+Version:    1.6.0
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -76,6 +76,11 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Sun Dec 14 2014 Martin Czygan
+- 1.6.0 release
+- marctojson got a -recordkey flag
+- move marctools import from miku to ubleipzig
+
 * Wed Sep 17 2014 Martin Czygan
 - 1.5.5 release
 - added marcdb -encode flag

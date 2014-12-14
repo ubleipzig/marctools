@@ -21,7 +21,7 @@ import (
 )
 
 // AppVersion is displayed by all command line tools
-const AppVersion = "1.5.5"
+const AppVersion = "1.6.0"
 
 // Work represents the input for a conversion of a single record to JSON
 type Work struct {

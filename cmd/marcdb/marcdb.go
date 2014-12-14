@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/miku/marctools"
+	"github.com/ubleipzig/marctools"
 )
 
 func main() {
