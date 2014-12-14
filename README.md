@@ -173,6 +173,7 @@ fields are used only once as keys. Here is a short [side-by-side comparison](htt
       -m="": a key=value pair to pass to meta
       -p=false: plain mode: dump without content and meta
       -r="": only dump the given tags (e.g. 001,003)
+      -recordkey="record": key name of the record
       -v=false: prints current program version and exit
       -w=4: number of workers
 
@@ -180,7 +181,7 @@ Default conversion (abbreviated, [pretty-printed](https://github.com/jmhodges/js
 
     $ marctojson fixtures/testbug2.mrc | jsonpp
     {
-       "content" : {
+       "record" : {
           ...
           "245" : [
              {
@@ -249,7 +250,7 @@ Dump the leader as well with `-l` and only dump field 040 with `-r 040`:
 
     $ marctojson -l -r 040 fixtures/testbug2.mrc | jsonpp
     {
-       "content" : {
+       "record" : {
           "040" : [
              {
                 "ind2" : " ",
@@ -310,7 +311,7 @@ Add some value (here the current date) to the meta map:
 
     $ marctojson -r "001, 245" -m date="$(date)" fixtures/testbug2.mrc | jsonpp
     {
-       "content" : {
+       "record" : {
           "001" : "testbug2",
           "245" : [
              {
@@ -331,6 +332,31 @@ Add some value (here the current date) to the meta map:
        "meta" : {
           "date" : "Wed Jul 23 17:21:24 CEST 2014"
        }
+    }
+
+In marctools version 1.6, the record key can be supplied by the user, and the default key for the record data was changed from `content` to `record`.
+
+    $ marctojson -r "001, 245" -recordkey data fixtures/testbug2.mrc | jsonpp
+    {
+      "data": {
+        "001": "testbug2",
+        "245": [
+          {
+            "a": [
+              "La congiura dei Principi Napoletani 1701 :"
+            ],
+            "b": [
+              "(prima e seconda stesura) /"
+            ],
+            "c": [
+              "Giambattista Vico ; a cura di Claudia Pandolfi."
+            ],
+            "ind1": "1",
+            "ind2": "3"
+          }
+        ]
+      },
+      "meta": {}
     }
 
 marctotsv
