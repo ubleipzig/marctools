@@ -33,6 +33,7 @@ func main() {
 	filterVar := flag.String("r", "", "only dump the given tags (e.g. 001,003)")
 	includeLeader := flag.Bool("l", false, "dump the leader as well")
 	metaVar := flag.String("m", "", "a key=value pair to pass to meta")
+	recordKey := flag.String("recordkey", "record", "key name of the record")
 	plainMode := flag.Bool("p", false, "plain mode: dump without content and meta")
 
 	var PrintUsage = func() {
@@ -115,7 +116,8 @@ func main() {
 			MetaMap:       &metaMap,
 			IncludeLeader: *includeLeader,
 			PlainMode:     *plainMode,
-			IgnoreErrors:  *ignoreErrors}
+			IgnoreErrors:  *ignoreErrors,
+			RecordKey:     *recordKey}
 		queue <- &work
 	}
 

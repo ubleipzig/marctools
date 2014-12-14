@@ -31,6 +31,7 @@ type Work struct {
 	IncludeLeader bool
 	PlainMode     bool // only dump the content
 	IgnoreErrors  bool
+	RecordKey     string
 }
 
 // Worker takes a Work item and sends the result (serialized json) on the out channel
@@ -50,8 +51,8 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 			out <- &b
 		} else {
 			m := map[string]interface{}{
-				"content": *recordMap,
-				"meta":    *work.MetaMap,
+				work.RecordKey: *recordMap,
+				"meta":         *work.MetaMap,
 			}
 			b, err := json.Marshal(m)
 			if err != nil {
