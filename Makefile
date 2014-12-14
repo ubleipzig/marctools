@@ -82,13 +82,13 @@ vagrant.key:
 setup: vagrant.key
 	$(SSHCMD) "sudo yum install -y sudo yum install http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm"
 	$(SSHCMD) "sudo yum install -y golang git rpm-build"
-	$(SSHCMD) "mkdir -p /home/vagrant/src/github.com/miku"
-	$(SSHCMD) "cd /home/vagrant/src/github.com/miku && git clone https://github.com/miku/marctools.git"
+	$(SSHCMD) "mkdir -p /home/vagrant/src/github.com/ubleipzig"
+	$(SSHCMD) "cd /home/vagrant/src/github.com/ubleipzig && git clone https://github.com/ubleipzig/marctools.git"
 
 rpm-compatible: vagrant.key
-	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && GOPATH=/home/vagrant go get ./..."
-	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/marctools && git pull origin master && pwd && GOPATH=/home/vagrant make clean rpm"
-	$(SCPCMD) vagrant@127.0.0.1:/home/vagrant/src/github.com/miku/marctools/*rpm .
+	$(SSHCMD) "cd /home/vagrant/src/github.com/ubleipzig/marctools && GOPATH=/home/vagrant go get ./..."
+	$(SSHCMD) "cd /home/vagrant/src/github.com/ubleipzig/marctools && git pull origin master && pwd && GOPATH=/home/vagrant make clean rpm"
+	$(SCPCMD) vagrant@127.0.0.1:/home/vagrant/src/github.com/ubleipzig/marctools/*rpm .
 
 # local rpm publishing
 REPOPATH = /usr/share/nginx/html/repo/CentOS/6/x86_64
