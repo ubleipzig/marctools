@@ -11,7 +11,6 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"sync"
-	"time"
 
 	"github.com/miku/marc22"
 	"github.com/ubleipzig/marctools"
@@ -141,10 +140,5 @@ func main() {
 	close(queue)
 	wg.Wait()
 	close(results)
-	select {
-	case <-time.After(1e9):
-		break
-	case <-done:
-		break
-	}
+	<-done
 }
