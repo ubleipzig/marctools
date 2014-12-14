@@ -23,9 +23,8 @@ import (
 // AppVersion is displayed by all command line tools
 const AppVersion = "1.6.0"
 
-// Work represents the input for a conversion of a single record to JSON
-type Work struct {
-	Record        *marc22.Record     // MARC record
+// JsonConversionOptions specify parameters for the MARC to JSON conversion
+type JsonConversionOptions struct {
 	FilterMap     *map[string]bool   // which tags to include
 	MetaMap       *map[string]string // meta information
 	IncludeLeader bool
@@ -35,14 +34,14 @@ type Work struct {
 }
 
 // Worker takes a Work item and sends the result (serialized json) on the out channel
-func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
+func Worker(in chan *marc22.Record, out chan *[]byte, wg *sync.WaitGroup, options *JsonConversionOptions) {
 	defer wg.Done()
-	for work := range in {
-		recordMap := RecordToMap(work.Record, work.FilterMap, work.IncludeLeader)
-		if work.PlainMode {
+	for record := range in {
+		recordMap := RecordToMap(record, options.FilterMap, options.IncludeLeader)
+		if options.PlainMode {
 			b, err := json.Marshal(*recordMap)
 			if err != nil {
-				if !work.IgnoreErrors {
+				if !options.IgnoreErrors {
 					log.Fatalln(err)
 				}
 				log.Printf("error: %s\n", err)
@@ -51,12 +50,12 @@ func Worker(in chan *Work, out chan *[]byte, wg *sync.WaitGroup) {
 			out <- &b
 		} else {
 			m := map[string]interface{}{
-				work.RecordKey: *recordMap,
-				"meta":         *work.MetaMap,
+				options.RecordKey: *recordMap,
+				"meta":            *options.MetaMap,
 			}
 			b, err := json.Marshal(m)
 			if err != nil {
-				if !work.IgnoreErrors {
+				if !options.IgnoreErrors {
 					log.Fatalln(err)
 				}
 				log.Printf("[EE] %s\n", err)

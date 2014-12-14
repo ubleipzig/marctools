@@ -82,7 +82,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	queue := make(chan *marctools.Work)
+	queue := make(chan *marc22.Record)
 	results := make(chan *[]byte)
 	done := make(chan bool)
 
@@ -91,9 +91,17 @@ func main() {
 	go marctools.FanInWriter(writer, results, done)
 
 	var wg sync.WaitGroup
+	options := marctools.JsonConversionOptions{
+		FilterMap:     &filterMap,
+		MetaMap:       &metaMap,
+		IncludeLeader: *includeLeader,
+		PlainMode:     *plainMode,
+		IgnoreErrors:  *ignoreErrors,
+		RecordKey:     *recordKey,
+	}
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
-		go marctools.Worker(queue, results, &wg)
+		go marctools.Worker(queue, results, &wg, &options)
 	}
 
 	for {
@@ -110,14 +118,7 @@ func main() {
 			}
 		}
 
-		work := marctools.Work{Record: record,
-			FilterMap:     &filterMap,
-			MetaMap:       &metaMap,
-			IncludeLeader: *includeLeader,
-			PlainMode:     *plainMode,
-			IgnoreErrors:  *ignoreErrors,
-			RecordKey:     *recordKey}
-		queue <- &work
+		queue <- record
 	}
 
 	close(queue)
