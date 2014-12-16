@@ -108,8 +108,8 @@ func StringToMapSet(s string) map[string]bool {
 	return result
 }
 
-// recordLength returns the length of the marc record as stored in the leader
-func recordLength(reader io.Reader) (length int64, err error) {
+// RecordLength returns the length of the marc record as stored in the leader
+func RecordLength(reader io.Reader) (length int64, err error) {
 	var l int
 	data := make([]byte, 24)
 	n, err := reader.Read(data)
@@ -142,7 +142,7 @@ func RecordCount(filename string) int64 {
 	var i, cumulative int64
 
 	for {
-		length, err := recordLength(handle)
+		length, err := RecordLength(handle)
 		if err == io.EOF {
 			break
 		}
@@ -236,7 +236,7 @@ func MarcMap(infile string, writer io.Writer) {
 	var i, offset int64
 
 	for {
-		length, err := recordLength(fi)
+		length, err := RecordLength(fi)
 		if err == io.EOF {
 			break
 		}
@@ -282,7 +282,7 @@ func MarcMapSqlite(infile, outfile string) {
 	var i, offset int64
 
 	for {
-		length, err := recordLength(fi)
+		length, err := RecordLength(fi)
 		if err == io.EOF {
 			break
 		}
@@ -343,7 +343,7 @@ func MarcSplitDirectoryPrefix(infile string, size int64, directory, prefix strin
 	var i, length, cumulative, offset, batch, fileno int64
 
 	for {
-		length, err = recordLength(file)
+		length, err = RecordLength(file)
 		if err == io.EOF {
 			break
 		}
