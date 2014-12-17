@@ -14,7 +14,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/binary"
 	"flag"
 	"fmt"
 	"io"
@@ -85,11 +84,9 @@ func stringFanWriter(in chan *work, done chan bool, options *writerOptions) {
 	}()
 	for w := range in {
 		fi.Seek(w.offset, 0)
-		_, err = io.CopyN(options.writer, fi, w.length)
-		if err != nil && err != io.EOF {
-			log.Fatal(err)
-		}
-		binary.Write(options.writer, binary.LittleEndian, marc22.RS)
+		buf := make([]byte, w.length)
+		fi.Read(buf)
+		options.writer.Write(buf)
 	}
 	done <- true
 }
