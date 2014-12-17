@@ -463,26 +463,23 @@ func RecordToMap(record *marc22.Record, filterMap *map[string]bool, includeLeade
 var regexSubfield = regexp.MustCompile(`^([\d]{3})\.([a-z0-9])$`)
 var regexControlfield = regexp.MustCompile(`^[\d]{3}$`)
 
-// RecordToTSV turns a single record into a single TSV line
-func RecordToTSV(record *marc22.Record,
+func RecordToSlice(record *marc22.Record,
 	tags *[]string,
 	fillna, separator *string,
-	skipIncompleteLines *bool) *string {
+	skipIncompleteLines *bool) []string {
 
-	var line []string
-	skipThisLine := false
+	var cols []string
 
 	for _, tag := range *tags {
 		if regexControlfield.MatchString(tag) {
 			fields := record.GetControlFields(tag)
 			if len(fields) > 0 {
-				line = append(line, fields[0].Data)
+				cols = append(cols, fields[0].Data)
 			} else {
 				if *skipIncompleteLines {
-					skipThisLine = true
-					break
+					return []string{}
 				}
-				line = append(line, *fillna) // or any fill value
+				cols = append(cols, *fillna)
 			}
 		} else if regexSubfield.MatchString(tag) {
 			parts := strings.Split(tag, ".")
@@ -490,56 +487,63 @@ func RecordToTSV(record *marc22.Record,
 			subfields := record.GetSubFields(parts[0], code)
 			if len(subfields) > 0 {
 				if *separator == "" {
-					// only use the first value
-					line = append(line, subfields[0].Value)
+					cols = append(cols, subfields[0].Value)
 				} else {
 					var values []string
 					for _, subfield := range subfields {
 						values = append(values, subfield.Value)
 					}
-					line = append(line, strings.Join(values, *separator))
+					cols = append(cols, strings.Join(values, *separator))
 				}
 			} else {
 				if *skipIncompleteLines {
-					skipThisLine = true
-					break
+					return []string{}
 				}
-				line = append(line, *fillna) // or any fill value
+				cols = append(cols, *fillna)
 			}
 		} else if strings.HasPrefix(tag, "@") {
 			leader := record.LeaderParsed
 			switch tag {
 			case "@Length":
-				line = append(line, fmt.Sprintf("%d", leader.Length))
+				cols = append(cols, fmt.Sprintf("%d", leader.Length))
 			case "@Status":
-				line = append(line, string(leader.Status))
+				cols = append(cols, string(leader.Status))
 			case "@Type":
-				line = append(line, string(leader.Type))
+				cols = append(cols, string(leader.Type))
 			case "@ImplementationDefined":
-				line = append(line, string(leader.ImplementationDefined[:5]))
+				cols = append(cols, string(leader.ImplementationDefined[:5]))
 			case "@CharacterEncoding":
-				line = append(line, string(leader.CharacterEncoding))
+				cols = append(cols, string(leader.CharacterEncoding))
 			case "@BaseAddress":
-				line = append(line, fmt.Sprintf("%d", leader.BaseAddress))
+				cols = append(cols, fmt.Sprintf("%d", leader.BaseAddress))
 			case "@IndicatorCount":
-				line = append(line, fmt.Sprintf("%d", leader.IndicatorCount))
+				cols = append(cols, fmt.Sprintf("%d", leader.IndicatorCount))
 			case "@SubfieldCodeLength":
-				line = append(line, fmt.Sprintf("%d", leader.SubfieldCodeLength))
+				cols = append(cols, fmt.Sprintf("%d", leader.SubfieldCodeLength))
 			case "@LengthOfLength":
-				line = append(line, fmt.Sprintf("%d", leader.LengthOfLength))
+				cols = append(cols, fmt.Sprintf("%d", leader.LengthOfLength))
 			case "@LengthOfStartPos":
-				line = append(line, fmt.Sprintf("%d", leader.LengthOfStartPos))
+				cols = append(cols, fmt.Sprintf("%d", leader.LengthOfStartPos))
 			default:
-				log.Fatalf("unknown tag: %s", tag)
+				log.Fatalf("unknown tag: %s\n", tag)
 			}
 		} else if !strings.HasPrefix(tag, "-") {
-			line = append(line, strings.TrimSpace(tag))
+			cols = append(cols, strings.TrimSpace(tag))
 		}
 	}
+	return cols
+}
 
-	result := ""
-	if !skipThisLine {
-		result = fmt.Sprintf("%s\n", strings.Join(line, "\t"))
+// RecordToTSV turns a single record into a single TSV line
+func RecordToTSV(record *marc22.Record,
+	tags *[]string,
+	fillna, separator *string,
+	skipIncompleteLines *bool) *string {
+
+	cols := RecordToSlice(record, tags, fillna, separator, skipIncompleteLines)
+	var result string
+	if len(cols) > 0 {
+		result = fmt.Sprintf("%s\n", strings.Join(cols, "\t"))
 	}
 	return &result
 }
