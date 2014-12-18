@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/miku/marc22"
-	"github.com/miku/marctools"
+	"github.com/ubleipzig/marctools"
 )
 
 func main() {
@@ -27,6 +27,7 @@ func main() {
 	includeLeader := flag.Bool("l", false, "dump the leader as well")
 	metaVar := flag.String("m", "", "a key=value pair to pass to meta")
 	plainMode := flag.Bool("p", false, "plain mode: dump without content and meta")
+	recordKey := flag.String("recordkey", "record", "key name of the record")
 
 	var PrintUsage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -75,18 +76,27 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	queue := make(chan *marctools.Work)
-	results := make(chan *[]byte)
+	queue := make(chan *marc22.Record)
+	results := make(chan []byte)
 	done := make(chan bool)
 
 	writer := bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
 	go marctools.FanInWriter(writer, results, done)
 
+	options := marctools.JsonConversionOptions{
+		FilterMap:     filterMap,
+		MetaMap:       metaMap,
+		IncludeLeader: *includeLeader,
+		PlainMode:     *plainMode,
+		IgnoreErrors:  *ignoreErrors,
+		RecordKey:     *recordKey,
+	}
+
 	var wg sync.WaitGroup
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
-		go marctools.Worker(queue, results, &wg)
+		go marctools.Worker(queue, results, &wg, options)
 	}
 
 	decoder := xml.NewDecoder(file)
@@ -101,14 +111,7 @@ func main() {
 			if se.Name.Local == "record" {
 				var record marc22.Record
 				decoder.DecodeElement(&record, &se)
-
-				work := marctools.Work{Record: &record,
-					FilterMap:     &filterMap,
-					MetaMap:       &metaMap,
-					IncludeLeader: *includeLeader,
-					PlainMode:     *plainMode,
-					IgnoreErrors:  *ignoreErrors}
-				queue <- &work
+				queue <- &record
 			}
 		}
 	}
