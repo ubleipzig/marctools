@@ -42,9 +42,9 @@ func Worker(in chan *marc22.Record, out chan *[]byte, wg *sync.WaitGroup, option
 			b, err := json.Marshal(*recordMap)
 			if err != nil {
 				if !options.IgnoreErrors {
-					log.Fatalln(err)
+					log.Fatal(err)
 				}
-				log.Printf("error: %s\n", err)
+				log.Println(err)
 				continue
 			}
 			out <- &b
@@ -56,9 +56,9 @@ func Worker(in chan *marc22.Record, out chan *[]byte, wg *sync.WaitGroup, option
 			b, err := json.Marshal(m)
 			if err != nil {
 				if !options.IgnoreErrors {
-					log.Fatalln(err)
+					log.Fatal(err)
 				}
-				log.Printf("[EE] %s\n", err)
+				log.Println(err)
 				continue
 			}
 			out <- &b
@@ -130,12 +130,12 @@ func RecordLength(reader io.Reader) (length int64, err error) {
 func RecordCount(filename string) int64 {
 	handle, err := os.Open(filename)
 	if err != nil {
-		log.Fatalf("%s\n", err)
+		log.Fatal(err)
 	}
 
 	defer func() {
 		if err := handle.Close(); err != nil {
-			log.Fatalf("%s\n", err)
+			log.Fatal(err)
 		}
 	}()
 
@@ -147,7 +147,7 @@ func RecordCount(filename string) int64 {
 			break
 		}
 		if err != nil {
-			log.Fatalf("%s\n", err)
+			log.Fatal(err)
 		}
 		i++
 		cumulative += length
@@ -175,11 +175,11 @@ func IDList(filename string) []string {
 		// use slower iteration over records
 		fi, err := os.Open(filename)
 		if err != nil {
-			log.Fatalf("%s\n", err)
+			log.Fatal(err)
 		}
 		defer func() {
 			if err := fi.Close(); err != nil {
-				log.Fatalf("%s\n", err)
+				log.Fatal(err)
 			}
 		}()
 
@@ -189,12 +189,12 @@ func IDList(filename string) []string {
 				break
 			}
 			if err != nil {
-				log.Fatalf("%s\n", err)
+				log.Fatal(err)
 			}
 
 			fields := record.GetControlFields("001")
 			if len(fields) != 1 {
-				log.Fatalf("unusual 001 field count: %d\n", len(fields))
+				log.Fatalf("invalid 001 field count: %d\n", len(fields))
 			}
 			ids = append(ids, strings.TrimSpace(fields[0].Data))
 		}
@@ -203,7 +203,7 @@ func IDList(filename string) []string {
 		command := fmt.Sprintf("%s '%s' | %s ' /^001 / {print $2}'", yaz, filename, awk)
 		out, err := exec.Command("bash", "-c", command).Output()
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal(err)
 		}
 
 		for _, line := range strings.Split(string(out), "\n") {
@@ -223,12 +223,12 @@ func MarcMap(infile string, writer io.Writer) {
 	fi, err := os.Open(infile)
 
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 
 	defer func() {
 		if err := fi.Close(); err != nil {
-			log.Fatalln(err)
+			log.Fatal(err)
 		}
 	}()
 
@@ -252,13 +252,13 @@ func MarcMapSqlite(infile, outfile string) {
 	fi, err := os.Open(infile)
 
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 
 	// dump results into sqlite3
 	db, err := sql.Open("sqlite3", outfile)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 	defer db.Close()
 
@@ -270,11 +270,11 @@ func MarcMapSqlite(infile, outfile string) {
 
 	tx, err := db.Begin()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 	stmt, err := tx.Prepare("INSERT INTO seekmap VALUES (?, ?, ?)")
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 	defer stmt.Close()
 
@@ -288,7 +288,7 @@ func MarcMapSqlite(infile, outfile string) {
 		}
 		_, err = stmt.Exec(ids[i], offset, length)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal(err)
 		}
 
 		offset += length
@@ -299,7 +299,7 @@ func MarcMapSqlite(infile, outfile string) {
 	// create index
 	_, err = tx.Exec("CREATE INDEX idx_seekmap_id ON seekmap (id)")
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 	tx.Commit()
 }
@@ -312,7 +312,7 @@ func writeSplit(file, output *os.File, offset int64, buffer []byte) {
 	output.Write(buffer)
 	err := output.Close()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 }
 
@@ -321,7 +321,7 @@ func createSplitFile(directory, prefix string, fileno int64) *os.File {
 	filename := filepath.Join(directory, fmt.Sprintf("%s%08d", prefix, fileno))
 	output, err := os.Create(filename)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 	return output
 }
@@ -331,12 +331,12 @@ func createSplitFile(directory, prefix string, fileno int64) *os.File {
 func MarcSplitDirectoryPrefix(infile string, size int64, directory, prefix string) {
 	file, err := os.Open(infile)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 
 	defer func() {
 		if err := file.Close(); err != nil {
-			log.Fatalln(err)
+			log.Fatal(err)
 		}
 	}()
 
@@ -348,7 +348,7 @@ func MarcSplitDirectoryPrefix(infile string, size int64, directory, prefix strin
 			break
 		}
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal(err)
 		}
 		if i%size == 0 && i > 0 {
 			output := createSplitFile(directory, prefix, fileno)

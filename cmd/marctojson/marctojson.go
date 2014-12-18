@@ -67,19 +67,19 @@ func main() {
 
 	file, err := os.Open(flag.Args()[0])
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 
 	defer func() {
 		if err := file.Close(); err != nil {
-			log.Fatalln(err)
+			log.Fatal(err)
 		}
 	}()
 
 	filterMap := marctools.StringToMapSet(*filterVar)
 	metaMap, err := marctools.KeyValueStringToMap(*metaVar)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 
 	queue := make(chan *marc22.Record)
@@ -111,10 +111,10 @@ func main() {
 		}
 		if err != nil {
 			if *ignoreErrors {
-				log.Printf("[EE] %s\n", err)
+				log.Println(err)
 				continue
 			} else {
-				log.Fatalln(err)
+				log.Fatal(err)
 			}
 		}
 
