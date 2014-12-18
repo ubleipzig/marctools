@@ -139,7 +139,7 @@ func RecordCount(filename string) int64 {
 		}
 	}()
 
-	var i, cumulative int64
+	var i, offset int64
 
 	for {
 		length, err := RecordLength(handle)
@@ -150,8 +150,8 @@ func RecordCount(filename string) int64 {
 			log.Fatal(err)
 		}
 		i++
-		cumulative += length
-		handle.Seek(cumulative, 0)
+		offset += length
+		handle.Seek(offset, 0)
 	}
 	return i
 }
