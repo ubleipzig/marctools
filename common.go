@@ -430,9 +430,9 @@ func recordMap(record *marc22.Record, filter map[string]bool) map[string]interfa
 }
 
 // RecordToMap converts a record to a map, optionally keeping only the tags
-// given in filterMap. If includeLeader is true, the leader is converted as well.
-func RecordMap(record *marc22.Record, filterMap map[string]bool, includeLeader bool) map[string]interface{} {
-	rmap := recordMap(record, filterMap)
+// given in filter. If includeLeader is true, the leader is converted as well.
+func RecordMap(record *marc22.Record, filter map[string]bool, includeLeader bool) map[string]interface{} {
+	rmap := recordMap(record, filter)
 	if includeLeader {
 		leader := record.LeaderParsed
 		l := map[string]string{
