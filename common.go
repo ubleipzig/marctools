@@ -25,8 +25,8 @@ const AppVersion = "1.6.0"
 
 // JsonConversionOptions specify parameters for the MARC to JSON conversion
 type JsonConversionOptions struct {
-	FilterMap     *map[string]bool   // which tags to include
-	MetaMap       *map[string]string // meta information
+	FilterMap     map[string]bool   // which tags to include
+	MetaMap       map[string]string // meta information
 	IncludeLeader bool
 	PlainMode     bool // only dump the content
 	IgnoreErrors  bool
@@ -34,12 +34,12 @@ type JsonConversionOptions struct {
 }
 
 // Worker takes a Work item and sends the result (serialized json) on the out channel
-func Worker(in chan *marc22.Record, out chan *[]byte, wg *sync.WaitGroup, options *JsonConversionOptions) {
+func Worker(in chan *marc22.Record, out chan []byte, wg *sync.WaitGroup, options JsonConversionOptions) {
 	defer wg.Done()
 	for record := range in {
-		recordMap := RecordToMap(record, options.FilterMap, options.IncludeLeader)
+		recordMap := RecordMap(record, options.FilterMap, options.IncludeLeader)
 		if options.PlainMode {
-			b, err := json.Marshal(*recordMap)
+			b, err := json.Marshal(recordMap)
 			if err != nil {
 				if !options.IgnoreErrors {
 					log.Fatal(err)
@@ -47,11 +47,11 @@ func Worker(in chan *marc22.Record, out chan *[]byte, wg *sync.WaitGroup, option
 				log.Println(err)
 				continue
 			}
-			out <- &b
+			out <- b
 		} else {
 			m := map[string]interface{}{
-				options.RecordKey: *recordMap,
-				"meta":            *options.MetaMap,
+				options.RecordKey: recordMap,
+				"meta":            options.MetaMap,
 			}
 			b, err := json.Marshal(m)
 			if err != nil {
@@ -61,15 +61,15 @@ func Worker(in chan *marc22.Record, out chan *[]byte, wg *sync.WaitGroup, option
 				log.Println(err)
 				continue
 			}
-			out <- &b
+			out <- b
 		}
 	}
 }
 
 // FanInWriter writes the channel content to the writer
-func FanInWriter(writer io.Writer, in chan *[]byte, done chan bool) {
+func FanInWriter(writer io.Writer, in chan []byte, done chan bool) {
 	for b := range in {
-		writer.Write(*b)
+		writer.Write(b)
 		writer.Write([]byte("\n"))
 	}
 	done <- true
@@ -381,29 +381,9 @@ func MarcSplit(infile string, size int64) {
 	MarcSplitDirectoryPrefix(infile, size, ".", "split-")
 }
 
-// recordToLeaderMap extracts the leader from a given record and puts it in a map
-func recordToLeaderMap(record *marc22.Record) *map[string]string {
-	leaderMap := make(map[string]string)
-	leader := record.LeaderParsed
-	leaderMap["status"] = string(leader.Status)
-	leaderMap["cs"] = string(leader.CharacterEncoding)
-	leaderMap["length"] = fmt.Sprintf("%d", leader.Length)
-	leaderMap["type"] = string(leader.Type)
-	leaderMap["impldef"] = string(leader.ImplementationDefined[:5])
-	leaderMap["ic"] = fmt.Sprintf("%d", leader.IndicatorCount)
-	leaderMap["lol"] = fmt.Sprintf("%d", leader.LengthOfLength)
-	leaderMap["losp"] = fmt.Sprintf("%d", leader.LengthOfStartPos)
-	leaderMap["sfcl"] = fmt.Sprintf("%d", leader.SubfieldCodeLength)
-	leaderMap["ba"] = fmt.Sprintf("%d", leader.BaseAddress)
-	leaderMap["raw"] = string(leader.Bytes())
-	return &leaderMap
-}
-
-// recordToContentMap converts a record into a map, optionally only the tags given in filterMap
-func recordToContentMap(record *marc22.Record, filterMap *map[string]bool) *map[string]interface{} {
-	contentMap := make(map[string]interface{})
-
-	filter := *filterMap
+// recordMap converts a record into a map, optionally only the tags given in filter
+func recordMap(record *marc22.Record, filter map[string]bool) map[string]interface{} {
+	m := make(map[string]interface{})
 	hasFilter := len(filter) > 0
 
 	for _, field := range record.ControlFields {
@@ -414,7 +394,7 @@ func recordToContentMap(record *marc22.Record, filterMap *map[string]bool) *map[
 				continue
 			}
 		}
-		contentMap[tag] = field.Data
+		m[tag] = field.Data
 	}
 
 	for _, field := range record.DataFields {
@@ -426,80 +406,94 @@ func recordToContentMap(record *marc22.Record, filterMap *map[string]bool) *map[
 			}
 		}
 
-		subfieldMap := make(map[string]interface{})
-		subfieldMap["ind1"] = field.Ind1
-		subfieldMap["ind2"] = field.Ind2
+		smap := map[string]interface{}{
+			"ind1": field.Ind1,
+			"ind2": field.Ind2,
+		}
 		for _, subfield := range field.SubFields {
 			code := fmt.Sprintf("%s", subfield.Code)
-			_, present := subfieldMap[code]
+			_, present := smap[code]
 			if present {
-				subfieldMap[code] = append(subfieldMap[code].([]string), subfield.Value)
+				smap[code] = append(smap[code].([]string), subfield.Value)
 			} else {
-				subfieldMap[code] = []string{subfield.Value}
+				smap[code] = []string{subfield.Value}
 			}
 		}
-		_, present := contentMap[tag]
+		_, present := m[tag]
 		if !present {
 			subfields := make([]interface{}, 0)
-			contentMap[tag] = subfields
+			m[tag] = subfields
 		}
-		contentMap[tag] = append(contentMap[tag].([]interface{}), subfieldMap)
-
+		m[tag] = append(m[tag].([]interface{}), smap)
 	}
-
-	return &contentMap
+	return m
 }
 
 // RecordToMap converts a record to a map, optionally keeping only the tags
 // given in filterMap. If includeLeader is true, the leader is converted as well.
-func RecordToMap(record *marc22.Record, filterMap *map[string]bool, includeLeader bool) *map[string]interface{} {
-	contentMap := *recordToContentMap(record, filterMap)
+func RecordMap(record *marc22.Record, filterMap map[string]bool, includeLeader bool) map[string]interface{} {
+	rmap := recordMap(record, filterMap)
 	if includeLeader {
-		contentMap["leader"] = recordToLeaderMap(record)
+		leader := record.LeaderParsed
+		l := map[string]string{
+			"status":  string(leader.Status),
+			"cs":      string(leader.CharacterEncoding),
+			"length":  fmt.Sprintf("%d", leader.Length),
+			"type":    string(leader.Type),
+			"impldef": string(leader.ImplementationDefined[:5]),
+			"ic":      fmt.Sprintf("%d", leader.IndicatorCount),
+			"lol":     fmt.Sprintf("%d", leader.LengthOfLength),
+			"losp":    fmt.Sprintf("%d", leader.LengthOfStartPos),
+			"sfcl":    fmt.Sprintf("%d", leader.SubfieldCodeLength),
+			"ba":      fmt.Sprintf("%d", leader.BaseAddress),
+			"raw":     string(leader.Bytes()),
+		}
+		rmap["leader"] = l
 	}
-	return &contentMap
+	return rmap
 }
 
 var regexSubfield = regexp.MustCompile(`^([\d]{3})\.([a-z0-9])$`)
 var regexControlfield = regexp.MustCompile(`^[\d]{3}$`)
 
+// RecordToSlice returns a string slice with the values of the given tags
 func RecordToSlice(record *marc22.Record,
-	tags *[]string,
-	fillna, separator *string,
-	skipIncompleteLines *bool) []string {
+	tags []string,
+	fillna, separator string,
+	skipIncompleteLines bool) []string {
 
 	var cols []string
 
-	for _, tag := range *tags {
+	for _, tag := range tags {
 		if regexControlfield.MatchString(tag) {
 			fields := record.GetControlFields(tag)
 			if len(fields) > 0 {
 				cols = append(cols, fields[0].Data)
 			} else {
-				if *skipIncompleteLines {
+				if skipIncompleteLines {
 					return []string{}
 				}
-				cols = append(cols, *fillna)
+				cols = append(cols, fillna)
 			}
 		} else if regexSubfield.MatchString(tag) {
 			parts := strings.Split(tag, ".")
 			code := parts[1]
 			subfields := record.GetSubFields(parts[0], code)
 			if len(subfields) > 0 {
-				if *separator == "" {
+				if separator == "" {
 					cols = append(cols, subfields[0].Value)
 				} else {
 					var values []string
 					for _, subfield := range subfields {
 						values = append(values, subfield.Value)
 					}
-					cols = append(cols, strings.Join(values, *separator))
+					cols = append(cols, strings.Join(values, separator))
 				}
 			} else {
-				if *skipIncompleteLines {
+				if skipIncompleteLines {
 					return []string{}
 				}
-				cols = append(cols, *fillna)
+				cols = append(cols, fillna)
 			}
 		} else if strings.HasPrefix(tag, "@") {
 			leader := record.LeaderParsed
@@ -536,14 +530,14 @@ func RecordToSlice(record *marc22.Record,
 
 // RecordToTSV turns a single record into a single TSV line
 func RecordToTSV(record *marc22.Record,
-	tags *[]string,
-	fillna, separator *string,
-	skipIncompleteLines *bool) *string {
+	tags []string,
+	fillna, separator string,
+	skipIncompleteLines bool) string {
 
 	cols := RecordToSlice(record, tags, fillna, separator, skipIncompleteLines)
 	var result string
 	if len(cols) > 0 {
 		result = fmt.Sprintf("%s\n", strings.Join(cols, "\t"))
 	}
-	return &result
+	return result
 }

@@ -83,7 +83,7 @@ func main() {
 	}
 
 	queue := make(chan *marc22.Record)
-	results := make(chan *[]byte)
+	results := make(chan []byte)
 	done := make(chan bool)
 
 	writer := bufio.NewWriter(os.Stdout)
@@ -92,8 +92,8 @@ func main() {
 
 	var wg sync.WaitGroup
 	options := marctools.JsonConversionOptions{
-		FilterMap:     &filterMap,
-		MetaMap:       &metaMap,
+		FilterMap:     filterMap,
+		MetaMap:       metaMap,
 		IncludeLeader: *includeLeader,
 		PlainMode:     *plainMode,
 		IgnoreErrors:  *ignoreErrors,
@@ -101,7 +101,7 @@ func main() {
 	}
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
-		go marctools.Worker(queue, results, &wg, &options)
+		go marctools.Worker(queue, results, &wg, options)
 	}
 
 	for {

@@ -18,27 +18,27 @@ import (
 
 type Work struct {
 	Record              *marc22.Record // MARC record
-	Tags                *[]string      // tags to dump
-	FillNA              *string        // placeholder if value is not available
-	Separator           *string
-	SkipIncompleteLines *bool // skip lines, that do
+	Tags                []string       // tags to dump
+	FillNA              string         // placeholder if value is not available
+	Separator           string
+	SkipIncompleteLines bool // skip lines, that do
 }
 
 // Worker takes a Work item and sends the result (serialized json) on the out channel
-func Worker(in chan *Work, out chan *string, wg *sync.WaitGroup) {
+func Worker(in chan Work, out chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for work := range in {
 		line := marctools.RecordToTSV(work.Record, work.Tags, work.FillNA, work.Separator, work.SkipIncompleteLines)
-		if len(*line) > 0 {
+		if len(line) > 0 {
 			out <- line
 		}
 	}
 }
 
 // FanInWriter writes the channel content to the writer
-func FanInWriter(writer io.Writer, in chan *string, done chan bool) {
+func FanInWriter(writer io.Writer, in chan string, done chan bool) {
 	for s := range in {
-		writer.Write([]byte(*s))
+		writer.Write([]byte(s))
 	}
 	done <- true
 }
@@ -101,8 +101,8 @@ func main() {
 		log.Fatalln("at least one tag is required")
 	}
 
-	queue := make(chan *Work)
-	results := make(chan *string)
+	queue := make(chan Work)
+	results := make(chan string)
 	done := make(chan bool)
 
 	writer := bufio.NewWriter(os.Stdout)
@@ -130,11 +130,11 @@ func main() {
 		}
 
 		work := Work{Record: record,
-			Tags:                &tags,
-			FillNA:              fillna,
-			Separator:           separator,
-			SkipIncompleteLines: skipIncompleteLines}
-		queue <- &work
+			Tags:                tags,
+			FillNA:              *fillna,
+			Separator:           *separator,
+			SkipIncompleteLines: *skipIncompleteLines}
+		queue <- work
 	}
 
 	close(queue)

@@ -255,7 +255,7 @@ func TestRecordToMap(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		result := RecordToMap(record, &tt.filterMap, tt.includeLeader)
+		result := RecordMap(record, tt.filterMap, tt.includeLeader)
 		if result == nil {
 			t.Error("RecordToMap should not return nil")
 		}
@@ -328,12 +328,9 @@ func TestRecordToTSV(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		result := RecordToTSV(record, &tt.tags, &tt.fillNA, &tt.separator, &tt.skipIncompleteLines)
-		if result == nil {
-			t.Error("RecordToTSV should not return nil")
-		}
-		if *result != tt.out {
-			t.Errorf("RecordToTSV(%s, %v, %s, %s, %t) => %+v, want: %+v", record, tt.tags, tt.fillNA, tt.separator, tt.skipIncompleteLines, *result, tt.out)
+		result := RecordToTSV(record, tt.tags, tt.fillNA, tt.separator, tt.skipIncompleteLines)
+		if result != tt.out {
+			t.Errorf("RecordToTSV(%s, %v, %s, %s, %t) => %+v, want: %+v", record, tt.tags, tt.fillNA, tt.separator, tt.skipIncompleteLines, result, tt.out)
 		}
 	}
 }
