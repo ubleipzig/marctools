@@ -218,44 +218,54 @@ func IDList(filename string) []string {
 	return ids
 }
 
-// MarcMap writes (id, offset, length) TSV of a given MARC file to a io.Writer
-func MarcMap(infile string, writer io.Writer) {
-	fi, err := os.Open(infile)
+// MapEntry contains location information of a single record in a MARC file
+type MapEntry struct {
+	ID     string
+	Offset int64
+	Length int64
+}
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer func() {
-		if err := fi.Close(); err != nil {
+// MarcMapEntries returns a chan of MapEntry structs.
+func MarcMapEntries(infile string) chan MapEntry {
+	c := make(chan MapEntry)
+	go func() {
+		handle, err := os.Open(infile)
+		if err != nil {
 			log.Fatal(err)
 		}
-	}()
+		defer func() {
+			if err := handle.Close(); err != nil {
+				log.Fatal(err)
+			}
+		}()
 
-	ids := IDList(infile)
-	var i, offset int64
+		ids := IDList(infile)
+		var i, offset int64
 
-	for {
-		length, err := RecordLength(fi)
-		if err == io.EOF {
-			break
+		for {
+			length, err := RecordLength(handle)
+			if err == io.EOF {
+				break
+			}
+			c <- MapEntry{ID: ids[i], Offset: offset, Length: length}
+			offset += length
+			i++
+			handle.Seek(offset, 0)
 		}
-		writer.Write([]byte(fmt.Sprintf("%s\t%d\t%d\n", ids[i], offset, length)))
-		offset += length
-		i++
-		fi.Seek(offset, 0)
+		close(c)
+	}()
+	return c
+}
+
+// MarcMap writes (id, offset, length) TSV of a given MARC file to a io.Writer
+func MarcMap(infile string, writer io.Writer) {
+	for e := range MarcMapEntries(infile) {
+		writer.Write([]byte(fmt.Sprintf("%s\t%d\t%d\n", e.ID, e.Offset, e.Length)))
 	}
 }
 
 // MarcMapSqlite writes (id, offset, length) sqlite3 database of a given MARC file to given output file
 func MarcMapSqlite(infile, outfile string) {
-	fi, err := os.Open(infile)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// dump results into sqlite3
 	db, err := sql.Open("sqlite3", outfile)
 	if err != nil {
 		log.Fatal(err)
@@ -278,25 +288,13 @@ func MarcMapSqlite(infile, outfile string) {
 	}
 	defer stmt.Close()
 
-	ids := IDList(infile)
-	var i, offset int64
-
-	for {
-		length, err := RecordLength(fi)
-		if err == io.EOF {
-			break
-		}
-		_, err = stmt.Exec(ids[i], offset, length)
+	for e := range MarcMapEntries(infile) {
+		_, err = stmt.Exec(e.ID, e.Offset, e.Length)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		offset += length
-		i++
-		fi.Seek(offset, 0)
 	}
 
-	// create index
 	_, err = tx.Exec("CREATE INDEX idx_seekmap_id ON seekmap (id)")
 	if err != nil {
 		log.Fatal(err)
