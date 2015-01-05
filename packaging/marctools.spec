@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       marctools
-Version:    1.6.0
+Version:    1.6.1
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -21,6 +21,7 @@ Other:
 * marcdb
 * marcdump
 * marcmap
+* marcsnapshot
 * marcsplit
 * marcuniq
 * marcxmltojson
@@ -45,6 +46,7 @@ install -m 755 marccount $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcdb $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcdump $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcmap $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marcsnapshot $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marcsplit $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marctojson $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 marctotsv $RPM_BUILD_ROOT/usr/local/sbin
@@ -68,6 +70,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/marcdb
 /usr/local/sbin/marcdump
 /usr/local/sbin/marcmap
+/usr/local/sbin/marcsnapshot
 /usr/local/sbin/marcsplit
 /usr/local/sbin/marctojson
 /usr/local/sbin/marctotsv
@@ -76,6 +79,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Tue Jan 6 2015 Martin Czygan
+- 1.6.1 release
+- added marcsnapshot experimental deduplication tool
+
 * Sun Dec 14 2014 Martin Czygan
 - 1.6.0 release
 - marctojson got a -recordkey flag

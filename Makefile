@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-TARGETS = marccount marcdb marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
+TARGETS = marccount marcdb marcdump marcmap marcsnapshot marcsplit marctojson marctotsv marcuniq marcxmltojson
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
@@ -40,6 +40,9 @@ marcdump:
 
 marcmap:
 	go build cmd/marcmap/marcmap.go
+
+marcsnapshot:
+	go build cmd/marcsnapshot/marcsnapshot.go
 
 marcsplit:
 	go build cmd/marcsplit/marcsplit.go
