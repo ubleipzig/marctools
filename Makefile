@@ -20,7 +20,7 @@ install:
 clean:
 	go clean
 	rm -fv coverage.out
-	rm -fv marccount marcdb marcdump marcmap marcsplit marctojson marctotsv marcuniq marcxmltojson
+	rm -fv $(TARGETS)
 	rm -fv *.x86_64.rpm
 	rm -fv debian/marctools*.deb
 	rm -rfv debian/marctools/usr
