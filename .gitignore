@@ -36,6 +36,7 @@ marccount
 marcdb
 marcdump
 marcmap
+marcsnapshot
 marcsplit
 marctojson
 marctotsv
