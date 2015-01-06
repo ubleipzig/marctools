@@ -21,7 +21,7 @@ import (
 )
 
 // AppVersion is displayed by all command line tools
-const AppVersion = "1.6.0"
+const AppVersion = "1.6.1"
 
 // JsonConversionOptions specify parameters for the MARC to JSON conversion
 type JsonConversionOptions struct {
