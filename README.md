@@ -167,6 +167,7 @@ fields are used only once as keys. Here is a short [side-by-side comparison](htt
 
     $ marctojson
     Usage of marctojson:
+      -b=10000: batch size for intercom
       -cpuprofile="": write cpu profile to file
       -i=false: ignore marc errors (not recommended)
       -l=false: dump the leader as well
