@@ -33,6 +33,40 @@ type JsonConversionOptions struct {
 	RecordKey     string
 }
 
+func BatchWorker(in chan []*marc22.Record, out chan []byte, wg *sync.WaitGroup, options JsonConversionOptions) {
+	defer wg.Done()
+	for records := range in {
+		for _, record := range records {
+			recordMap := RecordMap(record, options.FilterMap, options.IncludeLeader)
+			if options.PlainMode {
+				b, err := json.Marshal(recordMap)
+				if err != nil {
+					if !options.IgnoreErrors {
+						log.Fatal(err)
+					}
+					log.Println(err)
+					continue
+				}
+				out <- b
+			} else {
+				m := map[string]interface{}{
+					options.RecordKey: recordMap,
+					"meta":            options.MetaMap,
+				}
+				b, err := json.Marshal(m)
+				if err != nil {
+					if !options.IgnoreErrors {
+						log.Fatal(err)
+					}
+					log.Println(err)
+					continue
+				}
+				out <- b
+			}
+		}
+	}
+}
+
 // Worker takes a Work item and sends the result (serialized json) on the out channel
 func Worker(in chan *marc22.Record, out chan []byte, wg *sync.WaitGroup, options JsonConversionOptions) {
 	defer wg.Done()

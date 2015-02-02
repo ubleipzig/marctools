@@ -34,6 +34,7 @@ func main() {
 	metaVar := flag.String("m", "", "a key=value pair to pass to meta")
 	recordKey := flag.String("recordkey", "record", "key name of the record")
 	plainMode := flag.Bool("p", false, "plain mode: dump without content and meta")
+	batchSize := flag.Int("b", 10000, "batch size for intercom")
 
 	var PrintUsage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -82,7 +83,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	queue := make(chan *marc22.Record)
+	queue := make(chan []*marc22.Record)
 	results := make(chan []byte)
 	done := make(chan bool)
 
@@ -101,8 +102,11 @@ func main() {
 	}
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
-		go marctools.Worker(queue, results, &wg, options)
+		go marctools.BatchWorker(queue, results, &wg, options)
 	}
+
+	counter := 0
+	var records []*marc22.Record
 
 	for {
 		record, err := marc22.ReadRecord(file)
@@ -117,10 +121,14 @@ func main() {
 				log.Fatal(err)
 			}
 		}
-
-		queue <- record
+		records = append(records, record)
+		counter += 1
+		if counter%*batchSize == 0 {
+			queue <- records
+			records = records[:0]
+		}
 	}
-
+	queue <- records
 	close(queue)
 	wg.Wait()
 	close(results)
