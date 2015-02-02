@@ -24,6 +24,7 @@ _testmain.go
 
 coverage.out
 fixtures/biglok.mrc
+fixtures/large.mrc
 *.pprof
 vagrant.key
 .vagrant
