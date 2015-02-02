@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       marctools
-Version:    1.6.1
+Version:    1.6.2
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -79,6 +79,11 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Mon Feb 2 2015 Martin Czygan
+- 1.6.2 release
+- use batched operations in marctojson
+- TODO: eventually apply optimizations to marcxmltojson and marctotsv
+
 * Tue Jan 6 2015 Martin Czygan
 - 1.6.1 release
 - added marcsnapshot experimental deduplication tool
