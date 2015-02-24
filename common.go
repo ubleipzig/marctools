@@ -144,7 +144,6 @@ func StringToMapSet(s string) map[string]bool {
 
 // RecordLength returns the length of the marc record as stored in the leader
 func RecordLength(reader io.Reader) (length int64, err error) {
-	var l int
 	data := make([]byte, 24)
 	n, err := reader.Read(data)
 	if err != nil {
@@ -153,7 +152,7 @@ func RecordLength(reader io.Reader) (length int64, err error) {
 	if n != 24 {
 		return 0, fmt.Errorf("marc: invalid leader: expected 24 bytes, read %d", n)
 	}
-	l, err = strconv.Atoi(string(data[0:5]))
+	l, err := strconv.Atoi(string(data[0:5]))
 	if err != nil {
 		return 0, fmt.Errorf("marc: invalid record length: %s", err)
 	}
