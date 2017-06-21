@@ -116,7 +116,7 @@ func main() {
 			}
 		}
 		records = append(records, record)
-		counter += 1
+		counter++
 		if counter%*batchSize == 0 {
 			queue <- records
 			records = records[:0]
