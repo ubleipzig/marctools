@@ -36,11 +36,6 @@ func main() {
 	plainMode := flag.Bool("p", false, "plain mode: dump without content and meta")
 	batchSize := flag.Int("b", 10000, "batch size for intercom")
 
-	var PrintUsage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
-		flag.PrintDefaults()
-	}
-
 	flag.Parse()
 
 	if *numWorkers > 0 {
@@ -61,21 +56,20 @@ func main() {
 		os.Exit(0)
 	}
 
-	if flag.NArg() < 1 {
-		PrintUsage()
-		os.Exit(1)
-	}
+	reader := os.Stdin
 
-	file, err := os.Open(flag.Args()[0])
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer func() {
-		if err := file.Close(); err != nil {
+	if flag.NArg() > 0 {
+		file, err := os.Open(flag.Args()[0])
+		if err != nil {
 			log.Fatal(err)
 		}
-	}()
+		defer func() {
+			if err := file.Close(); err != nil {
+				log.Fatal(err)
+			}
+		}()
+		reader = file
+	}
 
 	filterMap := marctools.StringToMapSet(*filterVar)
 	metaMap, err := marctools.KeyValueStringToMap(*metaVar)
@@ -109,7 +103,7 @@ func main() {
 	var records []*marc22.Record
 
 	for {
-		record, err := marc22.ReadRecord(file)
+		record, err := marc22.ReadRecord(reader)
 		if err == io.EOF {
 			break
 		}
