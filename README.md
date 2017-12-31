@@ -158,7 +158,7 @@ Splits a MARC file into smaller pieces.
 marctojson
 ----------
 
-Converts MARC to JSON. This is (between 4 to 8 times) slower than `yaz-marcdump -i marc -o json`,
+Converts MARC to JSON. This is a bit slower than `yaz-marcdump -i marc -o json`,
 but offers a bit more flexibility in the output format: It is possible to filter fields,
 omit the leader and to add additional *meta* information.
 Also, the output format is terser. It keeps all the information (including order) from MARC,
