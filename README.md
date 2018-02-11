@@ -3,7 +3,7 @@ marctools
 
 Various MARC command line utilities.
 
-[![Build Status](http://img.shields.io/travis/miku/marctools.svg?style=flat)](https://travis-ci.org/miku/marctools)
+[![Build Status](http://img.shields.io/travis/miku/marctools.svg?style=flat)](https://travis-ci.org/miku/marctools)[![Go Report Card](https://goreportcard.com/badge/github.com/ubleipzig/marctools)](https://goreportcard.com/report/github.com/ubleipzig/marctools)
 
 Installation
 ------------
