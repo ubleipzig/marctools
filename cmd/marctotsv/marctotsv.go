@@ -16,7 +16,7 @@ import (
 	"github.com/ubleipzig/marctools"
 )
 
-type Work struct {
+type work struct {
 	Record              *marc22.Record // MARC record
 	Tags                []string       // tags to dump
 	FillNA              string         // placeholder if value is not available
@@ -25,7 +25,7 @@ type Work struct {
 }
 
 // Worker takes a Work item and sends the result (serialized json) on the out channel
-func Worker(in chan Work, out chan string, wg *sync.WaitGroup) {
+func Worker(in chan work, out chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for work := range in {
 		line := marctools.RecordToTSV(work.Record, work.Tags, work.FillNA, work.Separator, work.SkipIncompleteLines)
@@ -101,7 +101,7 @@ func main() {
 		log.Fatalln("at least one tag is required")
 	}
 
-	queue := make(chan Work)
+	queue := make(chan work)
 	results := make(chan string)
 	done := make(chan bool)
 
