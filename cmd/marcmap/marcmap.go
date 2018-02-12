@@ -17,6 +17,7 @@ func main() {
 	version := flag.Bool("v", false, "prints current program version")
 	output := flag.String("o", "", "output to sqlite3 file")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	safe := flag.Bool("safe", false, "use slower, but safer method to extract record identifiers")
 
 	var PrintUsage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -47,8 +48,8 @@ func main() {
 	filename := flag.Args()[0]
 
 	if *output == "" {
-		marctools.MarcMap(filename, os.Stdout)
+		marctools.MarcMap(filename, os.Stdout, *safe)
 	} else {
-		marctools.MarcMapSqlite(filename, *output)
+		marctools.MarcMapSqlite(filename, *output, *safe)
 	}
 }

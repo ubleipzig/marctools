@@ -190,22 +190,29 @@ func RecordCount(filename string) int64 {
 	return i
 }
 
-// IDList returns a slice of strings, containing all ids of the given marc file
-func IDList(filename string) []string {
-	fallback := false
-	yaz, err := exec.LookPath("yaz-marcdump")
-	if err != nil {
-		fallback = true
-	}
+// IdentifierList returns a slice of strings, containing all ids of the given
+// marc file. Set safe to true to use the slower, more safe method of parsing
+// each record. Fast method breaks when there are multiple 001 fields (invalid,
+// but real-world).
+func IdentifierList(filename string, safe bool) []string {
+	var fallback bool
+	var yaz, awk string
+	var err error
 
-	awk, err := exec.LookPath("awk")
-	if err != nil {
-		fallback = true
+	if !safe {
+		yaz, err = exec.LookPath("yaz-marcdump")
+		if err != nil {
+			fallback = true
+		}
+		awk, err = exec.LookPath("awk")
+		if err != nil {
+			fallback = true
+		}
 	}
 
 	var ids []string
 
-	if fallback {
+	if fallback || safe {
 		// use slower iteration over records
 		fi, err := os.Open(filename)
 		if err != nil {
@@ -227,8 +234,10 @@ func IDList(filename string) []string {
 			}
 
 			fields := record.GetControlFields("001")
-			if len(fields) != 1 {
-				log.Fatalf("invalid 001 field count: %d\n", len(fields))
+			// Cf. https://github.com/ubleipzig/marctools/issues/5
+			// In case of multiple identifiers, choose the first.
+			if len(fields) == 0 {
+				log.Fatalf("missing 001 field")
 			}
 			ids = append(ids, strings.TrimSpace(fields[0].Data))
 		}
@@ -260,7 +269,7 @@ type MapEntry struct {
 }
 
 // MarcMapEntries returns a chan of MapEntry structs.
-func MarcMapEntries(infile string) chan MapEntry {
+func MarcMapEntries(infile string, safe bool) chan MapEntry {
 	c := make(chan MapEntry)
 	go func() {
 		handle, err := os.Open(infile)
@@ -273,7 +282,7 @@ func MarcMapEntries(infile string) chan MapEntry {
 			}
 		}()
 
-		ids := IDList(infile)
+		ids := IdentifierList(infile, safe)
 		var i, offset int64
 
 		for {
@@ -292,14 +301,14 @@ func MarcMapEntries(infile string) chan MapEntry {
 }
 
 // MarcMap writes (id, offset, length) TSV of a given MARC file to a io.Writer
-func MarcMap(infile string, writer io.Writer) {
-	for e := range MarcMapEntries(infile) {
+func MarcMap(infile string, writer io.Writer, safe bool) {
+	for e := range MarcMapEntries(infile, safe) {
 		writer.Write([]byte(fmt.Sprintf("%s\t%d\t%d\n", e.ID, e.Offset, e.Length)))
 	}
 }
 
 // MarcMapSqlite writes (id, offset, length) sqlite3 database of a given MARC file to given output file
-func MarcMapSqlite(infile, outfile string) {
+func MarcMapSqlite(infile, outfile string, safe bool) {
 	db, err := sql.Open("sqlite3", outfile)
 	if err != nil {
 		log.Fatal(err)
@@ -322,7 +331,7 @@ func MarcMapSqlite(infile, outfile string) {
 	}
 	defer stmt.Close()
 
-	for e := range MarcMapEntries(infile) {
+	for e := range MarcMapEntries(infile, safe) {
 		_, err = stmt.Exec(e.ID, e.Offset, e.Length)
 		if err != nil {
 			log.Fatal(err)
