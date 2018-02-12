@@ -66,7 +66,7 @@ func TestIDList(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		ids := IDList(tt.in)
+		ids := IdentifierList(tt.in, false)
 		if len(ids) != len(tt.out) {
 			t.Errorf("IDList(%s) => %+v, want: %+v", tt.in, ids, tt.out)
 		}
@@ -101,7 +101,7 @@ func TestMarcMap(t *testing.T) {
 	var b bytes.Buffer
 	for _, tt := range tests {
 		b.Reset()
-		MarcMap(tt.in, &b)
+		MarcMap(tt.in, &b, false)
 		output := b.String()
 		if output != tt.out {
 			t.Errorf("MarcMap(%s) => %s, want: %s", tt.in, output, tt.out)
@@ -115,7 +115,7 @@ func TestMarcMapSqlite(t *testing.T) {
 		t.Errorf("%s\n", err)
 	}
 
-	MarcMapSqlite("./fixtures/journals.mrc", file.Name())
+	MarcMapSqlite("./fixtures/journals.mrc", file.Name(), false)
 
 	db, err := sql.Open("sqlite3", file.Name())
 	if err != nil {
