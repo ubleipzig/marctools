@@ -29,35 +29,35 @@ cover:
 	go get -d && go test -v	-coverprofile=coverage.out
 	go tool cover -html=coverage.out
 
-marccount:
-	go build cmd/marccount/marccount.go
+marccount: cmd/marccount/marccount.go
+	go build $<
 
-marcdb:
-	go build cmd/marcdb/marcdb.go
+marcdb: cmd/marcdb/marcdb.go
+	go build $<
 
-marcdump:
-	go build cmd/marcdump/marcdump.go
+marcdump: cmd/marcdump/marcdump.go
+	go build $<
 
-marcmap:
-	go build cmd/marcmap/marcmap.go
+marcmap: cmd/marcmap/marcmap.go
+	go build $<
 
-marcsnapshot:
-	go build cmd/marcsnapshot/marcsnapshot.go
+marcsnapshot: cmd/marcsnapshot/marcsnapshot.go
+	go build $<
 
-marcsplit:
-	go build cmd/marcsplit/marcsplit.go
+marcsplit: cmd/marcsplit/marcsplit.go
+	go build $<
 
-marctojson:
-	go build cmd/marctojson/marctojson.go
+marctojson: cmd/marctojson/marctojson.go
+	go build $<
 
-marctotsv:
-	go build cmd/marctotsv/marctotsv.go
+marctotsv: cmd/marctotsv/marctotsv.go
+	go build $<
 
-marcuniq:
-	go build cmd/marcuniq/marcuniq.go
+marcuniq: cmd/marcuniq/marcuniq.go
+	go build $<
 
-marcxmltojson:
-	go build cmd/marcxmltojson/marcxmltojson.go
+marcxmltojson: cmd/marcxmltojson/marcxmltojson.go
+	go build $<
 
 # experimental deb building
 deb: $(TARGETS)
