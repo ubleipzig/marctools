@@ -112,7 +112,7 @@ func main() {
 	// records (TODO: add flag to display skipped records)
 	skipped := make([]string, 0, 0)
 	// just count the total records and those without id
-	var counter, without_id int
+	var counter, withoutID int
 
 	for {
 		head, _ := fi.Seek(0, os.SEEK_CUR)
@@ -151,12 +151,12 @@ func main() {
 				}
 			}
 		} else if len(fields) == 0 {
-			without_id += 1
+			withoutID++
 		}
-		counter += 1
+		counter++
 	}
 
 	fmt.Fprintf(os.Stderr, "%d records read\n", counter)
 	fmt.Fprintf(os.Stderr, "%d records written, %d skipped, %d excluded, %d without ID (001)\n",
-		ids.Size(), len(skipped), len(excluded), without_id)
+		ids.Size(), len(skipped), len(excluded), withoutID)
 }

@@ -24,7 +24,7 @@ import (
 const AppVersion = "1.6.2"
 
 // JsonConversionOptions specify parameters for the MARC to JSON conversion
-type JsonConversionOptions struct {
+type JSONConversionOptions struct {
 	FilterMap     map[string]bool   // which tags to include
 	MetaMap       map[string]string // meta information
 	IncludeLeader bool
@@ -33,7 +33,8 @@ type JsonConversionOptions struct {
 	RecordKey     string
 }
 
-func BatchWorker(in chan []*marc22.Record, out chan []byte, wg *sync.WaitGroup, options JsonConversionOptions) {
+// Batchworker batches work of MARC records to JSON
+func BatchWorker(in chan []*marc22.Record, out chan []byte, wg *sync.WaitGroup, options JSONConversionOptions) {
 	defer wg.Done()
 	for records := range in {
 		for _, record := range records {
@@ -68,7 +69,7 @@ func BatchWorker(in chan []*marc22.Record, out chan []byte, wg *sync.WaitGroup, 
 }
 
 // Worker takes a Work item and sends the result (serialized json) on the out channel
-func Worker(in chan *marc22.Record, out chan []byte, wg *sync.WaitGroup, options JsonConversionOptions) {
+func Worker(in chan *marc22.Record, out chan []byte, wg *sync.WaitGroup, options JSONConversionOptions) {
 	defer wg.Done()
 	for record := range in {
 		recordMap := RecordMap(record, options.FilterMap, options.IncludeLeader)
@@ -460,7 +461,7 @@ func recordMap(record *marc22.Record, filter map[string]bool) map[string]interfa
 	return m
 }
 
-// RecordToMap converts a record to a map, optionally keeping only the tags
+// RecordMap converts a record to a map, optionally keeping only the tags
 // given in filter. If includeLeader is true, the leader is converted as well.
 func RecordMap(record *marc22.Record, filter map[string]bool, includeLeader bool) map[string]interface{} {
 	rmap := recordMap(record, filter)

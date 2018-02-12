@@ -18,7 +18,7 @@ import (
 	"github.com/ubleipzig/marctools"
 )
 
-type SeekInfo struct {
+type seekInfo struct {
 	Offset int
 	Length int
 }
@@ -204,7 +204,7 @@ func main() {
 	}
 	// for each filename, keep a list of IDs to keep
 	idmap := make(map[string][]string)
-	for k, _ := range mapfiles {
+	for k := range mapfiles {
 		idmap[k] = make([]string, 0)
 	}
 
@@ -232,7 +232,7 @@ func main() {
 		log.Println("building lookup table...")
 	}
 	// keep the seek information for all files in memory
-	table := make(map[string]map[string]SeekInfo)
+	table := make(map[string]map[string]seekInfo)
 
 	for k, v := range mapfiles {
 		ff, err := os.Open(v)
@@ -262,9 +262,9 @@ func main() {
 			}
 			_, ok := table[k]
 			if !ok {
-				table[k] = make(map[string]SeekInfo)
+				table[k] = make(map[string]seekInfo)
 			}
-			table[k][fields[0]] = SeekInfo{Offset: offset, Length: length}
+			table[k][fields[0]] = seekInfo{Offset: offset, Length: length}
 		}
 		ff.Close()
 	}
