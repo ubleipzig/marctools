@@ -86,7 +86,7 @@ func main() {
 	go marctools.FanInWriter(writer, results, done)
 
 	var wg sync.WaitGroup
-	options := marctools.JsonConversionOptions{
+	options := marctools.JSONConversionOptions{
 		FilterMap:     filterMap,
 		MetaMap:       metaMap,
 		IncludeLeader: *includeLeader,

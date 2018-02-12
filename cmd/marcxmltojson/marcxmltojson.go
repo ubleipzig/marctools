@@ -84,7 +84,7 @@ func main() {
 	defer writer.Flush()
 	go marctools.FanInWriter(writer, results, done)
 
-	options := marctools.JsonConversionOptions{
+	options := marctools.JSONConversionOptions{
 		FilterMap:     filterMap,
 		MetaMap:       metaMap,
 		IncludeLeader: *includeLeader,

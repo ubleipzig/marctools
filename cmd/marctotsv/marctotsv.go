@@ -129,12 +129,12 @@ func main() {
 			}
 		}
 
-		work := Work{Record: record,
+		item := work{Record: record,
 			Tags:                tags,
 			FillNA:              *fillna,
 			Separator:           *separator,
 			SkipIncompleteLines: *skipIncompleteLines}
-		queue <- work
+		queue <- item
 	}
 
 	close(queue)
