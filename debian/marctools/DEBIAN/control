@@ -1,5 +1,5 @@
 Package: marctools
-Version: 1.6.2
+Version: 1.6.3
 Section: utils
 Priority: optional
 Architecture: amd64

@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       marctools
-Version:    1.6.2
+Version:    1.6.3
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -79,6 +79,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Sat Mar 9 2019 Martin Czygan
+- 1.6.3 release
+- add -safe flag, discussion at https://github.com/ubleipzig/marctools/issues/5
+
 * Mon Feb 2 2015 Martin Czygan
 - 1.6.2 release
 - use batched operations in marctojson
