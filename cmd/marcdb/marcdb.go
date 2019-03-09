@@ -21,6 +21,7 @@ func main() {
 	output := flag.String("o", "", "output sqlite3 filename")
 	version := flag.Bool("v", false, "prints current program version")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	safe := flag.Bool("safe", false, "use slower, but safer method to extract record identifiers")
 
 	var PrintUsage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] MARCFILE\n", os.Args[0])
@@ -52,7 +53,7 @@ func main() {
 
 	// record ids in order
 	var b bytes.Buffer
-	marctools.MarcMap(filename, &b)
+	marctools.MarcMap(filename, &b, *safe)
 
 	// the input file
 	handle, err := os.Open(filename)

@@ -54,7 +54,7 @@ func fileMapper(filename string) string {
 			log.Fatal(err)
 		}
 	}()
-	marctools.MarcMap(filename, file)
+	marctools.MarcMap(filename, file, false)
 	return file.Name()
 }
 
