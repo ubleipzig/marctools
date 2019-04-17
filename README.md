@@ -439,6 +439,8 @@ Include all values, separated by a pipe via `- s "|"`:
 marcuniq
 --------
 
+Iterate over a MARC file and keep only the first record (by field 001). To deduplicate a number of updates, the data should be *reversed* first.
+
     $ marcuniq
     Usage: marcuniq [OPTIONS] MARCFILE
       -i=false: ignore marc errors (not recommended)
@@ -446,7 +448,7 @@ marcuniq
       -v=false: prints current program version
       -x="": comma separated list of ids to exclude (or filename with one id per line)
 
-Exclude three IDs and dump do file:
+Exclude three IDs and dump to file:
 
     $ marcuniq -x "testsample1,testsample2" -o filtered.mrc fixtures/journals.mrc
     excluded ids interpreted as string
