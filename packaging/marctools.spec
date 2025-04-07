@@ -38,7 +38,7 @@ Other:
 
 %install
 # create directories where the files will be located
-mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
+mkdir -p $RPM_BUILD_ROOT/usr/local/bin
 
 # put the files in to the relevant directories.
 # the argument on -m is the permissions expressed as octal. (See chmod man page for details.)
@@ -135,7 +135,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 - 1.3.6 release
 - added marcmap sqlite3 export option via -o
 
-* Thu Jan 07 2014 Martin Czygan
+* Tue Jan 07 2014 Martin Czygan
 - 1.3.5 release
 - make marcmap fast (yaz-marcdump and awk required)
 
