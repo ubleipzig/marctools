@@ -1,6 +1,6 @@
 Summary:    Various MARC command line utils in Go
 Name:       marctools
-Version:    1.6.3
+Version:    1.6.4
 Release:    0
 License:    GPLv3
 BuildArch:  x86_64
@@ -42,16 +42,16 @@ mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 
 # put the files in to the relevant directories.
 # the argument on -m is the permissions expressed as octal. (See chmod man page for details.)
-install -m 755 marccount $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marcdb $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marcdump $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marcmap $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marcsnapshot $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marcsplit $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marctojson $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marctotsv $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marcuniq $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 marcxmltojson $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 marccount $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 marcdb $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 marcdump $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 marcmap $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 marcsnapshot $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 marcsplit $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 marctojson $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 marctotsv $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 marcuniq $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 marcxmltojson $RPM_BUILD_ROOT/usr/local/bin
 
 
 %post
@@ -66,19 +66,23 @@ rm -rf %{_topdir}/BUILD/%{name}
 # list files owned by the package here
 %files
 %defattr(-,root,root)
-/usr/local/sbin/marccount
-/usr/local/sbin/marcdb
-/usr/local/sbin/marcdump
-/usr/local/sbin/marcmap
-/usr/local/sbin/marcsnapshot
-/usr/local/sbin/marcsplit
-/usr/local/sbin/marctojson
-/usr/local/sbin/marctotsv
-/usr/local/sbin/marcuniq
-/usr/local/sbin/marcxmltojson
+/usr/local/bin/marccount
+/usr/local/bin/marcdb
+/usr/local/bin/marcdump
+/usr/local/bin/marcmap
+/usr/local/bin/marcsnapshot
+/usr/local/bin/marcsplit
+/usr/local/bin/marctojson
+/usr/local/bin/marctotsv
+/usr/local/bin/marcuniq
+/usr/local/bin/marcxmltojson
 
 
 %changelog
+* Mon Apr 7 2025 Martin Czygan
+- 1.6.4 release
+- maintenance release
+
 * Sat Mar 9 2019 Martin Czygan
 - 1.6.3 release
 - add -safe flag, discussion at https://github.com/ubleipzig/marctools/issues/5

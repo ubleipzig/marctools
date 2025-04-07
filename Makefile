@@ -1,9 +1,8 @@
 SHELL := /bin/bash
 TARGETS = marccount marcdb marcdump marcmap marcsnapshot marcsplit marctojson marctotsv marcuniq marcxmltojson
 
-# http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
-	go get -d && go test -v
+	go test -v ./...
 
 fmt:
 	go fmt ./...
@@ -61,8 +60,8 @@ marcxmltojson: cmd/marcxmltojson/marcxmltojson.go
 
 # experimental deb building
 deb: $(TARGETS)
-	mkdir -p debian/marctools/usr/sbin
-	cp $(TARGETS) debian/marctools/usr/sbin
+	mkdir -p debian/marctools/usr/bin
+	cp $(TARGETS) debian/marctools/usr/bin
 	cd debian && fakeroot dpkg-deb --build marctools .
 
 # rpm building via vagrant

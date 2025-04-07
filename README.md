@@ -3,8 +3,6 @@ marctools
 
 Various MARC command line utilities.
 
-[![Build Status](http://img.shields.io/travis/miku/marctools.svg?style=flat)](https://travis-ci.org/miku/marctools)[![Go Report Card](https://goreportcard.com/badge/github.com/ubleipzig/marctools)](https://goreportcard.com/report/github.com/ubleipzig/marctools)
-
 Installation
 ------------
 
@@ -12,7 +10,7 @@ For native RPM or DEB packages see: [Releases](https://github.com/ubleipzig/marc
 
 If you have a local Go installation, you can just
 
-    go get github.com/ubleipzig/marctools/cmd/{marctojson,marctotsv,...}
+    go install github.com/ubleipzig/marctools/cmd/...@latest
 
 Executables available:
 
